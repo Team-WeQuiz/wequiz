@@ -1,4 +1,8 @@
-FE
+#FE
 
-hello!
-    - woorim
+```bash
+npm i
+npm run dev
+```
+
+hello! - woorim
