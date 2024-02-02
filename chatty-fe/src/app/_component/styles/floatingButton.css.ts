@@ -17,4 +17,22 @@ export const button = style({
 	cursor: 'pointer',
 	fontSize: '18px',
 	fontWeight: 700,
+	// ':after': {
+	// 	position: 'absolute',
+	// 	content: '',
+	// 	width: 0,
+	// 	height: '100%',
+	// 	top: 0,
+	// 	right: 0,
+	// 	zIndex: -1,
+	// 	backgroundColor: globals.color.main_4,
+	// 	borderRadius: 16,
+	// 	transition: 'all 0.3s ease',
+	// },
+	// selectors: {
+	// 	'&:hover:after': {
+	// 		left: 0,
+	// 		width: '100%',
+	// 	},
+	// },
 });
