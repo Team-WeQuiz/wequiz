@@ -13,7 +13,8 @@
     "@vanilla-extract/recipes": "^0.5.1",
     "next": "14.1.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
