@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:postgresql://localhost:5433/chatty
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
