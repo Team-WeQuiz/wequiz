@@ -3,9 +3,11 @@ from chain import Chain
 
 chain = Chain()
 
+# gardio에 삽입할 함수
 def answer(message, history):
     return chain.inference(message, history)
 
+# 그라디오 챗봇 클라이언트
 def set_client():
     client = gr.ChatInterface(
                 answer,
@@ -19,4 +21,5 @@ def set_client():
             )
     return client
 
+# 챗봇 실행
 set_client().launch()

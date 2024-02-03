@@ -11,6 +11,7 @@ with open('config.yaml', 'r') as file:
 # Open AI API Key
 os.environ["OPENAI_API_KEY"] = config.get("OPENAI_API_KEY")
 
+# LLM 체인 클래스
 class Chain():
     def __init__(self):
         self._id = ''
@@ -20,8 +21,9 @@ class Chain():
             ("user", "{input}")
         ])
         self.output_parser = StrOutputParser()
-        self.chain = self.prompt | self.llm | self.output_parser
+        self.chain = self.prompt | self.llm | self.output_parser   # Chain 구성
     
+    # LLM inference 함수
     def inference(self, message, history):
         return self.chain.invoke({"input": message})
 
