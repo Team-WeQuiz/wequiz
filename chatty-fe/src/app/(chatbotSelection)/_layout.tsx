@@ -19,6 +19,7 @@ export default function SelectionLayout({
 	const handleBackBtnClick = () => {
 		navigate.back();
 	};
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.headerWrapper}>
