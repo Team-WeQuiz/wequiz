@@ -16,7 +16,7 @@ class Chain():
         self._id = ''
         self.llm = ChatOpenAI()
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", "당신은 대한민국 고등학생을 가르치는 선생님입니다."),
+            ("system", config.get("SYSTEM_PROMPT")),
             ("user", "{input}")
         ])
         self.output_parser = StrOutputParser()
