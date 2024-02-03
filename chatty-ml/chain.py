@@ -4,20 +4,19 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-# Get Config
-with open('config.yaml', 'r') as file:
-    config = yaml.safe_load(file)
-
-# Open AI API Key
-os.environ["OPENAI_API_KEY"] = config.get("OPENAI_API_KEY")
-
 # LLM 체인 클래스
 class Chain():
     def __init__(self):
-        self._id = ''
+        # Get Config
+        with open('config.yaml', 'r') as file:
+            self.config = yaml.safe_load(file)
+            
+        # Open AI API Key
+        os.environ["OPENAI_API_KEY"] = self.config.get("OPENAI_API_KEY")
+
         self.llm = ChatOpenAI()
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", config.get("SYSTEM_PROMPT")),
+            ("system", self.config.get("SYSTEM_PROMPT")),
             ("user", "{input}")
         ])
         self.output_parser = StrOutputParser()
