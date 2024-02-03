@@ -6,6 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.ttf",
+  variable: "--main-font",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={pretendard.className}>{children}</body>
+      <body className={pretendard.variable}>{children}</body>
     </html>
   );
 }

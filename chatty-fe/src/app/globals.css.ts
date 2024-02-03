@@ -34,6 +34,7 @@ export const globals = createGlobalTheme(":root", {
 });
 
 globalStyle("*", {
+  fontFamily: "var(--main-font)",
   boxSizing: "border-box",
 });
 
