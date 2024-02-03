@@ -11,7 +11,9 @@ export const container = style({
 });
 
 export const pageContainer = style({
+  display: "flex",
   width: "100%",
   height: "100%",
   paddingBottom: 100,
+  justifyContent: "center",
 });
