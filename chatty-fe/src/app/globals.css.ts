@@ -1,4 +1,5 @@
 import { createGlobalTheme, globalStyle } from "@vanilla-extract/css";
+import { globalAgent } from "http";
 
 export const globals = createGlobalTheme(":root", {
   color: {
@@ -33,4 +34,10 @@ globalStyle("html, body", {
   margin: 0,
   padding: 0,
   overflowX: "hidden",
+});
+
+globalStyle("button", {
+  outline: "none",
+  border: "none",
+  background: "none",
 });
