@@ -1,2 +1,5 @@
 .env
+config.yaml
 dummyData
+__pycache__
+gradio_chached_examples

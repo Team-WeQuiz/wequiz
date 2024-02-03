@@ -2,3 +2,4 @@ fastapi
 langchain
 langchain-openai
 gradio
+pyyaml
