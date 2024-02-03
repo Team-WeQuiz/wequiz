@@ -10,6 +10,15 @@ export const globals = createGlobalTheme(":root", {
     main_5: "#FFEECC",
     main_6: "#FFF6E6",
     main_7: "#FFFCF7",
+    black: "#000000",
+    black_2: "#333333",
+    black_3: "#666666",
+    black_4: "#999999",
+    black_5: "#CCCCCC",
+    black_6: "#E6E6E6",
+    black_7: "#F7F7F7",
+    black_sub: "#111111",
+    white: "#FFFFFF",
   },
   fontColor: {
     main: "#111111",
@@ -34,6 +43,11 @@ globalStyle("html, body", {
   margin: 0,
   padding: 0,
   overflowX: "hidden",
+});
+
+globalStyle("h1, h2, h3, h4, h5, h6, p, span", {
+  margin: 0,
+  padding: 0,
 });
 
 globalStyle("button", {

@@ -1,7 +1,18 @@
+"use client";
 import * as styles from "./style/actionbutton.css";
 
-const Button = ({ content }: { content: string }) => {
-  return <button className={styles.button}>{content}</button>;
+const ActionButton = ({
+  content,
+  onClick,
+}: {
+  content: string;
+  onClick?: () => void;
+}) => {
+  return (
+    <button className={styles.button} onClick={onClick}>
+      <span className={styles.content}>{content}</span>
+    </button>
+  );
 };
 
-export default Button;
+export default ActionButton;

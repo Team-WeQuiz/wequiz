@@ -4,9 +4,9 @@ import * as styles from "./layout.css";
 
 const ChatbotListLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
+    <div className={styles.container}>
       <Header />
-      <div className={styles.container}>{children}</div>
+      <div className={styles.pageContainer}>{children}</div>
     </div>
   );
 };

@@ -5,6 +5,7 @@ export const header = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
+  maxWidth: 1200,
   width: "100%",
   padding: "36px 24px",
 });
