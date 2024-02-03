@@ -1,5 +1,10 @@
-import { style } from "@vanilla-extract/css";
+import { keyframes, style } from "@vanilla-extract/css";
 import { globals } from "../globals.css";
+
+const fadeInOut = keyframes({
+  "0%": { opacity: 0 },
+  "100%": { opacity: 1 },
+});
 
 export const container = style({
   maxWidth: 1920,
@@ -7,6 +12,7 @@ export const container = style({
   flexDirection: "column",
   alignItems: "center",
   margin: "auto",
+  animation: `${fadeInOut} 200ms ease-in-out`,
 });
 
 export const progressBar = style({
