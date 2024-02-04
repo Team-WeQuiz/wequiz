@@ -18,7 +18,7 @@ export default function Button({ isSelected, message, step }: ButtonProps) {
 			navigate.push('/upload-file');
 		}
 		if (step === 3) {
-			navigate.push('/my-page');
+			navigate.push('/chatbot-list');
 		}
 	};
 	return (
