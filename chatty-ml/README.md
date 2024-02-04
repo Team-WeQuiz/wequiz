@@ -1,30 +1,33 @@
-# Chatty ML!
+# Chatty ML Server
 
+## Overview
+챗봇 생성
 
-<div align='center'>
+## Architecture
 
-<table>
-    <thead>
-        <tr>
-            <th colspan="4"> Chatty ML </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <tr>
-            <td align='center'><a href=""><img src="4" width="100" height="100"></td>
-            <td align='center'><a href=""><img src="" width="100" height="100"></td>
-            <td align='center'><img src="" width="100" height="100"></td>
-          <tr>
-            <td align='center'>LangChain</td>
-            <td align='center'>FastAPI</td>
-            <td align='center'>Docker</td>
-          </tr>
-        </tr>
-    </tbody>
-</table>
+<img src="./assets/ML_architecture.png">
 
-</div>
+## Skills
+- Langchain
+- FastAPI
 
-&nbsp;  
+## Usage
+가상 환경 activate
+```
+source ./.env/bin/activate
+```
 
+필요한 패키지 다운로드
+```
+pip install -r requirements.txt
+```
+
+app 폴더로 이동
+```
+cd app
+```
+
+실행
+```
+python3 main.py
+```
