@@ -3,11 +3,12 @@ from model.chain import Chain
 
 class Chatbot():
     def __init__(self):
-        self.chain = chain = Chain()
+        self.chain = Chain()
 
     # gardio에 삽입할 함수
     def answer(self, message, history):
         return self.chain.inference(message, history)
+        
     # 그라디오 챗봇 클라이언트
     def set_client(self):
         client = gr.ChatInterface(
