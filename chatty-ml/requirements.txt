@@ -1,5 +1,10 @@
-fastapi
-langchain
-langchain-openai
-gradio
+fastapi==0.109.1
+langchain==0.1.5
+langchain-openai==0.0.5
+langchain-community==0.0.17
+langchain-core==0.1.18
+gradio==4.16.0
 pyyaml
+pymupdf
+faiss-cpu==1.7.4
+tiktoken
