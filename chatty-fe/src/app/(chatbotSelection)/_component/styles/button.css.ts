@@ -13,6 +13,13 @@ export const button = recipe({
 		borderRadius: 36,
 		color: '#fff',
 		fontSize: 28,
+		transition: ' box-shadow 0.3s ease-in-out, transform 0.2s ease',
+		':hover': {
+			boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+		},
+		':active': {
+			transform: 'scale(0.98)',
+		},
 	},
 	variants: {
 		selected: {
