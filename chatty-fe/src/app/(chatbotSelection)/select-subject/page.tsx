@@ -1,45 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as styles from './selectSubject.css';
 import SubjectCard from './_component/SubjectCard';
 import Button from '../_component/Button';
 import { Subject } from '../../_types/subject';
 import Layout from '../_layout';
 export default function SelectSubject() {
-	const [subjects, setSubjects] = useState<Subject[]>([
-		{
-			koreanTitle: '국어',
-			englishTitle: 'korean',
-			selected: false,
-		},
-		{
-			koreanTitle: '수학',
-			englishTitle: 'math',
-			selected: false,
-		},
-		{
-			koreanTitle: '영어',
-			englishTitle: 'english',
-			selected: false,
-		},
-		{
-			koreanTitle: '한국사',
-			englishTitle: 'history',
-			selected: false,
-		},
-		{
-			koreanTitle: '사탐',
-			englishTitle: 'social',
-			selected: false,
-		},
-		{
-			koreanTitle: '과탐',
-			englishTitle: 'science',
-			selected: false,
-		},
-	]);
+	const [subjects, setSubjects] = useState<Subject[]>([]);
 	const [isSelected, setIsSelected] = useState(false);
+	const fetchSubjects = async () => {
+		try {
+			const response = await fetch(`/api/subjects`);
+			const data: Subject[] = await response.json();
+			console.log('data: ', data);
+			const initializedSubjects = data.map((subject) => ({
+				...subject,
+				selected: false,
+			}));
+			setSubjects(initializedSubjects);
+		} catch (error) {
+			console.log('error: ', error);
+		}
+	};
 	const handleOnClick = (i: number) => {
 		const newState = subjects.map((subject, index) => {
 			if (index === i) {
@@ -50,6 +33,11 @@ export default function SelectSubject() {
 		setSubjects(newState);
 		setIsSelected(newState.some((subject) => subject.selected));
 	};
+
+	useEffect(() => {
+		fetchSubjects();
+	}, []);
+
 	return (
 		<Layout title='어떤 과목을 공부하고 계신가요?' progress={1}>
 			<div className={styles.cardWrapper}>
