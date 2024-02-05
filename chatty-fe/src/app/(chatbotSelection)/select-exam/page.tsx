@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../_layout';
 import Button from '../_component/Button';
 import * as styles from './selectExam.css';
@@ -8,16 +8,27 @@ import { Exam } from '@/app/_types/exam';
 
 export default function SelectExam() {
 	const [isSelected, setIsSelected] = useState(false);
-	const [exams, setExams] = useState<Exam[]>([
-		{
-			title: '수능',
+	// const [exams, setExams] = useState<Exam[]>([
+	// 	{
+	// 		title: '수능',
+	// 		selected: false,
+	// 	},
+	// 	{
+	// 		title: '내신',
+	// 		selected: false,
+	// 	},
+	// ]);
+	const [exams, setExams] = useState<Exam[]>([]);
+	const fetchExams = async () => {
+		const response = await fetch('/api/exams');
+		const data: Exam[] = await response.json();
+		const initializedExams = data.map((exam) => ({
+			...exam,
 			selected: false,
-		},
-		{
-			title: '내신',
-			selected: false,
-		},
-	]);
+		}));
+
+		setExams(initializedExams);
+	};
 	const handleOnClick = (i: number) => {
 		const newState = exams.map((exam, index) => {
 			if (index === i) {
@@ -28,6 +39,9 @@ export default function SelectExam() {
 		setExams(newState);
 		setIsSelected(newState.some((exam) => exam.selected));
 	};
+	useEffect(() => {
+		fetchExams();
+	}, []);
 	return (
 		<Layout title='어떤 시험을 준비하고 계신가요?' progress={2}>
 			<div className={styles.cardWrapper}>
