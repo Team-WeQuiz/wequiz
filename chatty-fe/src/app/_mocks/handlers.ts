@@ -2,6 +2,7 @@ import { HttpResponse, http } from 'msw';
 import { Subject } from '../_types/subject';
 
 export const handlers = [
+	// 과목 모킹
 	http.get('/api/subjects', () => {
 		const contents = [
 			{
@@ -27,6 +28,19 @@ export const handlers = [
 			{
 				koreanTitle: '과탐',
 				englishTitle: 'science',
+			},
+		];
+		return HttpResponse.json(contents);
+	}),
+
+	// 시험 종류 리스트 모킹
+	http.get('/api/exams', () => {
+		const contents = [
+			{
+				title: '수능',
+			},
+			{
+				title: '내신',
 			},
 		];
 		return HttpResponse.json(contents);
