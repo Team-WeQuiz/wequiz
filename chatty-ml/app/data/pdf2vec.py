@@ -1,15 +1,15 @@
-import faiss
+import os
 import tiktoken
-
 from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from ..model.embedding import Embedding
 
 class Pdf2Vec():
     def __init__(self):
         # get file
-       self.file = "dummyData/초거대 언어모델 연구 동향.pdf"
+       self.file = "app/data/dummyData/초거대 언어모델 연구 동향.pdf"  # 추후 여기는 입력 받은 file로 초기화하도록 수정
+       self.db_path = 'faiss_index'
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
         encoding = tiktoken.get_encoding(encoding_name)
@@ -31,16 +31,23 @@ class Pdf2Vec():
         return docs
     
     # text to vector convertor
-    def txt2vec(self, texts):
+    def save_vectors(self, docs):
         # # Create the vector store
-        # store = FAISS.from_texts([text.page_content for text in texts], OpenAIEmbeddings(openai_api_key=openai_api_key))
-        vector = texts
-        return vector
+        embedding = Embedding('docs')
+        self.db = FAISS.from_documents(docs, embedding.model)
+        # self.db.as_retriever()
+        self.db.save_local("app/data/faiss_index")
     
     def convert(self):
-        texts = self.pdf2txt(self.file)
-        vector = self.txt2vec(texts)
+        docs = self.pdf2txt(self.file)
+        self.save_vectors(docs)
+    
+    def query(self):
+        query = "LLLM의 등장으로 변화한 점을 알려줘"
+        docs = self.db.similarity_search(query)
+        print(docs[0].page_content)
 
 
 converter = Pdf2Vec()
 converter.convert()
+converter.query()
