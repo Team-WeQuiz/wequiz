@@ -41,13 +41,3 @@ class Pdf2Vec():
     def convert(self):
         docs = self.pdf2txt(self.file)
         self.save_vectors(docs)
-    
-    def query(self):
-        query = "LLLM의 등장으로 변화한 점을 알려줘"
-        docs = self.db.similarity_search(query)
-        print(docs[0].page_content)
-
-
-converter = Pdf2Vec()
-converter.convert()
-converter.query()
