@@ -1,3 +1,8 @@
+"""
+TODO
+- 챗봇 id에 따라 docs db의 path를 가져와야함
+"""
+
 from model.prompt import SYSTEM_PROMPT 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -6,6 +11,7 @@ from langchain_core.output_parsers import StrOutputParser
 # LLM 체인 클래스
 class Chain():
     def __init__(self):
+        self.docs = ''
         self.llm = ChatOpenAI()
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", SYSTEM_PROMPT),
