@@ -1,6 +1,6 @@
 import os
 import yaml
-from chatbot.chatbot import Chatbot
+from client.chatbot import Chatbot
 
 if __name__ == "__main__":
     # Get Config
