@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.511.0",
     "@vanilla-extract/css": "^1.14.1",
     "@vanilla-extract/recipes": "^0.5.1",
     "next": "14.1.0",
