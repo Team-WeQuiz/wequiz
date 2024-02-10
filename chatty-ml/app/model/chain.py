@@ -26,6 +26,6 @@ class Chain():
           )  # Chain 구성
     
     # LLM inference 함수
-    def inference(self, message, history):
+    def inference(self, message, history=None):
         return self.chain.invoke(message)
 
