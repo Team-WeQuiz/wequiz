@@ -10,8 +10,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
 from model.embedding import Embedding
-from operator import itemgetter
-
 # LLM 체인 클래스
 class Chain():
     def __init__(self):
@@ -29,6 +27,5 @@ class Chain():
     
     # LLM inference 함수
     def inference(self, message, history):
-        print(self.retriever.invoke(message))
         return self.chain.invoke(message)
 
