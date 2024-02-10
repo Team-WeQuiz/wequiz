@@ -17,7 +17,7 @@ class Pdf2Vec():
         return num_tokens
 
     # pdf parser
-    def pdf2txt(self, file_path):
+    def parse_pdf(self, file_path):
         loader = PyMuPDFLoader(file_path)
         data = loader.load()
         print(f"{len(data)}개의 페이지를 가지고 있습니다.")
@@ -39,5 +39,5 @@ class Pdf2Vec():
         self.db.save_local("app/data/faiss_index")
     
     def convert(self):
-        docs = self.pdf2txt(self.file)
+        docs = self.parse_pdf(self.file)
         self.save_vectors(docs)
