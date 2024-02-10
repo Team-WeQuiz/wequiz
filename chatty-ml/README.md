@@ -27,7 +27,13 @@ app 폴더로 이동
 cd app
 ```
 
-실행
+API 앱 실행
+```
+export OPENAI_API_KEY=your_openai_api_key_here
+uvicorn app:app --reload
+```
+
+챗봇 클라이언트 실행
 ```
 python3 main.py
 ```
