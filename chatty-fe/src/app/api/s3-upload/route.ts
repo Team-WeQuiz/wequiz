@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 		const file = formData.get('file');
 
 		if (!(file instanceof File)) {
-			return NextResponse.json({ status: 400 });
+			return NextResponse.json({ status: 400, error: 'No file uploaded' });
 		}
 		const fileName = file.name;
 		const Body = (await file.arrayBuffer()) as Buffer;
@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json({ status: 200 });
 	} catch (error) {
-		console.error('Error processing request:', error);
 		return NextResponse.json({ error });
 	}
 }
