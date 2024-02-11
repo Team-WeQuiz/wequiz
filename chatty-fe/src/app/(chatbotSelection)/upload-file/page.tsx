@@ -50,12 +50,7 @@ export default function UploadFile() {
 			const response = await axios.post('/api/upload', {
 				url: url, // 파일 URL 전달
 			});
-
-			if (response.status === 201) {
-				console.log('URL upload response:', response);
-			} else {
-				console.error('Error occurred during URL upload:', response.data.error);
-			}
+			console.log('URL upload response:', response);
 		} catch (error) {
 			console.error('Error during URL upload:', error);
 		}
