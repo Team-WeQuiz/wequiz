@@ -3,13 +3,11 @@ import tiktoken
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from ..model.embedding import Embedding
+from model.embedding import Embedding
 
 class Pdf2Vec():
     def __init__(self):
-        # get file
-       self.file = "app/data/dummyData/초거대 언어모델 연구 동향.pdf"  # 추후 여기는 입력 받은 file로 초기화하도록 수정
-       self.db_path = 'faiss_index'
+       self.db_path = 'data/faiss_index2'
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
         encoding = tiktoken.get_encoding(encoding_name)
@@ -36,8 +34,9 @@ class Pdf2Vec():
         embedding = Embedding('docs')
         self.db = FAISS.from_documents(docs, embedding.model)
         # self.db.as_retriever()
-        self.db.save_local("app/data/faiss_index")
+        self.db.save_local(self.db_path)
+        return self.db_path
     
-    def convert(self):
-        docs = self.parse_pdf(self.file)
-        self.save_vectors(docs)
+    def convert(self, file_path):
+        docs = self.parse_pdf(file_path)
+        return self.save_vectors(docs)
