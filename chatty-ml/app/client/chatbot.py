@@ -1,13 +1,15 @@
+import requests
 import gradio as gr
-from model.chain import Chain
 
 class Chatbot():
     def __init__(self):
-        self.chain = Chain()
+        self.client = self.set_client()
 
     # gardio에 삽입할 함수
     def answer(self, message, history):
-        return self.chain.inference(message, history)
+        # POST request to the FastAPI endpoint
+        response = requests.post("http://localhost:8000/ask", json={"message": message}).json()
+        return response["response"]
         
     # 그라디오 챗봇 클라이언트
     def set_client(self):
@@ -24,5 +26,4 @@ class Chatbot():
         return client
     
     def run(self):
-        client = self.set_client()
-        client.launch()
+        self.client.launch()
