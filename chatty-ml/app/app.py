@@ -11,8 +11,7 @@ class AskRequest(BaseModel):
     message: str
 
 @app.post("/ask")
-def chain_inference(ask_request: AskRequest):  # Use MessageRequest for request body
-    # Access message using message_request.message
+def chain_inference(ask_request: AskRequest):
     response = chain.inference(ask_request.message)
     return {"response": response}
 
