@@ -1,8 +1,10 @@
 import {
 	S3Client,
 	PutObjectCommand,
+	GetObjectCommand,
 	ListObjectsCommand,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { NextRequest, NextResponse } from 'next/server';
 const Bucket = process.env.NEXT_PUBLIC_AWS_BUCKET_NAME as string;
 const s3 = new S3Client({
@@ -21,11 +23,14 @@ export async function POST(request: NextRequest) {
 		if (!(file instanceof File)) {
 			return NextResponse.json({ status: 400, error: 'No file uploaded' });
 		}
-		const fileName = file.name;
+		const fileOriginalName = file.name;
+		const fileName = Date.now() + '-' + fileOriginalName;
 		const Body = (await file.arrayBuffer()) as Buffer;
 		s3.send(new PutObjectCommand({ Bucket, Key: fileName, Body }));
+		const getCommand = new GetObjectCommand({ Bucket, Key: fileName });
+		const preUrl = await getSignedUrl(s3, getCommand, { expiresIn: 3600 });
 
-		return NextResponse.json({ status: 200 });
+		return NextResponse.json({ status: 200, preUrl });
 	} catch (error) {
 		return NextResponse.json({ error });
 	}
