@@ -8,20 +8,11 @@ import { Exam } from '@/app/_types/exam';
 
 export default function SelectExam() {
 	const [isSelected, setIsSelected] = useState(false);
-	// const [exams, setExams] = useState<Exam[]>([
-	// 	{
-	// 		title: '수능',
-	// 		selected: false,
-	// 	},
-	// 	{
-	// 		title: '내신',
-	// 		selected: false,
-	// 	},
-	// ]);
 	const [exams, setExams] = useState<Exam[]>([]);
 	const fetchExams = async () => {
 		const response = await fetch('/api/exams');
-		const data: Exam[] = await response.json();
+		const res = await response.json();
+		const data: Exam[] = res.exams;
 		const initializedExams = data.map((exam) => ({
 			...exam,
 			selected: false,

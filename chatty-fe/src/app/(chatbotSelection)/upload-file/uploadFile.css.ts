@@ -1,5 +1,5 @@
 import { globals } from '@/app/globals.css';
-import { style } from '@vanilla-extract/css';
+import { keyframes, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
 // export const container = style({
@@ -15,6 +15,14 @@ import { recipe } from '@vanilla-extract/recipes';
 // 	backgroundColor: '#fff',
 // 	boxShadow: '0px 2px 6px 0px rgba(153, 153, 153, 0.25)',
 // });
+
+const colorChange = keyframes({
+	'0%': { color: globals.color.main_2 },
+	'25%': { color: globals.color.main_3 },
+	'50%': { color: globals.color.main_4 },
+	'75%': { color: globals.color.main_3 },
+	'100%': { color: globals.color.main_2 },
+});
 
 export const container = recipe({
 	base: {
@@ -35,6 +43,12 @@ export const container = recipe({
 			true: {
 				border: `2px dashed ${globals.color.main_5}`,
 				color: globals.color.main,
+				fontSize: 48,
+			},
+		},
+		isUploading: {
+			true: {
+				animation: `${colorChange} 1.5s ease-in-out infinite`,
 				fontSize: 48,
 			},
 		},

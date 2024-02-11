@@ -12,7 +12,8 @@ export default function SelectSubject() {
 	const fetchSubjects = async () => {
 		try {
 			const response = await fetch(`/api/subjects`);
-			const data: Subject[] = await response.json();
+			const res = await response.json();
+			const data: Subject[] = res.subjects;
 			console.log('data: ', data);
 			const initializedSubjects = data.map((subject) => ({
 				...subject,

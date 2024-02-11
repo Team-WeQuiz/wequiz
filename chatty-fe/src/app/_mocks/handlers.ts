@@ -1,6 +1,8 @@
 import { HttpResponse, http } from 'msw';
 import { Subject } from '../_types/subject';
 
+const allPosts: string[] = [];
+
 export const handlers = [
 	// 과목 모킹
 	http.get('/api/subjects', () => {
@@ -44,5 +46,12 @@ export const handlers = [
 			},
 		];
 		return HttpResponse.json(contents);
+	}),
+
+	// 업로드 url post 모킹
+	http.post('/api/upload', async ({ request }) => {
+		const newPost = await request.json();
+
+		return HttpResponse.json(newPost, { status: 201 });
 	}),
 ];

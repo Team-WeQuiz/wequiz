@@ -6,11 +6,18 @@ type ButtonProps = {
 	isSelected: boolean;
 	message: string;
 	step: number;
+	buttonClick?: () => void;
 };
 
-export default function Button({ isSelected, message, step }: ButtonProps) {
+export default function Button({
+	isSelected,
+	message,
+	step,
+	buttonClick,
+}: ButtonProps) {
 	const navigate = useRouter();
 	const handleOnClick = () => {
+		buttonClick ? buttonClick() : null;
 		if (step === 1) {
 			navigate.push('/select-exam');
 		}
