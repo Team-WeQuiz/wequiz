@@ -14,6 +14,16 @@ const s3 = new S3Client({
   },
 });
 
+async function uploadFileToS3(file: File, fileName: string): Promise<void> {
+  const Body = (await file.arrayBuffer()) as Buffer;
+  await s3.send(new PutObjectCommand({ Bucket, Key: fileName, Body }));
+}
+
+async function generatePresignedUrl(fileName: string): Promise<string> {
+  const getCommand = new GetObjectCommand({ Bucket, Key: fileName });
+  return getSignedUrl(s3, getCommand, { expiresIn: 3600 });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -24,10 +34,8 @@ export async function POST(request: NextRequest) {
     }
     const fileOriginalName = file.name;
     const fileName = Date.now() + '-' + fileOriginalName;
-    const Body = (await file.arrayBuffer()) as Buffer;
-    s3.send(new PutObjectCommand({ Bucket, Key: fileName, Body }));
-    const getCommand = new GetObjectCommand({ Bucket, Key: fileName });
-    const preUrl = await getSignedUrl(s3, getCommand, { expiresIn: 3600 });
+    uploadFileToS3(file, fileName);
+    const preUrl = await generatePresignedUrl(fileName);
 
     return NextResponse.json({ status: 200, preUrl });
   } catch (error) {
