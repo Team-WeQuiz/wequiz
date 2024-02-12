@@ -1,6 +1,32 @@
 {
-	"extends": [
-		"next/babel",
-		"next/core-web-vitals"
-	]
+  "env": {
+    "browser": true, // 브라우저 전역 변수를 사용할 수 있습니다.
+    "node": true, // Node.js 전역 변수를 사용할 수 있습니다.
+    "es2021": true, // ES2021 문법을 사용할 수 있습니다.
+    "es6": true // ES6 문법을 사용할 수 있습니다.
+  },
+  "extends": [
+    "next/core-web-vitals",
+    "prettier",
+    "prettier/prettier", // Prettier에 대한 ESLint 경고를 비활성화합니다. (중복 방지)
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "project": "./tsconfig.json",
+    "sourceType": "module",
+    "createDefaultProgram": true //타입스크립트 프로젝트를 빠르고 가볍게 ESLint에서 인식할 수 있도록 해줌.
+  },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "react/react-in-jsx-scope": ["off"],
+    "react/function-component-definition": ["off"],
+    "no-undef": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "allowImportingTsExtensions": 0
+  }
 }

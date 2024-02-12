@@ -1,5 +1,5 @@
-import React from "react";
-import * as styles from "./style/contentcard.css";
+import React from 'react';
+import * as styles from './style/contentcard.css';
 
 type CardProps = {
   children: React.ReactNode;

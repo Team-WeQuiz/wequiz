@@ -35,22 +35,22 @@ export default function SelectSubject() {
 		setIsSelected(newState.some((subject) => subject.selected));
 	};
 
-	useEffect(() => {
-		fetchSubjects();
-	}, []);
+  useEffect(() => {
+    fetchSubjects();
+  }, []);
 
-	return (
-		<Layout title='어떤 과목을 공부하고 계신가요?' progress={1}>
-			<div className={styles.cardWrapper}>
-				{subjects.map((subject, i) => (
-					<SubjectCard
-						subject={subject}
-						key={i}
-						onClick={() => handleOnClick(i)}
-					/>
-				))}
-			</div>
-			<Button isSelected={isSelected} message={'선택 했어요!'} step={1} />
-		</Layout>
-	);
+  return (
+    <Layout title="어떤 과목을 공부하고 계신가요?" progress={1}>
+      <div className={styles.cardWrapper}>
+        {subjects.map((subject, i) => (
+          <SubjectCard
+            subject={subject}
+            key={i}
+            onClick={() => handleOnClick(i)}
+          />
+        ))}
+      </div>
+      <Button isSelected={isSelected} message={'선택 했어요!'} step={1} />
+    </Layout>
+  );
 }

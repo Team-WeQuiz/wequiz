@@ -1,5 +1,5 @@
-import exp from "constants";
-import * as styles from "./style/taglabel.css";
+import exp from 'constants';
+import * as styles from './style/taglabel.css';
 
 type TagStyleMap = {
   [key: string]: string;
@@ -21,7 +21,7 @@ const TagLabel = ({
   tagNameKor: string;
   tagName: string;
 }) => {
-  const tagStyle = tagStyles[tagName] || "";
+  const tagStyle = tagStyles[tagName] || '';
 
   return (
     <div className={`${styles.labelContainer} ${tagStyle}`}>

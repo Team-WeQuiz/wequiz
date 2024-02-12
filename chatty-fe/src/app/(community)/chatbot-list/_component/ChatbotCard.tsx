@@ -1,12 +1,12 @@
-"use client";
-import ActionButton from "./ActionButton";
-import ContentCard from "./ContentCard";
-import * as styles from "./style/chatbotcard.css";
-import LoadingCircular from "./LoadingCircular";
-import TagLabel from "./TagLabel";
-import { ChatbotTags } from "@/app/_types/chatbot";
-import { useRouter } from "next/navigation";
-import BotImage from "@/public/images/bot.svg";
+'use client';
+import ActionButton from './ActionButton';
+import ContentCard from './ContentCard';
+import * as styles from './style/chatbotcard.css';
+import LoadingCircular from './LoadingCircular';
+import TagLabel from './TagLabel';
+import { ChatbotTags } from '@/app/_types/chatbot';
+import { useRouter } from 'next/navigation';
+import BotImage from '@/public/images/bot.svg';
 
 type ChatbotCardProps = {
   isLoading: boolean;

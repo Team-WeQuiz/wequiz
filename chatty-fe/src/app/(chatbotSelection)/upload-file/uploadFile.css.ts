@@ -56,20 +56,20 @@ export const container = recipe({
 });
 
 export const wrapper = style({
-	display: 'flex',
-	flexDirection: 'column',
-	justifyContent: 'center',
-	alignItems: 'center',
-	gap: 40,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 40,
 });
 
 export const ddWrapper = style({
-	display: 'flex',
-	flexDirection: 'column',
-	justifyContent: 'center',
-	alignItems: 'center',
-	gap: 10,
-	color: '#999',
-	fontSize: 16,
-	fontWeight: 500,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 10,
+  color: '#999',
+  fontSize: 16,
+  fontWeight: 500,
 });
