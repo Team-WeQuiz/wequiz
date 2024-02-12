@@ -13,7 +13,7 @@ export default function SubjectCard({ subject, onClick }: SubjectCardProps) {
       className={styles.container({ selected: subject.selected })}
       onClick={onClick}
     >
-      <CheckButton subject={subject} />
+      <CheckButton />
       {subject.koreanTitle}
     </div>
   );

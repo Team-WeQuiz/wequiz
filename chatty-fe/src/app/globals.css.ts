@@ -1,5 +1,4 @@
 import { createGlobalTheme, globalStyle } from '@vanilla-extract/css';
-import { globalAgent } from 'http';
 
 export const globals = createGlobalTheme(':root', {
   color: {

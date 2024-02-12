@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+//import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+//const inter = Inter({ subsets: ['latin'] });
 const pretendard = localFont({
   src: '../../public/fonts/PretendardVariable.ttf',
   variable: '--main-font',

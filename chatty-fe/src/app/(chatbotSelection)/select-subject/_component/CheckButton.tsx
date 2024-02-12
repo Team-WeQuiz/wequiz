@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Check from '@/assets/icons/check.svg';
 import * as styles from './styles/checkButton.css';
-import { Subject } from '@/app/_types/subject';
-import { globals } from '@/app/globals.css';
+//import { Subject } from '@/app/_types/subject';
+//import { globals } from '@/app/globals.css';
 
-type CheckButtonProps = {
-  subject: Subject;
-};
+// type CheckButtonProps = {
+//   subject: Subject;
+// };
 
-export default function CheckButton({ subject }: CheckButtonProps) {
+export default function CheckButton() {
   // const handleColor = (subject: Subject) => {
   // 	if (subject.selected) {
   // 		switch (subject.englishTitle) {
