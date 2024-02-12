@@ -18,29 +18,29 @@ export default function SelectExam() {
 			selected: false,
 		}));
 
-		setExams(initializedExams);
-	};
-	const handleOnClick = (i: number) => {
-		const newState = exams.map((exam, index) => {
-			if (index === i) {
-				return { ...exam, selected: !exam.selected };
-			}
-			return { ...exam, selected: false };
-		});
-		setExams(newState);
-		setIsSelected(newState.some((exam) => exam.selected));
-	};
-	useEffect(() => {
-		fetchExams();
-	}, []);
-	return (
-		<Layout title='어떤 시험을 준비하고 계신가요?' progress={2}>
-			<div className={styles.cardWrapper}>
-				{exams.map((exam, i) => (
-					<ExamCard exam={exam} onClick={() => handleOnClick(i)} key={i} />
-				))}
-			</div>
-			<Button isSelected={isSelected} message={'선택 했어요!'} step={2} />
-		</Layout>
-	);
+    setExams(initializedExams);
+  };
+  const handleOnClick = (i: number) => {
+    const newState = exams.map((exam, index) => {
+      if (index === i) {
+        return { ...exam, selected: !exam.selected };
+      }
+      return { ...exam, selected: false };
+    });
+    setExams(newState);
+    setIsSelected(newState.some((exam) => exam.selected));
+  };
+  useEffect(() => {
+    fetchExams();
+  }, []);
+  return (
+    <Layout title="어떤 시험을 준비하고 계신가요?" progress={2}>
+      <div className={styles.cardWrapper}>
+        {exams.map((exam, i) => (
+          <ExamCard exam={exam} onClick={() => handleOnClick(i)} key={i} />
+        ))}
+      </div>
+      <Button isSelected={isSelected} message={'선택 했어요!'} step={2} />
+    </Layout>
+  );
 }

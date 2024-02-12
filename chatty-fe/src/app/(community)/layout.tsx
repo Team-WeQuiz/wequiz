@@ -1,6 +1,6 @@
-import React from "react";
-import Header from "@/app/_component/Header";
-import * as styles from "./layout.css";
+import React from 'react';
+import Header from '@/app/_component/Header';
+import * as styles from './layout.css';
 
 const ChatbotListLayout = ({ children }: { children: React.ReactNode }) => {
   return (

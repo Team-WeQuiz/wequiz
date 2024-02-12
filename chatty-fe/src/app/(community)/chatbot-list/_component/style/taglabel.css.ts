@@ -1,13 +1,13 @@
-import { style } from "@vanilla-extract/css";
-import { globals } from "@/app/globals.css";
+import { style } from '@vanilla-extract/css';
+import { globals } from '@/app/globals.css';
 
 export const labelContainer = style({
-  display: "flex",
+  display: 'flex',
   width: 60,
-  alignItems: "center",
-  justifyContent: "center",
+  alignItems: 'center',
+  justifyContent: 'center',
   borderRadius: 8,
-  padding: "4px 16px",
+  padding: '4px 16px',
   backgroundColor: globals.color.black_5,
 });
 

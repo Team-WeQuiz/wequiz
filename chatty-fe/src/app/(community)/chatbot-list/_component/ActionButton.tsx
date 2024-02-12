@@ -1,5 +1,5 @@
-"use client";
-import * as styles from "./style/actionbutton.css";
+'use client';
+import * as styles from './style/actionbutton.css';
 
 const ActionButton = ({
   content,

@@ -1,4 +1,4 @@
 export type Exam = {
-	title: string;
-	selected: boolean;
+  title: string;
+  selected: boolean;
 };

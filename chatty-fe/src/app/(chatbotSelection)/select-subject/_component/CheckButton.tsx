@@ -5,28 +5,28 @@ import { Subject } from '@/app/_types/subject';
 import { globals } from '@/app/globals.css';
 
 type CheckButtonProps = {
-	subject: Subject;
+  subject: Subject;
 };
 
 export default function CheckButton({ subject }: CheckButtonProps) {
-	// const handleColor = (subject: Subject) => {
-	// 	if (subject.selected) {
-	// 		switch (subject.englishTitle) {
-	// 			case 'korean':
-	// 				return globals.subjectColor.korean;
-	// 			case 'english':
-	// 				return globals.subjectColor.english;
-	// 			case 'math':
-	// 				return globals.subjectColor.math;
-	// 			case 'history':
-	// 				return globals.subjectColor.history;
-	// 			case 'social':
-	// 				return globals.subjectColor.social;
-	// 			case 'science':
-	// 				return globals.subjectColor.science;
-	// 		}
-	// 	}
-	// };
+  // const handleColor = (subject: Subject) => {
+  // 	if (subject.selected) {
+  // 		switch (subject.englishTitle) {
+  // 			case 'korean':
+  // 				return globals.subjectColor.korean;
+  // 			case 'english':
+  // 				return globals.subjectColor.english;
+  // 			case 'math':
+  // 				return globals.subjectColor.math;
+  // 			case 'history':
+  // 				return globals.subjectColor.history;
+  // 			case 'social':
+  // 				return globals.subjectColor.social;
+  // 			case 'science':
+  // 				return globals.subjectColor.science;
+  // 		}
+  // 	}
+  // };
 
-	return <Check className={styles.check} />;
+  return <Check className={styles.check} />;
 }
