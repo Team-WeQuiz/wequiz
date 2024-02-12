@@ -1,4 +1,3 @@
-import exp from 'constants';
 import * as styles from './style/taglabel.css';
 
 type TagStyleMap = {

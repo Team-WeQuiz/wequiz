@@ -17,42 +17,42 @@ import { recipe } from '@vanilla-extract/recipes';
 // });
 
 const colorChange = keyframes({
-	'0%': { color: globals.color.main_2 },
-	'25%': { color: globals.color.main_3 },
-	'50%': { color: globals.color.main_4 },
-	'75%': { color: globals.color.main_3 },
-	'100%': { color: globals.color.main_2 },
+  '0%': { color: globals.color.main_2 },
+  '25%': { color: globals.color.main_3 },
+  '50%': { color: globals.color.main_4 },
+  '75%': { color: globals.color.main_3 },
+  '100%': { color: globals.color.main_2 },
 });
 
 export const container = recipe({
-	base: {
-		display: 'flex',
-		width: 1200,
-		height: 352,
-		padding: '8px 16px',
-		flexDirection: 'column',
-		justifyContent: 'center',
-		alignItems: 'center',
-		borderRadius: 12,
-		border: '2px dashed #e6e6e6',
-		backgroundColor: '#fff',
-		boxShadow: '0px 2px 6px 0px rgba(153, 153, 153, 0.25)',
-	},
-	variants: {
-		isUploaded: {
-			true: {
-				border: `2px dashed ${globals.color.main_5}`,
-				color: globals.color.main,
-				fontSize: 48,
-			},
-		},
-		isUploading: {
-			true: {
-				animation: `${colorChange} 1.5s ease-in-out infinite`,
-				fontSize: 48,
-			},
-		},
-	},
+  base: {
+    display: 'flex',
+    width: 1200,
+    height: 352,
+    padding: '8px 16px',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    border: '2px dashed #e6e6e6',
+    backgroundColor: '#fff',
+    boxShadow: '0px 2px 6px 0px rgba(153, 153, 153, 0.25)',
+  },
+  variants: {
+    isUploaded: {
+      true: {
+        border: `2px dashed ${globals.color.main_5}`,
+        color: globals.color.main,
+        fontSize: 48,
+      },
+    },
+    isUploading: {
+      true: {
+        animation: `${colorChange} 1.5s ease-in-out infinite`,
+        fontSize: 48,
+      },
+    },
+  },
 });
 
 export const wrapper = style({

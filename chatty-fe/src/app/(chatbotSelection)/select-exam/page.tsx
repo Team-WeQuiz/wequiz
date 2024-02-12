@@ -7,16 +7,16 @@ import ExamCard from './_component/ExamCard';
 import { Exam } from '@/app/_types/exam';
 
 export default function SelectExam() {
-	const [isSelected, setIsSelected] = useState(false);
-	const [exams, setExams] = useState<Exam[]>([]);
-	const fetchExams = async () => {
-		const response = await fetch('/api/exams');
-		const res = await response.json();
-		const data: Exam[] = res.exams;
-		const initializedExams = data.map((exam) => ({
-			...exam,
-			selected: false,
-		}));
+  const [isSelected, setIsSelected] = useState(false);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const fetchExams = async () => {
+    const response = await fetch('/api/exams');
+    const res = await response.json();
+    const data: Exam[] = res.exams;
+    const initializedExams = data.map((exam) => ({
+      ...exam,
+      selected: false,
+    }));
 
     setExams(initializedExams);
   };
