@@ -1,6 +1,6 @@
 package com.chatty.chatty.auth.controller.dto;
 
-public record SignupRequest(
+public record SignUpRequest(
         String username,
         String password,
         String email,
