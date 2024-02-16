@@ -1,6 +1,8 @@
 package com.chatty.chatty.auth.jwt;
 
 import com.chatty.chatty.user.entity.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Jwts.SIG;
 import java.nio.charset.StandardCharsets;
@@ -31,8 +33,27 @@ public class JwtUtil {
 
     public String createRefreshToken(User user, Long expiration) {
         return Jwts.builder()
+                .claim("username", user.getUsername())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(secretKey)
                 .compact();
     }
+
+    public boolean isValidRefreshToken(String refreshToken) {
+        try {
+            getClaimsToken(refreshToken);
+            return true;
+        } catch (NullPointerException | JwtException e) {
+            return false;
+        }
+    }
+
+    private Claims getClaimsToken(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
 }
