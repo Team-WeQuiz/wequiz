@@ -11,3 +11,7 @@ server:
 spring:
   profiles:
     active: local
+jwt:
+  secret: qwerasdfzxcvdsafdsaffdasafdfdsafdsafdsafdsasfda
+  access-token-expiration: 3600
+  refresh-token-expiration: 86400
