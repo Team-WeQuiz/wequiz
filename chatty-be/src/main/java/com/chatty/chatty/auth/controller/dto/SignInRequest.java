@@ -1,8 +1,8 @@
 package com.chatty.chatty.auth.controller.dto;
 
-public record SigninRequest(
+public record SignInRequest(
         String username,
-        String password;
+        String password
 ) {
-    
+
 }
