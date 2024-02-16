@@ -1,6 +1,6 @@
-package com.chatty.chatty.user.domain;
+package com.chatty.chatty.user.entity;
 
-import com.chatty.chatty.common.domain.BaseEntity;
+import com.chatty.chatty.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,7 +31,7 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(nullable = false)
     private String password;
 
     @Column(unique = true, nullable = false)
@@ -41,5 +41,5 @@ public class User extends BaseEntity {
     private String nickname;
 
     @Column
-    private int age;
+    private Integer age;
 }

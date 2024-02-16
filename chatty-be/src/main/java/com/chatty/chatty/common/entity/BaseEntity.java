@@ -1,4 +1,4 @@
-package com.chatty.chatty.common.domain;
+package com.chatty.chatty.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
