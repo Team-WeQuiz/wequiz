@@ -15,28 +15,32 @@ class Pdf2Vec():
         return num_tokens
 
     # pdf parser
-    def parse_pdf(self, file_path):
-        loader = PyMuPDFLoader(file_path)
-        data = loader.load()
-        print(f"{len(data)}개의 페이지를 가지고 있습니다.")
-        print(f"페이지에 {len(data[0].page_content)}개의 단어를 가지고 있습니다.")
-        print(f'예상되는 토큰 수 {self.num_tokens_from_string(data[0].page_content, "cl100k_base")}')
+    def parse_pdf(self, file_paths):
+        docs = []
+        for file_path in file_paths:
+            loader = PyMuPDFLoader(file_path)
+            data = loader.load()
+            print(f"{len(data)}개의 페이지를 가지고 있습니다.")
+            print(f"페이지에 {len(data[0].page_content)}개의 단어를 가지고 있습니다.")
+            print(f'예상되는 토큰 수 {self.num_tokens_from_string(data[0].page_content, "cl100k_base")}')
 
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        docs = text_splitter.split_documents(data)
-        print(f"파일에 {len(docs)}개의 문서를 가지고 있습니다.")
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+            doc = text_splitter.split_documents(data)
+            print(f"파일에 {len(doc)}개의 문서를 가지고 있습니다.")
+            docs += doc
 
+        print(f"총 {len(docs)}개의 문서가 준비되었습니다.")
         return docs
     
     # text to vector convertor
     def save_vectors(self, docs):
-        # # Create the vector store
+        # Create the vector store
         embedding = Embedding('docs')
         self.db = FAISS.from_documents(docs, embedding.model)
         # self.db.as_retriever()
         self.db.save_local(self.db_path)
         return self.db_path
     
-    def convert(self, file_path):
-        docs = self.parse_pdf(file_path)
+    def convert(self, file_paths):
+        docs = self.parse_pdf(file_paths)
         return self.save_vectors(docs)

@@ -13,7 +13,7 @@ from model.embedding import Embedding
 # LLM 체인 클래스
 class Chain():
     def __init__(self):
-        self.vectorstore= FAISS.load_local('./data/faiss_index', embeddings=Embedding('query').model)
+        self.vectorstore= FAISS.load_local('./data/faiss_index2', embeddings=Embedding('query').model)
         self.retriever = self.vectorstore.as_retriever()
         self.llm = ChatOpenAI()
         self.prompt = ChatPromptTemplate.from_template(SYSTEM_PROMPT)
