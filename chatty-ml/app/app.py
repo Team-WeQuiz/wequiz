@@ -1,8 +1,21 @@
+import sys
+import os
+
+# Get the parent directory of the current script (app directory)
+current_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+
+# Add the parent directory to sys.path
+sys.path.append(parent_dir)
+
+###################################################################################
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel 
 from model.chain import Chain
 from data.pdf2vec import Pdf2Vec
 from typing import List
+from utils.logger import log
 
 app = FastAPI()
 chain = Chain()
@@ -20,19 +33,22 @@ class ConvertRequest(BaseModel):
 def chain_inference(ask_request: AskRequest):
     try:
         response = chain.inference(ask_request.message)
+        log('info', 'Chain inference is successed.')
         return {"response": response}
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to perform chain inference.")
+        log('error', f'Failed to Chain Inference: {str(e)}')
+        raise e
 
 # API endpoint to convert PDF to vectors
 @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
-    #  dummy = "app/data/dummyData/초거대 언어모델 연구 동향.pdf"
     try:
         db_url = converter.convert(convert_request.file_paths)
+        log('info', 'PDF converted to vectors successfully.')
         return {"message": "PDF converted to vectors successfully.", "db_url": db_url}
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to convert PDF to vectors.")
+        log('error', f'Failed to Convert PDF to Vectors: {str(e)}')
+        raise e
 
 if __name__ == "__main__":
     import uvicorn
