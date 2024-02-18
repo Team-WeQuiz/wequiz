@@ -8,7 +8,7 @@ from utils.logger import log
 
 class Pdf2Vec():
     def __init__(self):
-       self.db_path = 'data/faiss_index2'
+       self.db_path = 'data/faiss_index3'
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
         encoding = tiktoken.get_encoding(encoding_name)
