@@ -10,6 +10,8 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
 from model.embedding import Embedding
+from utils.logger import log
+
 # LLM 체인 클래스
 class Chain():
     def __init__(self):
