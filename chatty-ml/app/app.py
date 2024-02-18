@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel 
 from model.chain import Chain
 from data.pdf2vec import Pdf2Vec
+from typing import List
 
 app = FastAPI()
 chain = Chain()
@@ -13,7 +14,7 @@ class AskRequest(BaseModel):
 
 # Pydantic model for request body validation
 class ConvertRequest(BaseModel):
-    file_path: str
+    file_paths: List[str]
 
 @app.post("/ask")
 def chain_inference(ask_request: AskRequest):
@@ -28,7 +29,7 @@ def chain_inference(ask_request: AskRequest):
 def convert_pdf(convert_request: ConvertRequest):
     #  dummy = "app/data/dummyData/초거대 언어모델 연구 동향.pdf"
     try:
-        db_url = converter.convert(convert_request.file_path)
+        db_url = converter.convert(convert_request.file_paths)
         return {"message": "PDF converted to vectors successfully.", "db_url": db_url}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to convert PDF to vectors.")
