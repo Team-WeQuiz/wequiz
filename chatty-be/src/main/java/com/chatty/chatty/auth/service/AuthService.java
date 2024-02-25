@@ -10,7 +10,6 @@ import com.chatty.chatty.user.entity.User;
 import com.chatty.chatty.user.repository.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +22,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Value("${jwt.access-token-expiration}")
-    private Long accessExpiration;
-
-    @Value("${jwt.refresh-token-expiration}")
-    private Long refreshExpiration;
-
     @Transactional
     public TokenResponse signUp(SignUpRequest request) {
         User newUser = User.builder()
@@ -38,8 +31,8 @@ public class AuthService {
                 .nickname(request.nickname())
                 .age(request.age())
                 .build();
-        String accessToken = jwtUtil.createAccessToken(newUser, accessExpiration);
-        String refreshToken = jwtUtil.createRefreshToken(newUser, refreshExpiration);
+        String accessToken = jwtUtil.createAccessToken(newUser);
+        String refreshToken = jwtUtil.createRefreshToken(newUser);
 
         userRepository.save(newUser);
         refreshTokenRepository.save(
@@ -64,18 +57,19 @@ public class AuthService {
         }
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("토큰이 존재하지 않습니다."));
-        String accessToken = "";
+        String accessToken;
         String refreshToken = refreshTokenEntity.getToken();
         if (jwtUtil.isValidRefreshToken(refreshToken)) {
-            accessToken = jwtUtil.createAccessToken(user, accessExpiration);
+            accessToken = jwtUtil.createAccessToken(user);
             return TokenResponse.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
-        } else {
-            refreshToken = jwtUtil.createRefreshToken(user, refreshExpiration);
-            refreshTokenEntity.updateToken(refreshToken);
         }
+        refreshToken = jwtUtil.createRefreshToken(user);
+        accessToken = jwtUtil.createAccessToken(user);
+        refreshTokenEntity.updateToken(refreshToken);
+        
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
