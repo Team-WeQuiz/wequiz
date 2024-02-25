@@ -4,6 +4,8 @@ import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
 import com.chatty.chatty.auth.controller.dto.TokenResponse;
 import com.chatty.chatty.auth.entity.RefreshToken;
+import com.chatty.chatty.auth.exception.AuthException;
+import com.chatty.chatty.auth.exception.AuthExceptionType;
 import com.chatty.chatty.auth.jwt.JwtUtil;
 import com.chatty.chatty.auth.repository.RefreshTokenRepository;
 import com.chatty.chatty.user.entity.User;
@@ -47,16 +49,16 @@ public class AuthService {
                 .build();
     }
 
-    //TODO: 예외처리 및 예외 메시지 분리
     @Transactional
     public TokenResponse signIn(SignInRequest request) {
         User user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        if (!new BCryptPasswordEncoder().matches(request.password(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+                .orElseThrow(() -> new AuthException(AuthExceptionType.USER_NOT_FOUND));
+        if (!isPasswordValid(request, user)) {
+            throw new AuthException(AuthExceptionType.INVALID_PASSWORD);
         }
+        //TODO: 리프레쉬 토큰 재발급 로직 구현
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("토큰이 존재하지 않습니다."));
+                .orElseThrow(() -> new AuthException(AuthExceptionType.INVALID_TOKEN));
         String accessToken;
         String refreshToken = refreshTokenEntity.getToken();
         if (jwtUtil.isValidRefreshToken(refreshToken)) {
@@ -69,11 +71,15 @@ public class AuthService {
         refreshToken = jwtUtil.createRefreshToken(user);
         accessToken = jwtUtil.createAccessToken(user);
         refreshTokenEntity.updateToken(refreshToken);
-        
+
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    private boolean isPasswordValid(SignInRequest request, User user) {
+        return new BCryptPasswordEncoder().matches(request.password(), user.getPassword());
     }
 
     public Optional<User> findByUsername(String username) {
