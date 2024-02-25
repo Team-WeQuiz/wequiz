@@ -91,53 +91,61 @@ const getUrl = async (fileName: string) => {
 };
 
 export const handleUpload = async (
-  file: File,
+  files: FileList,
   setUploadProgress: React.Dispatch<React.SetStateAction<number>>,
+  setFileNumber: React.Dispatch<React.SetStateAction<number>>,
+  setUploadedFileNumber: React.Dispatch<React.SetStateAction<number>>,
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>,
   setIsUploaded: React.Dispatch<React.SetStateAction<boolean>>,
-  setUrl: React.Dispatch<React.SetStateAction<string>>,
+  setUrls: React.Dispatch<React.SetStateAction<string[]>>,
 ): Promise<void> => {
   setIsUploading(true);
-  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
-  let uploadedChunk = 0; // progress 추적하기 위함
-  try {
-    const chunkedFile = await createChunkedArray(file, CHUNK_SIZE);
-    const uploadId = await getIdForMultipartUpload(file.name, file.type);
-    // 청크 배열을 순회하여 각 청크별로 업로드 요청 보냄
-    const uploadPromises = chunkedFile.map(async (chunk, index) => {
-      const uploadUrl = await getUploadUrlForChunk(
-        file.name,
-        index + 1,
-        uploadId,
-      );
-      const response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: chunk,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
-      uploadedChunk++;
-      const progress = Math.ceil((uploadedChunk / chunkedFile.length) * 100);
-      setUploadProgress(progress);
-      if (!response.ok) throw new Error('Upload failed');
-      return {
-        ETag: response.headers.get('ETag') ?? '',
-        PartNumber: index + 1,
-      };
-    });
+  setFileNumber(files.length);
 
-    const completedParts: CompletedPartType[] =
-      await Promise.all(uploadPromises);
-    await closeMultipartUpload(file.name, uploadId, completedParts);
-    const url = await getUrl(file.name);
-    setUrl(url);
-    setIsUploaded(true);
-  } catch (error) {
-    console.error('Upload error:', error);
-    setIsUploaded(false);
-  } finally {
-    setIsUploading(false);
-    setUploadProgress(0);
+  for (const file of files) {
+    const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+    let uploadedChunk = 0; // progress 추적하기 위함
+    try {
+      const chunkedFile = await createChunkedArray(file, CHUNK_SIZE);
+      const uploadId = await getIdForMultipartUpload(file.name, file.type);
+      // 청크 배열을 순회하여 각 청크별로 업로드 요청 보냄
+      const uploadPromises = chunkedFile.map(async (chunk, index) => {
+        const uploadUrl = await getUploadUrlForChunk(
+          file.name,
+          index + 1,
+          uploadId,
+        );
+        const response = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: chunk,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+        uploadedChunk++;
+        const progress = Math.ceil((uploadedChunk / chunkedFile.length) * 100);
+        setUploadProgress(progress);
+        if (!response.ok) throw new Error('Upload failed');
+        return {
+          ETag: response.headers.get('ETag') ?? '',
+          PartNumber: index + 1,
+        };
+      });
+
+      const completedParts: CompletedPartType[] =
+        await Promise.all(uploadPromises);
+      await closeMultipartUpload(file.name, uploadId, completedParts);
+      const url = await getUrl(file.name);
+      setUrls((prev) => [...prev, url]);
+    } catch (error) {
+      console.error('Upload error:', error);
+      setIsUploaded(false);
+    } finally {
+      setUploadProgress(0);
+      setUploadedFileNumber((prev) => prev + 1);
+    }
   }
+  setIsUploading(false);
+
+  setIsUploaded(true);
 };
