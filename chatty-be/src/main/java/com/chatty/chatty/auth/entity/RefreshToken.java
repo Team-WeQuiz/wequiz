@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 
 @Entity
 @RequiredArgsConstructor
-@Builder
 @Getter
 public class RefreshToken {
 
@@ -28,6 +27,12 @@ public class RefreshToken {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Builder
+    public RefreshToken(String token, User user) {
+        this.token = token;
+        this.user = user;
+    }
 
     public void updateToken(String token) {
         this.token = token;
