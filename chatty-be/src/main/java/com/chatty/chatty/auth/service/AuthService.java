@@ -31,7 +31,6 @@ public class AuthService {
                 .password(new BCryptPasswordEncoder().encode(request.password()))
                 .email(request.email())
                 .nickname(request.nickname())
-                .age(request.age())
                 .build();
         String accessToken = jwtUtil.createAccessToken(newUser);
         String refreshToken = jwtUtil.createRefreshToken(newUser);

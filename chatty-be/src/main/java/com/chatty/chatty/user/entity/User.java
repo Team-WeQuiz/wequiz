@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Table(name = "`user`")
+@Table(name = "`users`")
 public class User extends BaseEntity {
 
     @Id
@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, length = 20, nullable = false)
     private String username;
 
     @Column(nullable = false)
@@ -37,9 +37,6 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(unique = true, length = 10, nullable = false)
     private String nickname;
-
-    @Column
-    private Integer age;
 }

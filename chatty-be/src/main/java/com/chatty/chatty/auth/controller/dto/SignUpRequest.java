@@ -4,8 +4,7 @@ public record SignUpRequest(
         String username,
         String password,
         String email,
-        String nickname,
-        Integer age
+        String nickname
 ) {
 
 }

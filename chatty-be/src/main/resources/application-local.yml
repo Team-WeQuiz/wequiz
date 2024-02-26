@@ -8,7 +8,7 @@ spring:
     hibernate:
       ddl-auto: create
   datasource:
-    url: jdbc:postgresql://localhost:5433/chatty
+    url: jdbc:postgresql://localhost:5432/wequiz
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: wequizadmin
+    password: 'wequizadmin'
