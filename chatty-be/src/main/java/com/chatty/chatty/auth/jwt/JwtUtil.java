@@ -30,7 +30,7 @@ public class JwtUtil {
 
     public String createAccessToken(User user) {
         return Jwts.builder()
-                .claim("username", user.getUsername())
+                .claim("email", user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + accessExpiration))
                 .signWith(secretKey)
@@ -39,7 +39,7 @@ public class JwtUtil {
 
     public String createRefreshToken(User user) {
         return Jwts.builder()
-                .claim("username", user.getUsername())
+                .claim("email", user.getEmail())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(secretKey)
                 .compact();
