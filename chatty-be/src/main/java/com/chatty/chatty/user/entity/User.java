@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "`users`")
+@DynamicInsert
 public class User extends BaseEntity {
 
     @Id
@@ -28,15 +30,9 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(unique = true, length = 20, nullable = false)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
-
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true, length = 10, nullable = false)
-    private String nickname;
+    @Column(nullable = false)
+    private String password;
 }

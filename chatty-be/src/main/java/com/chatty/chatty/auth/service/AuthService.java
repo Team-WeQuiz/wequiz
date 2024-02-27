@@ -27,10 +27,8 @@ public class AuthService {
     @Transactional
     public TokenResponse signUp(SignUpRequest request) {
         User newUser = User.builder()
-                .username(request.username())
-                .password(new BCryptPasswordEncoder().encode(request.password()))
                 .email(request.email())
-                .nickname(request.nickname())
+                .password(new BCryptPasswordEncoder().encode(request.password()))
                 .build();
         String accessToken = jwtUtil.createAccessToken(newUser);
         String refreshToken = jwtUtil.createRefreshToken(newUser);
@@ -50,7 +48,7 @@ public class AuthService {
 
     @Transactional
     public TokenResponse signIn(SignInRequest request) {
-        User user = userRepository.findByUsername(request.username())
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new AuthException(AuthExceptionType.USER_NOT_FOUND));
         if (!isPasswordValid(request, user)) {
             throw new AuthException(AuthExceptionType.INVALID_PASSWORD);
@@ -81,7 +79,7 @@ public class AuthService {
         return new BCryptPasswordEncoder().matches(request.password(), user.getPassword());
     }
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

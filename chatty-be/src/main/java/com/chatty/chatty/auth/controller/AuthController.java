@@ -23,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/signUp")
     public ResponseEntity<TokenResponse> signUp(@RequestBody SignUpRequest request) {
-        if (authService.findByUsername(request.username()).isPresent()) {
+        if (authService.findByEmail(request.email()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(request));
