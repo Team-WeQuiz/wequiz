@@ -14,7 +14,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
+@DynamicInsert
+@DynamicUpdate
 @Entity
 @Getter
 @Builder
@@ -22,7 +25,6 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "`users`")
-@DynamicInsert
 public class User extends BaseEntity {
 
     @Id
@@ -35,4 +37,10 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
+    private Boolean is_valid;
+
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL DEFAULT 'bit.ly/wequiz_profile_image'")
+    private String profile_image;
 }
