@@ -8,7 +8,7 @@ from utils.logger import log
 
 class Pdf2Vec():
     def __init__(self):
-       self.db_path = 'data/faiss_index3'
+       self.db_url = 'data/faiss_index2'
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
         encoding = tiktoken.get_encoding(encoding_name)
@@ -45,8 +45,8 @@ class Pdf2Vec():
         try:
             self.db = FAISS.from_documents(docs, embedding.model)
             # self.db.as_retriever()
-            self.db.save_local(self.db_path)
-            return self.db_path
+            self.db.save_local(self.db_url)
+            return self.db_url
         except Exception as e:
             log('error', f'Failed to Save Vectors: {str(e)}')
             raise e

@@ -43,7 +43,11 @@ CHOICE_PROB_PROMPT = """
 [문제]
 question_context
 [보기]
-[answer_option_1, answer_option_2, answer_option_3, answer_option_4, answer_option_5]
+(1) answer_option_1
+(2) answer_option_2
+(3) answer_option_3
+(4) answer_option_4
+(5) answer_option_5
 [정답]
 answer
 """

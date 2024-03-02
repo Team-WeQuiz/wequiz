@@ -15,8 +15,8 @@ from utils.logger import log
 
 # LLM 체인 클래스
 class Chain():
-    def __init__(self, type):
-        self.vectorstore= FAISS.load_local('./data/faiss_index2', embeddings=Embedding('query').model)
+    def __init__(self, db_path, type):
+        self.vectorstore= FAISS.load_local(db_path, embeddings=Embedding('query').model)
         self.retriever = self.vectorstore.as_retriever()
         self.llm = OpenAI()
         self.prompt = {
