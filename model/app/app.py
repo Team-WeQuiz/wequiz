@@ -10,6 +10,7 @@ app = FastAPI()
 # Pydantic model for request body validation
 class GenRequest(BaseModel):
     message: str
+    db_path: str
     type: str
 
 # Pydantic model for request body validation
@@ -18,7 +19,7 @@ class ConvertRequest(BaseModel):
 
 @app.post("/generate")
 def generate_prob(gen_request: GenRequest):
-    chain = Chain(gen_request.type)
+    chain = Chain(gen_request.db_path, gen_request.type)
     try:
         response = chain.inference(gen_request.message)
         log('info', 'Chain inference is successed.')
