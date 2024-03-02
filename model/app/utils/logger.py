@@ -2,7 +2,7 @@ import os
 import logging
 
 def log(log_type, message):
-    log_file = '/home/kueyeon/workspace/chatty/chatty-ml/logs/app.log'
+    log_file = '/home/kueyeon/workspace/chatty/model/logs/app.log'
 
     # Create the logs directory if it doesn't exist
     log_dir = os.path.dirname(log_file)
