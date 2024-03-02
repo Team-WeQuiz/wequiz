@@ -6,21 +6,21 @@ from typing import List
 from utils.logger import log
 
 app = FastAPI()
-chain = Chain()
-converter = Pdf2Vec()
 
 # Pydantic model for request body validation
-class AskRequest(BaseModel):
+class GenRequest(BaseModel):
     message: str
+    type: str
 
 # Pydantic model for request body validation
 class ConvertRequest(BaseModel):
     file_paths: List[str]
 
-@app.post("/ask")
-def chain_inference(ask_request: AskRequest):
+@app.post("/generate")
+def generate_prob(gen_request: GenRequest):
+    chain = Chain(gen_request.type)
     try:
-        response = chain.inference(ask_request.message)
+        response = chain.inference(gen_request.message)
         log('info', 'Chain inference is successed.')
         return {"response": response}
     except Exception as e:
@@ -30,6 +30,7 @@ def chain_inference(ask_request: AskRequest):
 # API endpoint to convert PDF to vectors
 @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
+    converter = Pdf2Vec()
     try:
         db_url = converter.convert(convert_request.file_paths)
         log('info', 'PDF converted to vectors successfully.')
