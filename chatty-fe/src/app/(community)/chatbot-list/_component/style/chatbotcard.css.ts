@@ -98,3 +98,10 @@ export const buttonArea = style({
   width: '100%',
   justifyContent: 'center',
 });
+
+export const buttonText = style({
+  color: globals.color.white,
+  fontSize: 18,
+  fontWeight: 700,
+  padding: '5px 30px',
+});
