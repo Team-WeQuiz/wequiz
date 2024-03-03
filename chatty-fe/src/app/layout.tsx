@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 //import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
+import './layout.css';
 
 //const inter = Inter({ subsets: ['latin'] });
 const pretendard = localFont({
@@ -21,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={pretendard.variable}>{children}</body>
+      <body className={pretendard.variable}>
+        {children}
+        <div id="modal-root" />
+      </body>
     </html>
   );
 }

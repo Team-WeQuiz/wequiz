@@ -4,7 +4,7 @@ import { globals } from '@/app/globals.css';
 export const button = style({
   position: 'fixed',
   bottom: '40px',
-  zIndex: 9999,
+  zIndex: 2000,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
