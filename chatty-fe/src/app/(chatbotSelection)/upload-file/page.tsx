@@ -12,21 +12,25 @@ export default function UploadFile() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
-  const [url, setUrl] = useState('');
+  const [fileNumber, setFileNumber] = useState(0);
+  const [uploadedFileNumber, setUploadedFileNumber] = useState(1);
+  const [urls, setUrls] = useState<string[]>([]);
 
-  const onFileUpload = async (file: File) => {
+  const onFileUpload = async (files: FileList) => {
     await handleUpload(
-      file,
+      files,
       setUploadProgress,
+      setFileNumber,
+      setUploadedFileNumber,
       setIsUploading,
       setIsUploaded,
-      setUrl,
+      setUrls,
     );
   };
-  const postUrl = async (url: string) => {
+  const postUrl = async (urls: string[]) => {
     try {
       const response = await axios.post('/api/upload', {
-        url: url,
+        urls: urls,
       });
       console.log('URL upload response: ', response);
     } catch (error) {
@@ -44,7 +48,7 @@ export default function UploadFile() {
         onDrop={(e) => {
           e.preventDefault();
           if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            onFileUpload(e.dataTransfer.files[0]);
+            onFileUpload(e.dataTransfer.files);
             e.dataTransfer.clearData();
           }
         }}
@@ -52,6 +56,9 @@ export default function UploadFile() {
         {isUploading ? (
           <>
             <div>업로드 중입니다...</div>
+            <div>
+              {uploadedFileNumber} / {fileNumber}
+            </div>
             <div>{uploadProgress}%</div>
           </>
         ) : isUploaded ? (
@@ -67,7 +74,9 @@ export default function UploadFile() {
                   alt="upload"
                 />
                 Drag & Drop or
-                <UploadButton onFileSelected={(file) => onFileUpload(file)} />
+                <UploadButton
+                  onFileSelected={(files: FileList) => onFileUpload(files)}
+                />
               </div>
             </div>
           </>
@@ -77,7 +86,7 @@ export default function UploadFile() {
         message="이제 거의 다 끝났어요!"
         step={3}
         isSelected={isUploaded}
-        buttonClick={() => postUrl(url)}
+        buttonClick={() => postUrl(urls)}
       />
     </Layout>
   );
