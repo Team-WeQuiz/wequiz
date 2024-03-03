@@ -1,5 +1,5 @@
 'use client';
-import ActionButton from './ActionButton';
+//import ActionButton from './ActionButton';
 import ContentCard from './ContentCard';
 import * as styles from './style/chatbotcard.css';
 import LoadingCircular from './LoadingCircular';
@@ -7,8 +7,12 @@ import TagLabel from './TagLabel';
 import { ChatbotTags } from '@/app/_types/chatbot';
 import { useRouter } from 'next/navigation';
 import BotImage from '@/public/images/bot.svg';
+import useModal from '@/app/_hook/useModal';
+import CustomButton from '@/app/_component/CustomButton';
+import EnterModal from './EnterModal';
 
 type ChatbotCardProps = {
+  id: number;
   isLoading: boolean;
   title: string;
   tags: ChatbotTags;
@@ -47,36 +51,50 @@ const ContentLoading = () => {
   );
 };
 
-const ChatbotCard = ({ isLoading, title, tags, link }: ChatbotCardProps) => {
+const ChatbotCard = ({
+  id,
+  isLoading,
+  title,
+  tags,
+  link,
+}: ChatbotCardProps) => {
+  const { isOpen, openModal, closeModal } = useModal();
+
   const navigate = useRouter();
 
   const handleChatbotClick = () => {
     navigate.push(link);
+    openModal();
   };
 
   return (
-    <ContentCard
-      styleClassName={`${styles.card} ${
-        isLoading
-          ? styles.loadingCard
-          : `${styles.activeCard} ${styles.activeCardShadow}`
-      }`}
-    >
-      <ChabotTitle title={title} tags={tags} />
-      {isLoading ? (
-        <ContentLoading />
-      ) : (
-        <div>
-          <div className={styles.cardContent}>
-            <BotImage />
-            <p className={styles.contentText}>챗봇을 사용해보세요!</p>
+    <>
+      <ContentCard
+        styleClassName={`${styles.card} ${
+          isLoading
+            ? styles.loadingCard
+            : `${styles.activeCard} ${styles.activeCardShadow}`
+        }`}
+      >
+        <ChabotTitle title={title} tags={tags} />
+        {isLoading ? (
+          <ContentLoading />
+        ) : (
+          <div>
+            <div className={styles.cardContent}>
+              <BotImage />
+              <p className={styles.contentText}>챗봇을 사용해보세요!</p>
+            </div>
+            <div className={styles.buttonArea}>
+              <CustomButton variant="contained" onClick={handleChatbotClick}>
+                <span className={styles.buttonText}>사용하기</span>
+              </CustomButton>
+            </div>
           </div>
-          <div className={styles.buttonArea}>
-            <ActionButton content="사용하기" onClick={handleChatbotClick} />
-          </div>
-        </div>
-      )}
-    </ContentCard>
+        )}
+      </ContentCard>
+      <EnterModal id={id} isOpen={isOpen} onClose={closeModal} />
+    </>
   );
 };
 

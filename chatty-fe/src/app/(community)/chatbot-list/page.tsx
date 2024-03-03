@@ -78,17 +78,20 @@ const chatbotData: ChatbotData[] = [
 
 const ChatbotList = () => {
   return (
-    <div className={styles.gridContainer}>
-      {chatbotData.map((chatbot, i) => (
-        <ChatbotCard
-          key={i}
-          isLoading={chatbot.isLoading}
-          title={chatbot.chatbotName}
-          tags={chatbot.tags}
-          link={chatbot.link}
-        />
-      ))}
-    </div>
+    <>
+      <div className={styles.gridContainer}>
+        {chatbotData.map((chatbot, i) => (
+          <ChatbotCard
+            key={i}
+            id={chatbot.id}
+            isLoading={chatbot.isLoading}
+            title={chatbot.chatbotName}
+            tags={chatbot.tags}
+            link={chatbot.link}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
