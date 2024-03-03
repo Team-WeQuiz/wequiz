@@ -36,16 +36,16 @@ public class Quizroom extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-    private Integer num_of_quiz;
+    private Integer numOfQuiz;
 
     @Column(nullable = false)
-    private Integer time_limit;
+    private Integer timeLimit;
 
     @Column(columnDefinition = "INTEGER NOT NULL DEFAULT 0")
-    private Integer player_num;
+    private Integer playerNum;
 
     @Column(nullable = false)
-    private Integer player_limit_num;
+    private Integer playerLimitNum;
 
     @Column(length = 10)
     private String code;
@@ -54,14 +54,14 @@ public class Quizroom extends BaseEntity {
     private String link;
 
     @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean is_started;
+    private Boolean isStarted;
 
     @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean is_finished;
+    private Boolean isFinished;
 
     @Column
-    private String quiz_doc_id;
+    private String quizDocId;
 
     @Column
-    private String score_doc_id;
+    private String scoreDocId;
 }
