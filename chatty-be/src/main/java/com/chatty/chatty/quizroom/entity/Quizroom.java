@@ -1,4 +1,4 @@
-package com.chatty.chatty.user.entity;
+package com.chatty.chatty.quizroom.entity;
 
 import com.chatty.chatty.common.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -24,23 +24,44 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Table(name = "`users`")
-public class User extends BaseEntity {
+@Table(name = "`quizrooms`")
+public class Quizroom extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "room_id")
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    @Column(length = 20, nullable = false)
+    private String name;
 
     @Column(nullable = false)
-    private String password;
+    private Integer numOfQuiz;
+
+    @Column(nullable = false)
+    private Integer timeLimit;
+
+    @Column(columnDefinition = "INTEGER NOT NULL DEFAULT 0")
+    private Integer playerNum;
+
+    @Column(nullable = false)
+    private Integer playerLimitNum;
+
+    @Column(length = 10)
+    private String code;
+
+    @Column(nullable = false)
+    private String link;
 
     @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean isValid;
+    private Boolean isStarted;
 
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL DEFAULT 'bit.ly/wequiz_profile_image'")
-    private String profileImage;
+    @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
+    private Boolean isFinished;
+
+    @Column
+    private String quizDocId;
+
+    @Column
+    private String scoreDocId;
 }
