@@ -49,8 +49,8 @@ public class Player extends BaseEntity {
     private Integer progress;
 
     @Column(columnDefinition = "INTEGER NOT NULL DEFAULT -1")
-    private Integer time_taken;
+    private Integer timeTaken;
 
     @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean is_done;
+    private Boolean isDone;
 }

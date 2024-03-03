@@ -39,8 +39,8 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean is_valid;
+    private Boolean isValid;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL DEFAULT 'bit.ly/wequiz_profile_image'")
-    private String profile_image;
+    private String profileImage;
 }
