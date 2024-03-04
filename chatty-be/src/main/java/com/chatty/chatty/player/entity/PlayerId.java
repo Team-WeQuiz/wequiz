@@ -1,5 +1,6 @@
 package com.chatty.chatty.player.entity;
 
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 public class PlayerId implements Serializable {
 
     private Long user_id;
