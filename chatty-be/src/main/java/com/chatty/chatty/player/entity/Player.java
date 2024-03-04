@@ -5,12 +5,12 @@ import com.chatty.chatty.quizroom.entity.Quizroom;
 import com.chatty.chatty.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -28,18 +28,20 @@ import org.hibernate.annotations.DynamicUpdate;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@IdClass(PlayerId.class)
 @Table(name = "`players`")
 public class Player extends BaseEntity {
 
-    @Id
+    @EmbeddedId
+    private PlayerId id;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @MapsId("user_id")
     private User user;
 
-    @Id
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
+    @MapsId("room_id")
     private Quizroom quizroom;
 
     @Column(unique = true, length = 10, nullable = false)
