@@ -28,7 +28,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Table(name = "`players`")
+@Table(name = "players")
 public class Player extends BaseEntity {
 
     @Id
