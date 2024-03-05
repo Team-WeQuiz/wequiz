@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,11 +14,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
-@DynamicInsert
-@DynamicUpdate
 @Entity
 @Getter
 @Builder
@@ -41,7 +38,7 @@ public class QuizRoom extends BaseEntity {
     @Column(nullable = false)
     private Integer timeLimit;
 
-    @Column(columnDefinition = "INTEGER NOT NULL DEFAULT 0")
+    @Column(nullable = false)
     private Integer playerNum;
 
     @Column(nullable = false)
@@ -53,7 +50,7 @@ public class QuizRoom extends BaseEntity {
     @Column(nullable = false)
     private String link;
 
-    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 0")
+    @Column(nullable = false)
     private Status status;
 
     @Column
@@ -61,4 +58,10 @@ public class QuizRoom extends BaseEntity {
 
     @Column
     private String scoreDocId;
+
+    @PrePersist
+    public void setDefaultColumns() {
+        this.playerNum = this.playerNum == null ? 1 : this.playerNum;
+        this.status = this.status == null ? Status.READY : this.status;
+    }
 }
