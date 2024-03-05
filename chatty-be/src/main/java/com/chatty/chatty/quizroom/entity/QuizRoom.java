@@ -53,11 +53,8 @@ public class QuizRoom extends BaseEntity {
     @Column(nullable = false)
     private String link;
 
-    @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean isStarted;
-
-    @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean isFinished;
+    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 0")
+    private Status status;
 
     @Column
     private String quizDocId;
