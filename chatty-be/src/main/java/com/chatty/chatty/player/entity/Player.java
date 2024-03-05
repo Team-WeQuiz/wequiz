@@ -41,7 +41,7 @@ public class Player extends BaseEntity {
     @JoinColumn(name = "room_id")
     private QuizRoom quizRoom;
 
-    @Column(unique = true, length = 10, nullable = false)
+    @Column(length = 10, nullable = false)
     private String nickname;
 
     @Column(nullable = false)
