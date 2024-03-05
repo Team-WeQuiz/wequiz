@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,11 +18,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
-@DynamicInsert
-@DynamicUpdate
 @Entity
 @Getter
 @Builder
@@ -47,9 +44,11 @@ public class Player extends BaseEntity {
     @Column(unique = true, length = 10, nullable = false)
     private String nickname;
 
-    @Column(columnDefinition = "INTEGER NOT NULL DEFAULT -1")
+    @Column(nullable = false)
     private Integer timeTaken;
 
-    @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
-    private Boolean isDone;
+    @PrePersist
+    public void setDefaultColumns() {
+        this.timeTaken = this.timeTaken == null ? -1 : this.timeTaken;
+    }
 }

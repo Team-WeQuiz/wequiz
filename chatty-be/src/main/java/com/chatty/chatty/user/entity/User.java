@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,11 +14,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
-@DynamicInsert
-@DynamicUpdate
 @Entity
 @Getter
 @Builder
@@ -26,6 +23,8 @@ import org.hibernate.annotations.DynamicUpdate;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "users")
 public class User extends BaseEntity {
+
+    private static final String DEFAULT_PROFILE_IMAGE = "bit.ly/wequiz_profile_image";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +37,15 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
+    @Column(nullable = false)
     private Boolean isValid;
 
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL DEFAULT 'bit.ly/wequiz_profile_image'")
+    @Column(nullable = false)
     private String profileImage;
+
+    @PrePersist
+    public void setDefaultColumns() {
+        this.isValid = this.isValid == null ? false : this.isValid;
+        this.profileImage = this.profileImage == null ? DEFAULT_PROFILE_IMAGE : this.profileImage;
+    }
 }
