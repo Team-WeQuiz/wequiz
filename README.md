@@ -1,7 +1,9 @@
-# 💬 Chatty
-큐티~ 채티~ 프리티~
+# 🎮 WeQuiz
+| Shall we quiz?
 
 ## 🤔 Overview
+AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
+
 ## 🛠️ Architecture
 
 🎨 **Front-End**
@@ -23,7 +25,7 @@
 <table>
     <thead>
         <tr>
-            <th colspan="5"> Team Chatty </th>
+            <th colspan="5"> Team WeQuiz </th>
         </tr>
     </thead>
     <tbody>
@@ -57,4 +59,4 @@
 
 ---
 
-2024-1 KMUCS 캡스톤디자인 | Copyright 2024. `Chatty` All rights reserved.
+2024-1 KMUCS 캡스톤디자인 | Copyright 2024. `WeQuiz` All rights reserved.
