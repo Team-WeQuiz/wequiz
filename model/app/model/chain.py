@@ -35,14 +35,8 @@ class Chain():
         )
         self.memory = VectorStoreRetrieverMemory(retriever=self.retriever)
         self.chain = LLMChain(llm=self.llm, prompt=self.prompt, memory=self.memory, output_parser=self.parser)
-        # self.qa = RetrievalQA.from_chain_type(
-        #     self.chain,
-        #     retriever=self.retriever,
-        # )
-        log('info', 'Setting Chain successfully.')
     
     # LLM inference 함수
     def inference(self, message):
-        log('info', self.parser.get_format_instructions())
         return self.chain.invoke(message)
 
