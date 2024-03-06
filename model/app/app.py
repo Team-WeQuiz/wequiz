@@ -22,8 +22,8 @@ def generate_prob(gen_request: GenRequest):
     chain = Chain(gen_request.db_path, gen_request.type)
     try:
         response = chain.inference(gen_request.message)
-        log('info', f'Chain inference is successed. {response}')
-        return {"questions": [response]}
+        log('info', f'Chain inference is successed.')
+        return response
     except Exception as e:
         log('error', f'Failed to Chain Inference: {str(e)}')
         raise e
