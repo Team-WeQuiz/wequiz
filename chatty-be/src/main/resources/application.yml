@@ -13,5 +13,5 @@ spring:
     active: local
 jwt:
   secret: qwerasdfzxcvdsafdsaffdasafdfdsafdsafdsafdsasfda
-  access-token-expiration: 3600
-  refresh-token-expiration: 86400
+  access-token-expiration: 86400000
+  refresh-token-expiration: 2592000000
