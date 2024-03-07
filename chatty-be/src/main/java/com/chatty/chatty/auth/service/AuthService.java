@@ -1,5 +1,9 @@
 package com.chatty.chatty.auth.service;
 
+import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_PASSWORD;
+import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_TOKEN;
+import static com.chatty.chatty.auth.exception.AuthExceptionType.USER_NOT_FOUND;
+
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
 import com.chatty.chatty.auth.controller.dto.TokenResponse;
@@ -30,13 +34,13 @@ public class AuthService {
                 .email(request.email())
                 .password(new BCryptPasswordEncoder().encode(request.password()))
                 .build();
-        String accessToken = jwtUtil.createAccessToken(newUser);
-        String refreshToken = jwtUtil.createRefreshToken(newUser);
+        User savedUser = userRepository.save(newUser);
+        String accessToken = jwtUtil.createAccessToken(savedUser);
+        String refreshToken = jwtUtil.createRefreshToken(savedUser);
 
-        userRepository.save(newUser);
         refreshTokenRepository.save(
                 RefreshToken.builder()
-                        .user(newUser)
+                        .user(savedUser)
                         .token(refreshToken)
                         .build()
         );
@@ -49,13 +53,13 @@ public class AuthService {
     @Transactional
     public TokenResponse signIn(SignInRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new AuthException(AuthExceptionType.USER_NOT_FOUND));
+                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
         if (!isPasswordValid(request, user)) {
-            throw new AuthException(AuthExceptionType.INVALID_PASSWORD);
+            throw new AuthException(INVALID_PASSWORD);
         }
         //TODO: 리프레쉬 토큰 재발급 로직 구현
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new AuthException(AuthExceptionType.INVALID_TOKEN));
+                .orElseThrow(() -> new AuthException(INVALID_TOKEN));
         String accessToken;
         String refreshToken = refreshTokenEntity.getToken();
         if (jwtUtil.isValidRefreshToken(refreshToken)) {
