@@ -5,6 +5,8 @@ from data.splitter import Splitter
 from data.vector import Vector
 from typing import List
 from utils.logger import log
+import uuid
+
 
 app = FastAPI()
 
@@ -27,7 +29,19 @@ def generate_prob(prob: ProbRequest):
     try:
         response = chain.prob(prob.message)
         log('info', f'Prob Chain inference is successed.')
-        return response
+        data = {
+            "questions": [
+                {
+                    "id": uuid.uuid4(),
+                    "question_number": 1,
+                    "type": 1,  # 1:객, 2:주, 3:단
+                    "question": response["text"]["question"],
+                    "options": response["text"]["choices"],
+                    "answer": response["text"]["answer"]
+                }
+            ]
+        }
+        return data
     except Exception as e:
         log('error', f'Failed to Prob Chain Inference: {str(e)}')
         raise e
