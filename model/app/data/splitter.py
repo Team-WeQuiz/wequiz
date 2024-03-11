@@ -1,22 +1,16 @@
-import os
 import tiktoken
 from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from model.embedding import Embedding
 from utils.logger import log
 
-class Pdf2Vec():
-    def __init__(self):
-       self.db_url = 'data/faiss_index2'
-
+class Splitter():
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
         encoding = tiktoken.get_encoding(encoding_name)
         num_tokens = len(encoding.encode(string))
         return num_tokens
 
-    # pdf parser
-    def parse_pdf(self, file_paths):
+    # split docs
+    def split_docs(self, file_paths):
         if len(file_paths) == 0:
             log('warning', 'List of File paths is Empty.')
         else:
@@ -37,21 +31,3 @@ class Pdf2Vec():
         print(f"총 {len(docs)}개의 문서가 준비되었습니다.")
         log('info', f'Total {len(docs)} Docs are ready.')
         return docs
-    
-    # text to vector convertor
-    def save_vectors(self, docs):
-        # Create the vector store
-        embedding = Embedding('docs')
-        try:
-            self.db = FAISS.from_documents(docs, embedding.model)
-            # self.db.as_retriever()
-            self.db.save_local(self.db_url)
-            return self.db_url
-        except Exception as e:
-            log('error', f'Failed to Save Vectors: {str(e)}')
-            raise e
-
-    
-    def convert(self, file_paths):
-        docs = self.parse_pdf(file_paths)
-        return self.save_vectors(docs)
