@@ -1,44 +1,51 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel 
 from model.chain import Chain
-# from data.pdf2vec import Pdf2Vec
+from data.splitter import Splitter
+from data.vector import Vector
 from typing import List
 from utils.logger import log
 
 app = FastAPI()
 
 # Pydantic model for request body validation
-class GenRequest(BaseModel):
+class ProbRequest(BaseModel):
     message: str
     db_path: str
     type: str  # "객관식", "주관식", "단답형"
+
+# class MetaRequest(BaseModel):
+#     db_path: str
 
 # Pydantic model for request body validation
 class ConvertRequest(BaseModel):
     file_paths: List[str]
 
-@app.post("/generate")
-def generate_prob(gen_request: GenRequest):
-    chain = Chain(gen_request.db_path, gen_request.type)
+@app.post("/generate/prob")
+def generate_prob(prob: ProbRequest):
+    chain = Chain(prob.db_path, prob.type)
     try:
-        response = chain.inference(gen_request.message)
-        log('info', f'Chain inference is successed.')
+        response = chain.prob(prob.message)
+        log('info', f'Prob Chain inference is successed.')
         return response
     except Exception as e:
-        log('error', f'Failed to Chain Inference: {str(e)}')
+        log('error', f'Failed to Prob Chain Inference: {str(e)}')
         raise e
 
+
 # API endpoint to convert PDF to vectors
-# @app.post("/convert")
-# def convert_pdf(convert_request: ConvertRequest):
-#     converter = Pdf2Vec()
-#     try:
-#         db_url = converter.convert(convert_request.file_paths)
-#         log('info', 'PDF converted to vectors successfully.')
-#         return {"message": "PDF converted to vectors successfully.", "db_url": db_url}
-#     except Exception as e:
-#         log('error', f'Failed to Convert PDF to Vectors: {str(e)}')
-#         raise e
+@app.post("/convert")
+def convert_pdf(convert_request: ConvertRequest):
+    splitter = Splitter()
+    vector = Vector() 
+    try:
+        split_docs = splitter.split_docs(convert_request.file_paths)
+        db_url = vector.convert(split_docs)
+        log('info', 'PDF converted to vectors successfully.')
+        return {"message": "PDF converted to vectors successfully.", "db_url": db_url}
+    except Exception as e:
+        log('error', f'Failed to Convert PDF to Vectors: {str(e)}')
+        raise e
 
 if __name__ == "__main__":
     import uvicorn
