@@ -9,8 +9,8 @@ class Splitter():
     def __init__(self, file_paths):
         self.bucket_name = 'kyuyeon-test'
         self.file_paths = file_paths
-        self.aws_access_key_id='AKIAQK6HVDT7BE6V2DOQ'
-        self.aws_secret_access_key='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'
+        self.aws_access_key_id=''
+        self.aws_secret_access_key=''
 
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
