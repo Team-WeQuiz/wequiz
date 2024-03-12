@@ -12,6 +12,7 @@ app = FastAPI()
 
 # Pydantic model for request body validation
 class ProbRequest(BaseModel):
+    id: str
     message: str
     db_path: str
     type: str  # "객관식", "주관식", "단답형"
@@ -30,6 +31,7 @@ def generate_prob(prob: ProbRequest):
         response = chain.prob(prob.message)
         log('info', f'Prob Chain inference is successed.')
         data = {
+            "id": prob.id,
             "questions": [
                 {
                     "id": uuid.uuid4(),
@@ -39,7 +41,8 @@ def generate_prob(prob: ProbRequest):
                     "options": response["text"]["choices"],
                     "answer": response["text"]["answer"]
                 }
-            ]
+            ],
+            "description": 'not yet',
         }
         return data
     except Exception as e:
@@ -50,10 +53,10 @@ def generate_prob(prob: ProbRequest):
 # API endpoint to convert PDF to vectors
 @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
-    splitter = Splitter()
+    splitter = Splitter(convert_request.file_paths)
     vector = Vector() 
     try:
-        split_docs = splitter.split_docs(convert_request.file_paths)
+        split_docs = splitter.split_docs()
         db_url = vector.convert(split_docs)
         log('info', 'PDF converted to vectors successfully.')
         return {"message": "PDF converted to vectors successfully.", "db_url": db_url}

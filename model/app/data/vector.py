@@ -4,7 +4,7 @@ from utils.logger import log
 
 class Vector():
     def __init__(self):
-        self.db_url = 'data/faiss_index2'
+        self.db_url = 'data/faiss_index3'
 
         # text to vector convertor
     def vectorize(self, split_docs):
