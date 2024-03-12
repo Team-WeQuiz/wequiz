@@ -2,23 +2,37 @@ import tiktoken
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.logger import log
+from langchain_community.document_loaders import S3FileLoader
+
 
 class Splitter():
+    def __init__(self, file_paths):
+        self.bucket_name = 'kyuyeon-test'
+        self.file_paths = file_paths
+        self.aws_access_key_id='AKIAQK6HVDT7BE6V2DOQ'
+        self.aws_secret_access_key='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'
+
+
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
         encoding = tiktoken.get_encoding(encoding_name)
         num_tokens = len(encoding.encode(string))
         return num_tokens
 
+
     # split docs
-    def split_docs(self, file_paths):
-        if len(file_paths) == 0:
+    def split_docs(self):
+        if len(self.file_paths) == 0:
             log('warning', 'List of File paths is Empty.')
         else:
-            log('info', f'There are {len(file_paths)} Files.')
+            log('info', f'There are {len(self.file_paths)} Files.')
         docs = []
-        for file_path in file_paths:
-            loader = PyMuPDFLoader(file_path)
-            data = loader.load()
+        for file_path in self.file_paths:
+            s3_file = S3FileLoader(
+                self.bucket_name, file_path, aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key
+                )
+            
+            # loader = PyMuPDFLoader(s3_file.load())
+            data = s3_file.load()
             print(f"{len(data)}개의 페이지를 가지고 있습니다.")
             print(f"페이지에 {len(data[0].page_content)}개의 단어를 가지고 있습니다.")
             print(f'예상되는 토큰 수 {self.num_tokens_from_string(data[0].page_content, "cl100k_base")}')
