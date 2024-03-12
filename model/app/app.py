@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel 
 from model.chain import Chain
 from data.splitter import Splitter
-from data.vector import Vector
+from data.vectorizer import Vectorizer
 from typing import List
 from utils.logger import log
 import uuid
@@ -54,10 +54,10 @@ def generate_prob(prob: ProbRequest):
 @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
     splitter = Splitter(convert_request.file_paths)
-    vector = Vector() 
+    vectorizer = Vectorizer() 
     try:
         split_docs = splitter.split_docs()
-        db_url = vector.convert(split_docs)
+        db_url = vectorizer.convert(split_docs)
         log('info', 'PDF converted to vectors successfully.')
         return {"message": "PDF converted to vectors successfully.", "db_url": db_url}
     except Exception as e:
