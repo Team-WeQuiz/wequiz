@@ -9,6 +9,7 @@ export const globals = createGlobalTheme(':root', {
     blue_5: '#D4E9FF',
     blue_6: '#E9F4FF',
     blue_7: '#F8FCFF',
+    blue_stroke: '#0966C4',
     black: '#000000',
     black_2: '#333333',
     black_3: '#666666',
@@ -17,13 +18,16 @@ export const globals = createGlobalTheme(':root', {
     black_6: '#E6E6E6',
     black_7: '#F7F7F7',
     sub: '#FFB526',
+    sub_stroke: '#E59700',
     red: '#FF0C0C',
     green: '#55F02F',
   },
 });
 
 globalStyle('*', {
+  fontFamily: 'var(--main-font)',
   boxSizing: 'border-box',
+  fontSize: '16px',
 });
 
 globalStyle('html, body', {

@@ -2,6 +2,7 @@ import type { StorybookConfig } from '@storybook/nextjs';
 
 import { VanillaExtractPlugin } from '@vanilla-extract/webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
@@ -54,6 +55,33 @@ const config: StorybookConfig = {
   },
   docs: {
     autodocs: 'tag',
+  },
+  core: {
+    builder: '@storybook/builder-webpack5',
+  },
+  webpackFinal: async (config) => {
+    if (!config.resolve) {
+      config.resolve = {};
+    }
+    config.resolve.plugins = [new TsconfigPathsPlugin()];
+    const imageRule = config.module?.rules?.find((rule) => {
+      const test = (rule as { test: RegExp }).test;
+
+      if (!test) {
+        return false;
+      }
+
+      return test.test('.svg');
+    }) as { [key: string]: any };
+
+    imageRule.exclude = /\.svg$/;
+
+    config.module?.rules?.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
+
+    return config;
   },
 };
 export default config;
