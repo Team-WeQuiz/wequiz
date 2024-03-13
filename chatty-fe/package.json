@@ -52,6 +52,7 @@
     "prettier": "^3.2.5",
     "storybook": "^7.6.17",
     "style-loader": "^3.3.4",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^5"
   }
 }
