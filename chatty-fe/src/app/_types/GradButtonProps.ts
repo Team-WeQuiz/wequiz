@@ -1,4 +1,4 @@
-export type SquareButton = {
+export type GradButtonProps = {
   disabled?: boolean;
   form?: string;
   formaction?: string;
@@ -12,6 +12,7 @@ export type SquareButton = {
   children?: React.ReactNode;
   onClick?: () => void;
   isLoading?: boolean;
+  rounded?: boolean;
   fullWidth?: boolean;
   color?: 'primary' | 'secondary';
 };

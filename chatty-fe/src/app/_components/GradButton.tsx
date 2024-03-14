@@ -1,9 +1,9 @@
 import React from 'react';
-import { SquareButton } from '@/app/_types/SquareButton';
-import * as styles from './SquareButton.css';
+import { GradButtonProps } from '@/app/_types/GradButtonProps';
+import * as styles from './GradButton.css';
 import LoadingCircular from './LoadingCircular';
 
-const SquareButton = ({
+const GradButton = ({
   disabled,
   form,
   formaction,
@@ -17,9 +17,10 @@ const SquareButton = ({
   children,
   onClick,
   isLoading,
+  rounded = false,
   fullWidth = false,
   color = 'primary',
-}: SquareButton) => {
+}: GradButtonProps) => {
   return (
     <button
       type={type}
@@ -34,18 +35,17 @@ const SquareButton = ({
       disabled={disabled || isLoading}
       onClick={onClick}
       className={`
-        ${styles.squareButton}
+        ${styles.gradButton}
+        ${rounded && styles.rounded}
         ${fullWidth && styles.fullWidth}
-        ${isLoading && styles.loading}
+        ${isLoading && `${styles.disabled} ${styles.loading}`}
         ${disabled && styles.disabled}
         ${color === 'primary' ? styles.primary : styles.secondary}
-        `}
+      `}
     >
       {children}
       {isLoading && (
-        <div
-          className={`${styles.loadingContainer}`}
-        >
+        <div className={`${styles.loadingContainer}`}>
           <LoadingCircular />
         </div>
       )}
@@ -53,4 +53,4 @@ const SquareButton = ({
   );
 };
 
-export default SquareButton;
+export default GradButton;

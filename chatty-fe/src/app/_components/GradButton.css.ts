@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { globals } from '../globals.css';
 
-export const squareButton = style({
+export const gradButton = style({
   minHeight: 60,
   position: 'relative',
   display: 'flex',
@@ -18,13 +18,21 @@ export const squareButton = style({
   },
 });
 
+export const rounded = style({
+  borderRadius: 30,
+  padding: '18px 24px',
+});
+
 export const primary = style({
   background: `linear-gradient(180deg, rgba(38, 146, 255, 0.10) 0%, #2692FF 77.5%)`,
   boxShadow: '0px 2px 8px 2px rgba(23, 96, 171, 0.30)',
   ':hover': {
     boxShadow: '0px 3px 8px 3px rgba(23, 96, 171, 0.30)',
   },
-  WebkitTextStroke: `1px ${globals.color.blue_stroke}`,
+  textShadow: `1px 1px 1px ${globals.color.blue_stroke}, 
+    -1px -1px 1px ${globals.color.blue_stroke}, 
+    1px -1px 1px ${globals.color.blue_stroke}, 
+    -1px 1px 1px ${globals.color.blue_stroke}`,
 });
 
 export const secondary = style({
@@ -34,7 +42,35 @@ export const secondary = style({
   ':hover': {
     boxShadow: '0px 3px 8px 3px rgba(169, 121, 29, 0.30)',
   },
-  WebkitTextStroke: `1px ${globals.color.sub_stroke}`,
+  textShadow: `1px 1px 1px ${globals.color.sub_stroke}, 
+    -1px -1px 1px ${globals.color.sub_stroke}, 
+    1px -1px 1px ${globals.color.sub_stroke}, 
+    -1px 1px 1px ${globals.color.sub_stroke}`,
+});
+
+export const fullWidth = style({
+  width: '100%',
+});
+
+export const disabled = style({
+  background: `linear-gradient(180deg, rgba(230, 230, 230, 0.10) 0%, #DEDEDE 77.5%)`,
+  cursor: 'default',
+  boxShadow: 'none',
+  ':hover': {
+    boxShadow: 'none',
+  },
+  ':active': {
+    transform: 'none',
+  },
+  textShadow: `1px 1px 1px ${globals.color.black_4}, 
+  -1px -1px 1px ${globals.color.black_4}, 
+  1px -1px 1px ${globals.color.black_4}, 
+  -1px 1px 1px ${globals.color.black_4}`,
+});
+
+export const loading = style({
+  cursor: 'default',
+  pointerEvents: 'none',
 });
 
 export const loadingContainer = style({
@@ -47,25 +83,4 @@ export const loadingContainer = style({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-});
-
-export const fullWidth = style({
-  width: '100%',
-});
-
-export const disabled = style({
-  background: globals.color.black_6,
-  cursor: 'default',
-  boxShadow: 'none',
-  ':hover': {
-    boxShadow: 'none',
-  },
-  ':active': {
-    transform: 'none',
-  },
-});
-
-export const loading = style({
-  cursor: 'default',
-  pointerEvents: 'none',
 });

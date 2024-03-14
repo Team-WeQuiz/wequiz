@@ -1,5 +1,5 @@
 import React from 'react';
-import { SolidButton } from '@/app/_types/SolidButton';
+import { SolidButtonProps } from '@/app/_types/SolidButtonProps';
 import * as styles from './SolidButton.css';
 import LoadingCircular from './LoadingCircular';
 
@@ -19,7 +19,7 @@ const SolidButton = ({
   isLoading,
   shadowExist = true,
   fullWidth = false,
-}: SolidButton) => {
+}: SolidButtonProps) => {
   return (
     <button
       type={type}
@@ -37,7 +37,8 @@ const SolidButton = ({
         ${shadowExist && styles.shadow}
         ${fullWidth && styles.fullWidth}
         ${isLoading && styles.loading}
-        ${disabled && styles.disabled}`}
+        ${disabled && styles.disabled}
+      `}
     >
       {children}
       {isLoading && (
