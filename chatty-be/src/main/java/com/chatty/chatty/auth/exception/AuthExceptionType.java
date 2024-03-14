@@ -14,6 +14,7 @@ public enum AuthExceptionType implements ExceptionType {
     EXPIRED_TOKEN(Status.BAD_REQUEST, 1007, "이미 만료된 토큰입니다"),
     UNSUPPORTED_TOKEN(Status.BAD_REQUEST, 1008, "지원하지 않는 토큰입니다"),
     INVALID_SIGNATURE(Status.BAD_REQUEST, 1009, "잘못된 서명입니다"),
+    UNSUPPORTED_LOGIN_PROVIDER(Status.BAD_REQUEST, 1010, "지원하지 않는 로그인 제공자입니다"),
     ;
 
     private final Status status;
