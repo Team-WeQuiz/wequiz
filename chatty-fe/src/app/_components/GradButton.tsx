@@ -17,9 +17,9 @@ const GradButton = ({
   children,
   onClick,
   isLoading,
+  color = 'primary',
   rounded = false,
   fullWidth = false,
-  color = 'primary',
 }: GradButtonProps) => {
   return (
     <button
@@ -34,14 +34,13 @@ const GradButton = ({
       value={value}
       disabled={disabled || isLoading}
       onClick={onClick}
-      className={`
-        ${styles.gradButton}
-        ${rounded && styles.rounded}
-        ${fullWidth && styles.fullWidth}
-        ${isLoading && `${styles.disabled} ${styles.loading}`}
-        ${disabled && styles.disabled}
-        ${color === 'primary' ? styles.primary : styles.secondary}
-      `}
+      className={styles.gradButton({
+        color,
+        rounded,
+        fullWidth,
+        isLoading,
+        disabled: disabled || isLoading,
+      })}
     >
       {children}
       {isLoading && (
