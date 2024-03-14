@@ -1,22 +1,27 @@
+'use client';
 import React, { useRef } from 'react';
-import * as styles from './InputField.css';
+import * as styles from './TextInputField.css';
 import Image from 'next/image';
 
-type InputFiledProps = {
+type TextInputFiledProps = {
   placeholder?: string;
   borderRadius?: number;
   backgroundColor?: string;
   required?: boolean;
   isChat?: boolean;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export default function InputField({
+export default function TextInputField({
   placeholder = '',
   borderRadius,
   backgroundColor,
   required = false,
   isChat = false,
-}: InputFiledProps) {
+  value,
+  onChange,
+}: TextInputFiledProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleChatDivClick = () => {
     inputRef.current?.focus();
@@ -35,6 +40,8 @@ export default function InputField({
           ref={inputRef}
           placeholder={placeholder}
           required={required}
+          value={value}
+          onChange={onChange}
           className={styles.chatInput}
         />
         <Image src="/images/Send_fill.svg" alt="send" width={48} height={48} />
@@ -45,6 +52,8 @@ export default function InputField({
       <input
         placeholder={placeholder}
         required={required}
+        value={value}
+        onChange={onChange}
         className={`${styles.container}`}
         style={{
           borderRadius: `${borderRadius}px`,

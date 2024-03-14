@@ -8,8 +8,14 @@ export const container = style({
   padding: '20px 12px',
   alignItems: 'center',
   gap: 10,
-  color: globals.color.black_3,
+  color: globals.color.black,
   border: `1px solid ${globals.color.black_6}`,
+  '::placeholder': {
+    color: globals.color.black_3,
+  },
+  ':focus': {
+    outline: `1px solid ${globals.color.black_3}`,
+  },
 });
 
 export const chatContainer = style([
