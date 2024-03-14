@@ -25,7 +25,7 @@ const meta: Meta<typeof RadioInputField> = {
   args: {
     name: 'exampleRadio',
     options: options,
-    selectedValue: 'option1', // Default selected value for the story
+    selectedValue: 'option1',
   },
 };
 
@@ -37,7 +37,7 @@ export const Default: Story = {};
 
 export const WithInitialValue: Story = {
   args: {
-    selectedValue: 'option2', // Initial selected value different than default
+    selectedValue: 'option2',
   },
   decorators: [
     (Story) => (
@@ -57,5 +57,3 @@ export const CustomOptions: Story = {
     selectedValue: 'custom1',
   },
 };
-
-// Optionally, you could add decorators or other configurations specific to the RadioInputField
