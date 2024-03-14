@@ -2,14 +2,15 @@ import { Meta, StoryObj } from '@storybook/react';
 import RadioInputField from './RadioInputField';
 
 type Option = {
+  id: string;
   value: string;
   label: string;
 };
 
 const options: Option[] = [
-  { value: 'option1', label: 'Option 1' },
-  { value: 'option2', label: 'Option 2' },
-  { value: 'option3', label: 'Option 3' },
+  { id: 'option1', value: 'option1', label: 'Option 1' },
+  { id: 'option2', value: 'option2', label: 'Option 2' },
+  { id: 'option3', value: 'option3', label: 'Option 3' },
 ];
 
 const meta: Meta<typeof RadioInputField> = {
@@ -51,8 +52,8 @@ export const WithInitialValue: Story = {
 export const CustomOptions: Story = {
   args: {
     options: [
-      { value: 'custom1', label: 'Custom 1' },
-      { value: 'custom2', label: 'Custom 2' },
+      { id: 'custom1', value: 'custom1', label: 'Custom 1' },
+      { id: 'custom2', value: 'custom2', label: 'Custom 2' },
     ],
     selectedValue: 'custom1',
   },

@@ -8,9 +8,9 @@ import RadioInputField from '@/app/_components/RadioInputField';
 
 export default function CreateRoom() {
   const problemTypeOptions = [
-    { value: '객관식', label: '객관식' },
-    { value: '주관식', label: '주관식' },
-    { value: '단답형', label: '단답형' },
+    { id: '객관식', value: '객관식', label: '객관식' },
+    { id: '객관식', value: '주관식', label: '주관식' },
+    { id: '객관식', value: '단답형', label: '단답형' },
   ];
 
   const [fileNames, setFileNames] = useState<string[]>([]);
