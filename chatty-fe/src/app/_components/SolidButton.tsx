@@ -33,12 +33,12 @@ const SolidButton = ({
       value={value}
       disabled={disabled || isLoading}
       onClick={onClick}
-      className={`${styles.solidButton}
-        ${shadowExist && styles.shadow}
-        ${fullWidth && styles.fullWidth}
-        ${isLoading && styles.loading}
-        ${disabled && styles.disabled}
-      `}
+      className={styles.solidButton({
+        shadowExist,
+        fullWidth,
+        isLoading,
+        disabled,
+      })}
     >
       {children}
       {isLoading && (

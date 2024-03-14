@@ -53,14 +53,6 @@ export const RoundedSecondary: Story = {
   },
 };
 
-export const RoundedIsLoading: Story = {
-  args: {
-    children: 'Rounded Loading Button',
-    rounded: true,
-    isLoading: true,
-  },
-};
-
 export const Disabled: Story = {
   args: {
     children: 'Disabled Button',
@@ -71,6 +63,14 @@ export const Disabled: Story = {
 export const Loading: Story = {
   args: {
     children: 'Loading Button',
+    isLoading: true,
+  },
+};
+
+export const RoundedIsLoading: Story = {
+  args: {
+    children: 'Rounded Loading Button',
+    rounded: true,
     isLoading: true,
   },
 };
