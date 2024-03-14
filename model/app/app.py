@@ -6,7 +6,7 @@ from data.vectorizer import Vectorizer
 from typing import List
 from utils.logger import log
 import uuid
-
+import json
 
 app = FastAPI()
 
@@ -17,12 +17,16 @@ class ProbRequest(BaseModel):
     db_path: str
     type: str  # "객관식", "주관식", "단답형"
 
-# class MetaRequest(BaseModel):
-#     db_path: str
-
 # Pydantic model for request body validation
 class ConvertRequest(BaseModel):
-    file_paths: List[str]
+    files: List[str]
+
+class GenerateRequest(BaseModel):
+    id: str
+    numOfQuiz: int
+    type: str
+    files: List[str]
+
 
 @app.post("/generate/prob")
 def generate_prob(prob: ProbRequest):
@@ -53,7 +57,7 @@ def generate_prob(prob: ProbRequest):
 # API endpoint to convert PDF to vectors
 @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
-    splitter = Splitter(convert_request.file_paths)
+    splitter = Splitter(convert_request.files)
     vectorizer = Vectorizer() 
     try:
         split_docs = splitter.split_docs()
@@ -63,6 +67,28 @@ def convert_pdf(convert_request: ConvertRequest):
     except Exception as e:
         log('error', f'Failed to Convert PDF to Vectors: {str(e)}')
         raise e
+
+
+# integration API
+@app.post("/generate")
+def generate(generate_request: GenerateRequest):
+    convert_res = convert_pdf(
+        ConvertRequest(files=generate_request.files)
+    )
+    log('info', 'PDF converted to vectors successfully.')
+
+    prob_res = generate_prob(
+        ProbRequest(
+            id=generate_request.id,
+            message='원핫인코딩',
+            db_path=convert_res['db_url'],
+            type=generate_request.type
+        )
+    )
+    log('info', f'Prob Chain inference is successed.')
+
+    return prob_res
+
 
 if __name__ == "__main__":
     import uvicorn
