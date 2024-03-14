@@ -2,7 +2,7 @@ from langchain_community.vectorstores import FAISS
 from model.embedding import Embedding
 from utils.logger import log
 
-class Vector():
+class Vectorizer():
     def __init__(self):
         self.db_url = 'data/faiss_index3'
 
