@@ -2,6 +2,7 @@ import React from 'react';
 import * as styles from './RadioInputField.css';
 
 type Option = {
+  id: string;
   value: string;
   label: string;
 };
@@ -24,10 +25,11 @@ export default function RadioInputField({
       {options.map((option) => (
         <div className={styles.labelContainer} key={option.value}>
           <label
-            key={option.value}
+            htmlFor={option.id}
             className={`${styles.label} ${selectedValue === option.value ? styles.selectedLabel : ''}`}
           >
             <input
+              id={option.id}
               type="radio"
               name={name}
               value={option.value}
