@@ -1,9 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react';
-import SquareButton from './SquareButton';
+import GradButton from './GradButton';
 
 const meta = {
-  title: 'Components/SquareButton',
-  component: SquareButton,
+  title: 'Components/GradButton',
+  component: GradButton,
   argTypes: {
     disabled: { control: 'boolean' },
     form: { control: 'text' },
@@ -20,7 +20,7 @@ const meta = {
     color: { control: 'inline-radio', options: ['primary', 'secondary'] },
     fullWidth: { control: 'boolean', defaultValue: false },
   },
-} satisfies Meta<typeof SquareButton>;
+} satisfies Meta<typeof GradButton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -35,6 +35,29 @@ export const Secondary: Story = {
   args: {
     children: 'Secondary Button',
     color: 'secondary',
+  },
+};
+
+export const RoundedPrimary: Story = {
+  args: {
+    children: 'Rounded Primary Button',
+    rounded: true,
+  },
+};
+
+export const RoundedSecondary: Story = {
+  args: {
+    children: 'Rounded Secondary Button',
+    rounded: true,
+    color: 'secondary',
+  },
+};
+
+export const RoundedIsLoading: Story = {
+  args: {
+    children: 'Rounded Loading Button',
+    rounded: true,
+    isLoading: true,
   },
 };
 

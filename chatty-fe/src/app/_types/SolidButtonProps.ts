@@ -1,4 +1,4 @@
-export type SolidButton = {
+export type SolidButtonProps = {
   disabled?: boolean;
   form?: string;
   formaction?: string;
