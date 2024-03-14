@@ -4,21 +4,33 @@ import { globals } from '../globals.css';
 export const container = style({
   display: 'flex',
   height: 60,
+  width: '100%',
   padding: '20px 12px',
   alignItems: 'center',
   gap: 10,
-  borderRadius: 12,
+  color: globals.color.black_3,
   border: `1px solid ${globals.color.black_6}`,
 });
 
-export const small = style({
-  width: 360,
-});
+export const chatContainer = style([
+  container,
+  {
+    justifyContent: 'space-between',
+    backgroundColor: globals.color.blue_6,
+    borderRadius: 20,
+    cursor: 'text',
+    ':focus-within': {
+      outline: '2px solid blue',
+    },
+  },
+]);
 
-export const medium = style({
-  width: 404,
-});
-
-export const large = style({
-  width: 956,
+export const chatInput = style({
+  border: 'none',
+  flexGrow: 1,
+  color: globals.color.black_3,
+  backgroundColor: 'inherit',
+  ':focus': {
+    outline: 'none',
+  },
 });
