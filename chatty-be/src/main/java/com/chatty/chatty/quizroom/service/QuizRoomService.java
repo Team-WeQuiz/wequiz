@@ -34,6 +34,7 @@ public class QuizRoomService {
 
     @Transactional
     public MakeRoomResponse makeRoom(MakeRoomRequest request) {
+        log.info("request : {}", request);
         QuizRoom newQuizRoom = QuizRoom.builder()
                 .name(request.name())
                 .numOfQuiz(request.numOfQuiz())
@@ -50,8 +51,10 @@ public class QuizRoomService {
         MakeQuizRequest quizDocRequest = MakeQuizRequest.builder()
                 .id(savedQuizRoom.getId())
                 .files(request.files())
+                .type("객관식")
                 .numOfQuiz(request.numOfQuiz())
                 .build();
+        log.info("quizDocRequest : {}", quizDocRequest);
         MakeQuizResponse quizDocResponse = modelService.makeQuiz(quizDocRequest);
 
         return MakeRoomResponse.builder()

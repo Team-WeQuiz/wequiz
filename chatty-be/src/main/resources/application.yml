@@ -8,6 +8,10 @@ server:
     mime-types: application/json
     min-response-size: 500
 
+springdoc:
+  swagger-ui:
+    path=/:
+
 spring:
   profiles:
     active: local
