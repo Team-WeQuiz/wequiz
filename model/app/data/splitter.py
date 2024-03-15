@@ -2,6 +2,7 @@ import tiktoken
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.logger import log
+from utils.aws_security import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from langchain_community.document_loaders import S3FileLoader
 
 
@@ -9,8 +10,8 @@ class Splitter():
     def __init__(self, file_paths):
         self.bucket_name = 'kyuyeon-test'
         self.file_paths = file_paths
-        self.aws_access_key_id=''
-        self.aws_secret_access_key=''
+        self.aws_access_key_id=AWS_ACCESS_KEY_ID
+        self.aws_secret_access_key=AWS_SECRET_ACCESS_KEY
 
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:

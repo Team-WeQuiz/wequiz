@@ -6,3 +6,4 @@ gradio_chached_examples
 faiss_index
 index.*
 logs
+*_security.py

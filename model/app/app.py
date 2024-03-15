@@ -12,7 +12,7 @@ app = FastAPI()
 
 # Pydantic model for request body validation
 class ProbRequest(BaseModel):
-    id: str
+    id: int
     message: str
     db_path: str
     type: str  # "객관식", "주관식", "단답형"
@@ -22,7 +22,7 @@ class ConvertRequest(BaseModel):
     files: List[str]
 
 class GenerateRequest(BaseModel):
-    id: str
+    id: int
     numOfQuiz: int
     type: str
     files: List[str]
