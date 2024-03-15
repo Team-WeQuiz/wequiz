@@ -1,5 +1,7 @@
 package com.chatty.chatty.quizroom.service;
 
+import com.chatty.chatty.quizroom.controller.dto.MakeQuizRequest;
+import com.chatty.chatty.quizroom.controller.dto.MakeQuizResponse;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -45,9 +47,18 @@ public class QuizRoomService {
         String link = BASE_LINK + savedQuizRoom.getId();
         savedQuizRoom.setLink(link);
 
+        MakeQuizRequest quizDocRequest = MakeQuizRequest.builder()
+                .id(savedQuizRoom.getId())
+                .fileId(request.fileId())
+                .numOfQuiz(request.numOfQuiz())
+                .build();
+        MakeQuizResponse quizDocResponse = modelService.makeQuiz(quizDocRequest);
+
         return MakeRoomResponse.builder()
                 .id(savedQuizRoom.getId())
                 .link(savedQuizRoom.getLink())
+                .quiz(quizDocResponse.quiz())
+                .description(quizDocResponse.description())
                 .build();
     }
 }
