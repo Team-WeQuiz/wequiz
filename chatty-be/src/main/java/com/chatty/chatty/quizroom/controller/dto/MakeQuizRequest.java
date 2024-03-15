@@ -1,5 +1,6 @@
 package com.chatty.chatty.quizroom.controller.dto;
 
+import java.util.List;
 import lombok.Builder;
 
 @Builder
@@ -7,9 +8,12 @@ public record MakeQuizRequest(
 
         Long id,
 
-        Long fileId,
+        Integer numOfQuiz,
 
-        Integer numOfQuiz
+        String type,
+
+        List<String> files
+
 ) {
 
 }

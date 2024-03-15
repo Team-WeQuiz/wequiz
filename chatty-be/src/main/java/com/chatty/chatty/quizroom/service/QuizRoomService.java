@@ -49,7 +49,7 @@ public class QuizRoomService {
 
         MakeQuizRequest quizDocRequest = MakeQuizRequest.builder()
                 .id(savedQuizRoom.getId())
-                .fileId(request.fileId())
+                .files(request.files())
                 .numOfQuiz(request.numOfQuiz())
                 .build();
         MakeQuizResponse quizDocResponse = modelService.makeQuiz(quizDocRequest);
@@ -57,7 +57,7 @@ public class QuizRoomService {
         return MakeRoomResponse.builder()
                 .id(savedQuizRoom.getId())
                 .link(savedQuizRoom.getLink())
-                .quiz(quizDocResponse.quiz())
+                .questions(quizDocResponse.questions())
                 .description(quizDocResponse.description())
                 .build();
     }
