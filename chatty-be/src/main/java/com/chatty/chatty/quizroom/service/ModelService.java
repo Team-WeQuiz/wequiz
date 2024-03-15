@@ -21,7 +21,7 @@ public class ModelService {
 
     public MakeQuizResponse makeQuiz(MakeQuizRequest request) {
         ResponseEntity<MakeQuizResponse> makeQuizResponse = restClient.post()
-                .uri("/generate/prob")
+                .uri("/generate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
