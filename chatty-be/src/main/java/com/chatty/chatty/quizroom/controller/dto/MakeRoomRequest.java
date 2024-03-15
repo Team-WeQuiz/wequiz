@@ -1,5 +1,7 @@
 package com.chatty.chatty.quizroom.controller.dto;
 
+import java.util.List;
+
 public record MakeRoomRequest(
 
         String name,
@@ -12,7 +14,7 @@ public record MakeRoomRequest(
 
         String code,
 
-        Long fileId
+        List<String> files
 ) {
 
 }
