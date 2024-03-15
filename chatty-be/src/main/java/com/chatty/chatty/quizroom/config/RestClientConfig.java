@@ -10,7 +10,7 @@ public class RestClientConfig {
     @Bean
     public RestClient restClient() {
         return RestClient.builder()
-                .baseUrl("http://www.ml-server")
+                .baseUrl("http://www.localhost:8000")
                 .build();
     }
 }
