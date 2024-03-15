@@ -38,7 +38,6 @@ public class QuizRoomController {
 
     @PostMapping
     public ResponseEntity<MakeRoomResponse> makeRoom(@RequestBody MakeRoomRequest request) {
-        quizRoomService.makeRoom(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.makeRoom(request));
     }
 
