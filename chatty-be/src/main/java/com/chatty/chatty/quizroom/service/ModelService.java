@@ -3,12 +3,14 @@ package com.chatty.chatty.quizroom.service;
 import com.chatty.chatty.quizroom.config.RestClientConfig;
 import com.chatty.chatty.quizroom.controller.dto.MakeQuizRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeQuizResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 @Service
+@Slf4j
 public class ModelService {
 
     private final RestClientConfig restClientConfig;
