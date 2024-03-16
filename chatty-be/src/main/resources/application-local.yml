@@ -16,7 +16,7 @@ spring:
 social:
   client:
     kakao:
-      client-id: 2c4ad786d9aba291f13265945a5885ec
+      client-id: 948b0f6cb65248afcd53e046c4e61145
       client-secret: KtXGlrkvmLgT8KbvgVzmbvXt15bXXdp6
       redirect-uri: http://localhost:3000/sign-in/kakao/callback
       grant_type: authorization_code
