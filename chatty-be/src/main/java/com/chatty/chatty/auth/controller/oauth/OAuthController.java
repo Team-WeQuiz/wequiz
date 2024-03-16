@@ -1,6 +1,7 @@
-package com.chatty.chatty.auth.controller;
+package com.chatty.chatty.auth.controller.oauth;
 
 import com.chatty.chatty.auth.controller.dto.TokenResponse;
+import com.chatty.chatty.auth.controller.oauth.dto.SocialLoginRequest;
 import com.chatty.chatty.auth.entity.Provider;
 import com.chatty.chatty.auth.service.oauth.OAuthService;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,12 @@ public class OAuthController {
     private final OAuthService oAuthService;
 
     @PostMapping("/oauth/{provider}/login")
-    public ResponseEntity<TokenResponse> doSocialLogin(
+    public ResponseEntity<TokenResponse> signIn(
             @RequestBody SocialLoginRequest request,
             @PathVariable String provider
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(OAuthService.doSocialLogin(request, Provider.from(provider)));
+                .body(oAuthService.signIn(request, Provider.from(provider)));
     }
 }
