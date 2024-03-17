@@ -14,9 +14,11 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -52,12 +54,6 @@ public class QuizRoom extends BaseEntity {
 
     @Column(nullable = false)
     private Status status;
-
-    @Column
-    private String quizDocId;
-
-    @Column
-    private String scoreDocId;
 
     @PrePersist
     public void setDefaultColumns() {

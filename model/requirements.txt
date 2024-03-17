@@ -9,3 +9,5 @@ pymupdf
 faiss-cpu==1.7.4
 tiktoken
 uvicorn
+boto3
+unstructured==0.7.12
