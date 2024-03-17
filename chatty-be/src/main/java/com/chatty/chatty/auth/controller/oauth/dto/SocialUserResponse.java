@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record SocialUserResponse(
-        String userEmail,
+        String email,
         String profileImage
 ) {
 
