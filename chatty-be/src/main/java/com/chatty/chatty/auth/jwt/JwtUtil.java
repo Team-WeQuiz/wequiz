@@ -44,7 +44,6 @@ public class JwtUtil {
     }
 
     public String createAccessToken(User user) {
-        log.info("user.getId(): {}", user.getId());
         return Jwts.builder()
                 .claim("id", user.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
