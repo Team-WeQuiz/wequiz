@@ -63,19 +63,16 @@ public class KakaoLoginService implements SocialLoginService {
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put("authorization", "Bearer " + accessToken);
         ResponseEntity<?> response = kakaoUserApi.getUserInfo(headerMap);
-        log.info("response : {}", response);
         String jsonString = response.getBody().toString();
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class, new GsonLocalDateTimeAdapter())
                 .create();
-        KakaoLoginResponse kaKaoLoginResponse = gson.fromJson(jsonString, KakaoLoginResponse.class);
-        KakaoAccount kakao_account = kaKaoLoginResponse.getKakao_account();
-        KakaoProperties kakao_properties = kaKaoLoginResponse.getProperties();
-        log.info("kakao_account : {}", kakao_account);
-        log.info("kakao_properties : {}", kakao_properties);
+        KakaoLoginResponse kakaoLoginResponse = gson.fromJson(jsonString, KakaoLoginResponse.class);
+        KakaoAccount kakao_account = kakaoLoginResponse.getKakao_account();
+        KakaoProperties kakao_properties = kakaoLoginResponse.getProperties();
         return SocialUserResponse.builder()
-                .userEmail(kakao_account.getEmail())
+                .email(kakao_account.getEmail())
                 .profileImage(kakao_properties.getProfile_image())
                 .build();
     }

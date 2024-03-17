@@ -34,15 +34,15 @@ public class OAuthService {
         log.info("loginService.getServiceName() : {}", loginService.getServiceName());
         SocialAuthResponse socialAuthResponse = loginService.getAccessToken(request.code());
         SocialUserResponse socialUserResponse = loginService.getUserInfo(socialAuthResponse.getAccess_token());
-        log.info("socialUserResponse : {}", socialUserResponse.userEmail());
+        log.info("socialUserResponse : {}", socialUserResponse.email());
         log.info("socialUserResponse : {}", socialUserResponse.profileImage());
 
-        Optional<User> optionalUser = userRepository.findByEmail(socialUserResponse.userEmail());
+        Optional<User> optionalUser = userRepository.findByEmail(socialUserResponse.email());
         User user;
 
         if (optionalUser.isEmpty()) {
             User newUser = User.builder()
-                    .email(socialUserResponse.userEmail())
+                    .email(socialUserResponse.email())
                     .isValid(true)
                     .loginType(loginService.getServiceName())
                     .profileImage(socialUserResponse.profileImage())
