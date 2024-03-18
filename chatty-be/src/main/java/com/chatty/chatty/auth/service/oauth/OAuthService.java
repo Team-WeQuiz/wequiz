@@ -30,12 +30,8 @@ public class OAuthService {
     @Transactional
     public TokenResponse signIn(SocialLoginRequest request, Provider provider) {
         SocialLoginService loginService = getLoginService(provider);
-        log.info("request.code() : {}", request.code());
-        log.info("loginService.getServiceName() : {}", loginService.getServiceName());
         SocialAuthResponse socialAuthResponse = loginService.getAccessToken(request.code());
         SocialUserResponse socialUserResponse = loginService.getUserInfo(socialAuthResponse.getAccess_token());
-        log.info("socialUserResponse : {}", socialUserResponse.email());
-        log.info("socialUserResponse : {}", socialUserResponse.profileImage());
 
         Optional<User> optionalUser = userRepository.findByEmail(socialUserResponse.email());
         User user;
@@ -51,8 +47,6 @@ public class OAuthService {
         } else {
             user = optionalUser.get();
         }
-        log.info("user.getEmail() : {}", user.getEmail());
-        log.info("user.getProfileImage() : {}", user.getProfileImage());
 
         String accessToken = jwtUtil.createAccessToken(user);
         String refreshToken = jwtUtil.createRefreshToken(user);
