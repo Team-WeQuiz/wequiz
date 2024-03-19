@@ -8,7 +8,7 @@ public record MakeQuizResponse(
 
         Long id,
 
-        List<String> questions,
+        List<?> questions,
 
         String description
 ) {
