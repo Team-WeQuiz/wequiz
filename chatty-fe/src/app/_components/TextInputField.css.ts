@@ -40,3 +40,16 @@ export const chatInput = style({
     outline: 'none',
   },
 });
+
+export const defaultInput = style({
+  position: 'relative',
+});
+
+export const endAdornment = style({
+  position: 'absolute',
+  right: 0,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  display: 'flex',
+  alignItems: 'center',
+});

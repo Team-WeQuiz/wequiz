@@ -9,11 +9,33 @@ export const lobbyContainer = style({
   alignItems: 'center',
 });
 
+export const centerContainer = style({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  maxWidth: 1084,
+  padding: '52px 0',
+  gap: 30,
+});
+
+export const toolBar = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  width: '100%',
+});
+
+export const searchInput = style({
+  width: 360,
+});
+
+export const createButton = style({
+  width: 168,
+});
+
 export const gameListGrid = style({
   display: 'grid',
   gap: '24px',
   width: '100%',
-  maxWidth: 1084,
   padding: '0 24px',
   borderStyle: 'solid',
   borderWidth: 1,

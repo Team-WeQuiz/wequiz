@@ -11,6 +11,7 @@ type TextInputFiledProps = {
   isChat?: boolean;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  endAdornment?: React.ReactNode;
 };
 
 export default function TextInputField({
@@ -21,6 +22,7 @@ export default function TextInputField({
   isChat = false,
   value,
   onChange,
+  endAdornment,
 }: TextInputFiledProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleChatDivClick = () => {
@@ -49,17 +51,22 @@ export default function TextInputField({
     );
   } else {
     return (
-      <input
-        placeholder={placeholder}
-        required={required}
-        value={value}
-        onChange={onChange}
-        className={`${styles.container}`}
-        style={{
-          borderRadius: `${borderRadius}px`,
-          backgroundColor: `${backgroundColor}`,
-        }}
-      />
+      <div className={styles.defaultInput}>
+        <input
+          placeholder={placeholder}
+          required={required}
+          value={value}
+          onChange={onChange}
+          className={`${styles.container}`}
+          style={{
+            borderRadius: `${borderRadius}px`,
+            backgroundColor: `${backgroundColor}`,
+          }}
+        />
+        {endAdornment && (
+          <div className={styles.endAdornment}>{endAdornment}</div>
+        )}
+      </div>
     );
   }
 }
