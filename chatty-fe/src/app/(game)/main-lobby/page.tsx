@@ -6,6 +6,7 @@ import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
 import GradButton from '@/app/_components/GradButton';
 import GameListGrid from './_components/GameListGrid';
+import Image from 'next/image';
 
 const MainLobby = () => {
   const [search, setSearch] = React.useState('');
@@ -24,7 +25,12 @@ const MainLobby = () => {
               }}
               endAdornment={
                 <SolidButton shadowExist={false}>
-                  <span>검색</span>
+                  <Image
+                    src="/images/Search.svg"
+                    alt="search"
+                    width={24}
+                    height={24}
+                  />
                 </SolidButton>
               }
             />
