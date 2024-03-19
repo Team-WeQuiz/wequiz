@@ -5,6 +5,7 @@ import * as styles from './page.css';
 import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
 import GradButton from '@/app/_components/GradButton';
+import GameListGrid from './_components/GameListGrid';
 
 const MainLobby = () => {
   const [search, setSearch] = React.useState('');
@@ -34,36 +35,7 @@ const MainLobby = () => {
             </GradButton>
           </div>
         </div>
-
-        <div className={styles.gameListGrid}>
-          <div
-            style={{
-              width: '100%',
-              height: '120px',
-              backgroundColor: 'skyblue',
-            }}
-          >
-            Game 1
-          </div>
-          <div
-            style={{
-              width: '100%',
-              height: '120px',
-              backgroundColor: 'skyblue',
-            }}
-          >
-            Game 2
-          </div>
-          <div
-            style={{
-              width: '100%',
-              height: '120px',
-              backgroundColor: 'skyblue',
-            }}
-          >
-            Game 3
-          </div>
-        </div>
+        <GameListGrid />
       </div>
     </div>
   );
