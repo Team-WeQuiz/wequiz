@@ -52,6 +52,7 @@ public class User extends BaseEntity {
 
     @PrePersist
     public void setDefaultColumns() {
+        this.loginType = this.loginType == null ? Provider.NORMAL : this.loginType;
         this.isValid = this.isValid != null && this.isValid;
         this.profileImage = this.profileImage == null ? DEFAULT_PROFILE_IMAGE : this.profileImage;
     }
