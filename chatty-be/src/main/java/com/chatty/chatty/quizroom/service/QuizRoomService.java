@@ -45,7 +45,7 @@ public class QuizRoomService {
         MakeQuizRequest quizDocRequest = MakeQuizRequest.builder()
                 .id(savedQuizRoom.getId())
                 .files(request.files())
-                .type("객관식")
+                .type(request.type())
                 .numOfQuiz(request.numOfQuiz())
                 .build();
         log.info("quizDocRequest : {}", quizDocRequest);

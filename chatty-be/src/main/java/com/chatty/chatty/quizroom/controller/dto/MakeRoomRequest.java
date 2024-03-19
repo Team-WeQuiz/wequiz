@@ -14,6 +14,8 @@ public record MakeRoomRequest(
 
         String code,
 
+        String type,
+
         List<String> files
 ) {
 
