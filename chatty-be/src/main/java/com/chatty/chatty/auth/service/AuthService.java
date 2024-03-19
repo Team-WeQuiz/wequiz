@@ -2,17 +2,17 @@ package com.chatty.chatty.auth.service;
 
 import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_PASSWORD;
 import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_TOKEN;
-import static com.chatty.chatty.auth.exception.AuthExceptionType.USER_NOT_FOUND;
+import static com.chatty.chatty.user.exception.UserExceptionType.USER_NOT_FOUND;
 
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
 import com.chatty.chatty.auth.controller.dto.TokenResponse;
 import com.chatty.chatty.auth.entity.RefreshToken;
 import com.chatty.chatty.auth.exception.AuthException;
-import com.chatty.chatty.auth.exception.AuthExceptionType;
 import com.chatty.chatty.auth.jwt.JwtUtil;
 import com.chatty.chatty.auth.repository.RefreshTokenRepository;
 import com.chatty.chatty.user.entity.User;
+import com.chatty.chatty.user.exception.UserException;
 import com.chatty.chatty.user.repository.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +53,7 @@ public class AuthService {
     @Transactional
     public TokenResponse signIn(SignInRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
         if (!isPasswordValid(request, user)) {
             throw new AuthException(INVALID_PASSWORD);
         }
