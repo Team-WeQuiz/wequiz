@@ -50,9 +50,6 @@ public class QuizRoom extends BaseEntity {
     private String code;
 
     @Column(nullable = false)
-    private String link;
-
-    @Column(nullable = false)
     private Status status;
 
     @PrePersist

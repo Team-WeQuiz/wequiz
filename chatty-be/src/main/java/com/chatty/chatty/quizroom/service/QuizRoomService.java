@@ -18,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class QuizRoomService {
 
-    private final String BASE_LINK = "https://localhost:8080/rooms/";
-
     private final QuizRoomRepository quizRoomRepository;
 
     private final ModelService modelService;
@@ -41,12 +39,8 @@ public class QuizRoomService {
                 .timeLimit(request.timeLimit())
                 .playerLimitNum(request.playerLimitNum())
                 .code(request.code())
-                .link(BASE_LINK)
                 .build();
         QuizRoom savedQuizRoom = quizRoomRepository.save(newQuizRoom);
-
-        String link = BASE_LINK + savedQuizRoom.getId();
-        savedQuizRoom.setLink(link);
 
         MakeQuizRequest quizDocRequest = MakeQuizRequest.builder()
                 .id(savedQuizRoom.getId())
@@ -59,7 +53,6 @@ public class QuizRoomService {
 
         return MakeRoomResponse.builder()
                 .id(savedQuizRoom.getId())
-                .link(savedQuizRoom.getLink())
                 .questions(quizDocResponse.questions())
                 .description(quizDocResponse.description())
                 .build();
