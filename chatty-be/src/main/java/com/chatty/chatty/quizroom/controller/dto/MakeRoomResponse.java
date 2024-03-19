@@ -10,7 +10,7 @@ public record MakeRoomResponse(
 
         String link,
 
-        List<?> questions,
+        List<String> questions,
 
         String description
 ) {
