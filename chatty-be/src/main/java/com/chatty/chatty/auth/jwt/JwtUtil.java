@@ -8,7 +8,6 @@ import static com.chatty.chatty.auth.exception.AuthExceptionType.SIGNATURE_NOT_F
 import static com.chatty.chatty.auth.exception.AuthExceptionType.UNSUPPORTED_TOKEN;
 
 import com.chatty.chatty.auth.exception.AuthException;
-import com.chatty.chatty.auth.exception.AuthExceptionType;
 import com.chatty.chatty.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -60,7 +59,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public boolean isValidRefreshToken(String refreshToken) {
+    public boolean isRefreshTokenValid(String refreshToken) {
         if (isTokenExpired(refreshToken)) {
             return false;
         }

@@ -1,20 +1,17 @@
 package com.chatty.chatty.auth.service;
 
-import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_PASSWORD;
-import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_TOKEN;
-import static com.chatty.chatty.auth.exception.AuthExceptionType.USER_NOT_FOUND;
+import static com.chatty.chatty.auth.exception.AuthExceptionType.*;
 
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
+import com.chatty.chatty.auth.controller.dto.SignInResponse;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
-import com.chatty.chatty.auth.controller.dto.TokenResponse;
+import com.chatty.chatty.auth.controller.dto.SignUpResponse;
 import com.chatty.chatty.auth.entity.RefreshToken;
 import com.chatty.chatty.auth.exception.AuthException;
-import com.chatty.chatty.auth.exception.AuthExceptionType;
 import com.chatty.chatty.auth.jwt.JwtUtil;
 import com.chatty.chatty.auth.repository.RefreshTokenRepository;
 import com.chatty.chatty.user.entity.User;
 import com.chatty.chatty.user.repository.UserRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,13 +26,13 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public TokenResponse signUp(SignUpRequest request) {
+    public SignUpResponse signUp(SignUpRequest request) {
+        validateDuplicateEmail(request);
         User newUser = User.builder()
                 .email(request.email())
-                .password(new BCryptPasswordEncoder().encode(request.password()))
+                .password(encoded(request.password()))
                 .build();
         User savedUser = userRepository.save(newUser);
-        String accessToken = jwtUtil.createAccessToken(savedUser);
         String refreshToken = jwtUtil.createRefreshToken(savedUser);
 
         refreshTokenRepository.save(
@@ -44,46 +41,58 @@ public class AuthService {
                         .token(refreshToken)
                         .build()
         );
-        return TokenResponse.builder()
-                .accessToken(accessToken)
+        return SignUpResponse.builder()
+                .accessToken(jwtUtil.createAccessToken(savedUser))
                 .refreshToken(refreshToken)
                 .build();
     }
 
     @Transactional
-    public TokenResponse signIn(SignInRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
+    public SignInResponse signIn(SignInRequest request) {
+        User user = findUserByEmail(request.email());
+        validateSignInRequest(request, user);
+        String accessToken = jwtUtil.createAccessToken(user);
+        return SignInResponse.builder()
+                .accessToken(accessToken)
+                .build();
+    }
+
+    private void validateDuplicateEmail(SignUpRequest request) {
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new AuthException(INVALID_EMAIL);
+        }
+    }
+
+    private String encoded(String password) {
+        return new BCryptPasswordEncoder().encode(password);
+    }
+
+    private void validateSignInRequest(SignInRequest request, User user) {
+        validatePassword(request, user);
+        validateRefreshToken(user);
+    }
+
+    private void validateRefreshToken(User user) {
+        String refreshToken = refreshTokenRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new AuthException(INVALID_TOKEN))
+                .getToken();
+        if (!jwtUtil.isRefreshTokenValid(refreshToken)) {
+            throw new AuthException(INVALID_TOKEN);
+        }
+    }
+
+    private void validatePassword(SignInRequest request, User user) {
         if (!isPasswordValid(request, user)) {
             throw new AuthException(INVALID_PASSWORD);
         }
-        //TODO: 리프레쉬 토큰 재발급 로직 구현
-        RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new AuthException(INVALID_TOKEN));
-        String accessToken;
-        String refreshToken = refreshTokenEntity.getToken();
-        if (jwtUtil.isValidRefreshToken(refreshToken)) {
-            accessToken = jwtUtil.createAccessToken(user);
-            return TokenResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-        }
-        refreshToken = jwtUtil.createRefreshToken(user);
-        accessToken = jwtUtil.createAccessToken(user);
-        refreshTokenEntity.updateToken(refreshToken);
-
-        return TokenResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
     }
 
     private boolean isPasswordValid(SignInRequest request, User user) {
         return new BCryptPasswordEncoder().matches(request.password(), user.getPassword());
     }
 
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
     }
 }
