@@ -1,6 +1,9 @@
 package com.chatty.chatty.auth.controller.dto;
 
-public record RefreshTokenResponse(
+import lombok.Builder;
+
+@Builder
+public record RefreshTokenRequest(
         String refreshToken
 ) {
 

@@ -1,5 +1,6 @@
 package com.chatty.chatty.auth.controller;
 
+import com.chatty.chatty.auth.controller.dto.RefreshTokenRequest;
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignInResponse;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
@@ -30,5 +31,10 @@ public class AuthController {
     @PostMapping("/signIn")
     public ResponseEntity<SignInResponse> signIn(@RequestBody SignInRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<SignUpResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(request));
     }
 }

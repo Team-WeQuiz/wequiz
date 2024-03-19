@@ -75,7 +75,7 @@ public class JwtUtil {
         return getClaimFromToken(token).getExpiration().before(new Date());
     }
 
-    public Long extract(String token) {
+    public Long getUserIdFromToken(String token) {
         try {
             return getClaimFromToken(token).get("id", Long.class);
         } catch (SecurityException e) {

@@ -2,6 +2,7 @@ package com.chatty.chatty.auth.service;
 
 import static com.chatty.chatty.auth.exception.AuthExceptionType.*;
 
+import com.chatty.chatty.auth.controller.dto.RefreshTokenRequest;
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignInResponse;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
@@ -27,7 +28,7 @@ public class AuthService {
 
     @Transactional
     public SignUpResponse signUp(SignUpRequest request) {
-        validateDuplicateEmail(request);
+        validateDuplicateEmail(request.email());
         User newUser = User.builder()
                 .email(request.email())
                 .password(encoded(request.password()))
@@ -50,15 +51,31 @@ public class AuthService {
     @Transactional
     public SignInResponse signIn(SignInRequest request) {
         User user = findUserByEmail(request.email());
-        validateSignInRequest(request, user);
-        String accessToken = jwtUtil.createAccessToken(user);
+        validateSignInRequest(user.getId(), request.password());
         return SignInResponse.builder()
-                .accessToken(accessToken)
+                .accessToken(jwtUtil.createAccessToken(user))
                 .build();
     }
 
-    private void validateDuplicateEmail(SignUpRequest request) {
-        if (userRepository.findByEmail(request.email()).isPresent()) {
+    @Transactional
+    public SignUpResponse refresh(RefreshTokenRequest request) {
+        User user = findUserById(jwtUtil.getUserIdFromToken(request.refreshToken()));
+        refreshTokenRepository.deleteByUserId(user.getId());
+        String refreshToken = jwtUtil.createRefreshToken(user);
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .user(user)
+                        .token(refreshToken)
+                        .build()
+        );
+        return SignUpResponse.builder()
+                .accessToken(jwtUtil.createAccessToken(user))
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    private void validateDuplicateEmail(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new AuthException(INVALID_EMAIL);
         }
     }
@@ -67,13 +84,13 @@ public class AuthService {
         return new BCryptPasswordEncoder().encode(password);
     }
 
-    private void validateSignInRequest(SignInRequest request, User user) {
-        validatePassword(request, user);
-        validateRefreshToken(user);
+    private void validateSignInRequest(Long userId, String password) {
+        validatePassword(userId, password);
+        validateRefreshToken(userId);
     }
 
-    private void validateRefreshToken(User user) {
-        String refreshToken = refreshTokenRepository.findByUserId(user.getId())
+    private void validateRefreshToken(Long userId) {
+        String refreshToken = refreshTokenRepository.findByUserId(userId)
                 .orElseThrow(() -> new AuthException(INVALID_TOKEN))
                 .getToken();
         if (!jwtUtil.isRefreshTokenValid(refreshToken)) {
@@ -81,14 +98,20 @@ public class AuthService {
         }
     }
 
-    private void validatePassword(SignInRequest request, User user) {
-        if (!isPasswordValid(request, user)) {
+    private void validatePassword(Long userId, String password) {
+        if (!isPasswordValid(userId, password)) {
             throw new AuthException(INVALID_PASSWORD);
         }
     }
 
-    private boolean isPasswordValid(SignInRequest request, User user) {
-        return new BCryptPasswordEncoder().matches(request.password(), user.getPassword());
+    private boolean isPasswordValid(Long userId, String password) {
+        User user = findUserById(userId);
+        return new BCryptPasswordEncoder().matches(password, user.getPassword());
+    }
+
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
     }
 
     public User findUserByEmail(String email) {
