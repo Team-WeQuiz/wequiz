@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 import * as styles from './page.css';
 import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { validateEmail, validatePassword } from '@/app/_lib/validation';
+import { authHandler } from '@/app/_lib/auth';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -15,7 +14,6 @@ export default function SignUp() {
   const [hasPasswordCheckStarted, setHasPasswordCheckStarted] = useState(false);
   const isEmailValid = validateEmail(email);
   const isPasswordValid = validatePassword(password);
-  const router = useRouter();
 
   useEffect(() => {
     if (hasPasswordCheckStarted) {
@@ -30,34 +28,14 @@ export default function SignUp() {
     setPasswordCheck(e.target.value);
   };
 
-  const handleLogin = async () => {
-    if (isEmailValid && isPasswordValid && !isPasswordMismatch) {
-      try {
-        const response = await axios.post(
-          'http://localhost:8080/api/auth/signUp',
-          {
-            email: email,
-            password: password,
-          },
-        );
-        console.log(response);
-        const { accessToken, refreshToken } = response.data;
-        if (accessToken && refreshToken) {
-          localStorage.setItem('accessToken', accessToken);
-          localStorage.setItem('refreshToken', refreshToken);
-        }
-        router.push('/main-lobby');
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      console.error('회원정보 입력 바람');
-    }
-  };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await handleLogin();
+    if (isEmailValid && isPasswordValid && !isPasswordMismatch) {
+      authHandler(
+        { email: email, password: password },
+        'http://localhost:8080/api/auth/signUp',
+      );
+    }
   };
 
   return (

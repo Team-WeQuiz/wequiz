@@ -1,61 +1,28 @@
 'use client';
 
-import axios from 'axios';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { authHandler } from '@/app/_lib/auth';
+import { useSearchParams } from 'next/navigation';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect } from 'react';
 
 function GoogleLoginComponent() {
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
-  const [isFetched, setIsFetched] = useState(false);
-  const [data, setData] = useState({ token: '', refreshToken: '' });
-  const router = useRouter();
 
-  const loginHandler = async (code: string | string[]) => {
-    try {
-      const response = await axios.post(
-        'http://localhost:8080/api/oauth/google/signIn',
-        {
-          code: code,
-        },
-      );
-      setIsFetched(true);
-      setData({
-        token: response.data.accessToken,
-        refreshToken: response.data.refreshToken,
-      });
-      router.push('/main-lobby');
-      console.log(response);
-    } catch (error) {
-      console.error('error: ', error);
-    }
+  const handleSubmit = async (code: string | string[]) => {
+    authHandler(
+      { code: code },
+      'http://localhost:8080/api/oauth/google/signIn',
+    );
   };
 
   useEffect(() => {
     if (authCode) {
       const decoded = decodeURI(authCode);
       console.log(decoded);
-      loginHandler(decoded);
+      handleSubmit(decoded);
     }
   });
-
-  useEffect(() => {
-    if (data.token && data.refreshToken) {
-      localStorage.setItem('accessToken', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
-    }
-  }, [data]);
-
-  if (isFetched) {
-    return (
-      <div>
-        <h1>로그인 성공</h1>
-        <h2>token: ${data.token}</h2>
-        <h2>refreshToken: ${data.refreshToken}</h2>
-      </div>
-    );
-  }
 
   return <div>로그인 중입니다..</div>;
 }
