@@ -1,12 +1,12 @@
 package com.chatty.chatty.auth.service;
 
 import static com.chatty.chatty.auth.exception.AuthExceptionType.*;
+import static com.chatty.chatty.user.exception.UserExceptionType.USER_NOT_FOUND;
 
 import com.chatty.chatty.auth.controller.dto.RefreshTokenRequest;
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
-import com.chatty.chatty.auth.controller.dto.SignInResponse;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
-import com.chatty.chatty.auth.controller.dto.SignUpResponse;
+import com.chatty.chatty.auth.controller.dto.TokenResponse;
 import com.chatty.chatty.auth.entity.RefreshToken;
 import com.chatty.chatty.auth.exception.AuthException;
 import com.chatty.chatty.auth.jwt.JwtUtil;
@@ -28,7 +28,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public SignUpResponse signUp(SignUpRequest request) {
+    public TokenResponse signUp(SignUpRequest request) {
         validateDuplicateEmail(request.email());
         User newUser = User.builder()
                 .email(request.email())
@@ -43,23 +43,24 @@ public class AuthService {
                         .token(refreshToken)
                         .build()
         );
-        return SignUpResponse.builder()
+        return TokenResponse.builder()
                 .accessToken(jwtUtil.createAccessToken(savedUser))
                 .refreshToken(refreshToken)
                 .build();
     }
 
     @Transactional
-    public SignInResponse signIn(SignInRequest request) {
+    public TokenResponse signIn(SignInRequest request) {
         User user = findUserByEmail(request.email());
         validateSignInRequest(user.getId(), request.password());
-        return SignInResponse.builder()
+        return TokenResponse.builder()
                 .accessToken(jwtUtil.createAccessToken(user))
+                .refreshToken(getRefreshToken(user.getId()))
                 .build();
     }
 
     @Transactional
-    public SignUpResponse refresh(RefreshTokenRequest request) {
+    public TokenResponse refresh(RefreshTokenRequest request) {
         User user = findUserById(jwtUtil.getUserIdFromToken(request.refreshToken()));
         refreshTokenRepository.deleteByUserId(user.getId());
         String refreshToken = jwtUtil.createRefreshToken(user);
@@ -69,7 +70,7 @@ public class AuthService {
                         .token(refreshToken)
                         .build()
         );
-        return SignUpResponse.builder()
+        return TokenResponse.builder()
                 .accessToken(jwtUtil.createAccessToken(user))
                 .refreshToken(refreshToken)
                 .build();
@@ -112,11 +113,17 @@ public class AuthService {
 
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    }
+
+    private String getRefreshToken(Long userId) {
+        return refreshTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new AuthException(INVALID_TOKEN))
+                .getToken();
     }
 }
