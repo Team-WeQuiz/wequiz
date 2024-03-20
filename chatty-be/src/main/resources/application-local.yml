@@ -21,7 +21,7 @@ social:
       redirect-uri: http://localhost:3000/sign-in/kakao/callback
       grant_type: authorization_code
     google:
-      client-id: 536185302907-cs7293um69ca55b9p2c0k6339ir37cjn.apps.googleusercontent.com
-      client-secret: g
+      client-id: 98146529486-md3ri8vfvupsgokf1bup6smaeuj1bbuo.apps.googleusercontent.com
+      client-secret: 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
       redirect-uri: http://localhost:3000/sign-in/google/callback
       grant_type: authorization_code
