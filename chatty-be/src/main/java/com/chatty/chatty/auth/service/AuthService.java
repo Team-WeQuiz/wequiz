@@ -12,6 +12,7 @@ import com.chatty.chatty.auth.exception.AuthException;
 import com.chatty.chatty.auth.jwt.JwtUtil;
 import com.chatty.chatty.auth.repository.RefreshTokenRepository;
 import com.chatty.chatty.user.entity.User;
+import com.chatty.chatty.user.exception.UserException;
 import com.chatty.chatty.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
