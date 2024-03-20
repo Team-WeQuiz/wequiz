@@ -2,9 +2,9 @@ package com.chatty.chatty.auth.service.oauth;
 
 import static com.chatty.chatty.auth.exception.AuthExceptionType.UNSUPPORTED_LOGIN_PROVIDER;
 
-import com.chatty.chatty.auth.controller.dto.TokenResponse;
 import com.chatty.chatty.auth.controller.oauth.dto.SocialAuthResponse;
 import com.chatty.chatty.auth.controller.oauth.dto.SocialLoginRequest;
+import com.chatty.chatty.auth.controller.dto.SignInResponse;
 import com.chatty.chatty.auth.controller.oauth.dto.SocialUserResponse;
 import com.chatty.chatty.auth.entity.Provider;
 import com.chatty.chatty.auth.exception.AuthException;
@@ -28,7 +28,7 @@ public class OAuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public TokenResponse signIn(SocialLoginRequest request, Provider provider) {
+    public SignInResponse signIn(SocialLoginRequest request, Provider provider) {
         SocialLoginService loginService = getLoginService(provider);
         SocialAuthResponse socialAuthResponse = loginService.getAccessToken(request.code());
         SocialUserResponse socialUserResponse = loginService.getUserInfo(socialAuthResponse.getAccess_token());
@@ -49,8 +49,7 @@ public class OAuthService {
         }
 
         String accessToken = jwtUtil.createAccessToken(user);
-        String refreshToken = jwtUtil.createRefreshToken(user);
-        return new TokenResponse(accessToken, refreshToken);
+        return new SignInResponse(accessToken);
     }
 
     private SocialLoginService getLoginService(Provider provider) {

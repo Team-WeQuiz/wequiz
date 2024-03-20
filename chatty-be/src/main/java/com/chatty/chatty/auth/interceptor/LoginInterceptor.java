@@ -25,7 +25,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = AuthenticationExtractor.extract(request)
                 .orElseThrow(() -> new AuthException(UNAUTHORIZED));
-        Long userId = jwtUtil.extract(token);
+        Long userId = jwtUtil.getUserIdFromToken(token);
         log.info("userId: {}", userId);
         authenticationContext.setAuthentication(userId);
         return true;
