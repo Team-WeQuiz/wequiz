@@ -2,9 +2,8 @@ package com.chatty.chatty.auth.controller;
 
 import com.chatty.chatty.auth.controller.dto.RefreshTokenRequest;
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
-import com.chatty.chatty.auth.controller.dto.SignInResponse;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
-import com.chatty.chatty.auth.controller.dto.SignUpResponse;
+import com.chatty.chatty.auth.controller.dto.TokenResponse;
 import com.chatty.chatty.auth.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,17 +23,17 @@ public class AuthController {
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest request) {
+    public ResponseEntity<TokenResponse> signUp(@RequestBody SignUpRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(request));
     }
 
     @PostMapping("/signIn")
-    public ResponseEntity<SignInResponse> signIn(@RequestBody SignInRequest request) {
+    public ResponseEntity<TokenResponse> signIn(@RequestBody SignInRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(request));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<SignUpResponse> refresh(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<TokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(request));
     }
 }
