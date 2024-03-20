@@ -12,6 +12,8 @@ type TextInputFiledProps = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   endAdornment?: React.ReactNode;
+  type?: string;
+  autoComplete?: string;
 };
 
 export default function TextInputField({
@@ -20,9 +22,11 @@ export default function TextInputField({
   backgroundColor,
   required = false,
   isChat = false,
+  type,
   value,
   onChange,
   endAdornment,
+  autoComplete,
 }: TextInputFiledProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleChatDivClick = () => {
@@ -45,6 +49,7 @@ export default function TextInputField({
           value={value}
           onChange={onChange}
           className={styles.chatInput}
+          type={type}
         />
         <Image src="/images/Send_fill.svg" alt="send" width={48} height={48} />
       </div>
@@ -57,6 +62,8 @@ export default function TextInputField({
           required={required}
           value={value}
           onChange={onChange}
+          type={type}
+          autoComplete={autoComplete}
           className={`${styles.container}`}
           style={{
             borderRadius: `${borderRadius}px`,

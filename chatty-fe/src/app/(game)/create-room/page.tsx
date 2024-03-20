@@ -48,6 +48,7 @@ export default function CreateRoom() {
             <ContentsBox imgSrc="/images/Home.svg" title="방 제목" />
             <div className={styles.titleWrapper}>
               <TextInputField
+                type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 borderRadius={12}
@@ -60,6 +61,7 @@ export default function CreateRoom() {
             <ContentsBox imgSrc="/images/comment.svg" title="설명" />
             <div className={styles.defaultWrapper}>
               <TextInputField
+                type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 borderRadius={12}
@@ -72,6 +74,7 @@ export default function CreateRoom() {
             <ContentsBox imgSrc="/images/Group_add.svg" title="인원 수" />
             <div className={styles.defaultWrapper}>
               <TextInputField
+                type="number"
                 value={numberOfParticipants}
                 onChange={(e) => setNumberOfParticipants(e.target.value)}
                 borderRadius={12}
@@ -84,6 +87,7 @@ export default function CreateRoom() {
             <ContentsBox imgSrc="/images/Key.svg" title="비밀번호" />
             <div className={styles.defaultWrapper}>
               <TextInputField
+                type="text"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 borderRadius={12}
@@ -96,6 +100,7 @@ export default function CreateRoom() {
             <ContentsBox imgSrc="/images/Tumer_fill.svg" title="시간" />
             <div className={styles.defaultWrapper}>
               <TextInputField
+                type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
                 borderRadius={12}
@@ -129,6 +134,7 @@ export default function CreateRoom() {
             <ContentsBox imgSrc="/images/Book_open_alt.svg" title="문제 수" />
             <div className={styles.defaultWrapper}>
               <TextInputField
+                type="number"
                 value={numberOfProblems}
                 onChange={(e) => setNumberOfProblems(e.target.value)}
                 borderRadius={12}

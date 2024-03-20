@@ -27,6 +27,7 @@
     "no-undef": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error"],
-    "allowImportingTsExtensions": 0
+    "allowImportingTsExtensions": 0,
+    "@typescript-eslint/no-explicit-any": ["warn"]
   }
 }
