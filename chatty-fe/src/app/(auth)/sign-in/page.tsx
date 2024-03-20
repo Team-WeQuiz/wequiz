@@ -7,10 +7,13 @@ import SolidButton from '@/app/_components/SolidButton';
 import Link from 'next/link';
 import Script from 'next/script';
 import { googleLogin, kakaoInit, kakaoLogin } from '@/app/_lib/auth';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleKakaoLogin = () => {
     kakaoLogin('http://localhost:3000/sign-in/kakao/callback');
@@ -20,13 +23,34 @@ export default function SignIn() {
     googleLogin('http://localhost:3000/sign-in/google/callback');
   };
 
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/auth/signIn',
+        {
+          eamil: email,
+          password: password,
+        },
+      );
+      const { accessToken, refreshToken } = response.data;
+      if (accessToken && refreshToken) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+      }
+      router.push('/main-lobby');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={styles.mainContainer}>
       <div className={styles.container}>
         <div className={styles.imageBox}>
           <Image src="/images/logo.svg" width={360} height={167} alt="logo" />
         </div>
-        <div className={styles.formWrapper}>
+        <form className={styles.formWrapper} onSubmit={handleSubmit}>
           <div className={styles.inputFieldWrapper}>
             <TextInputField
               type="email"
@@ -34,6 +58,7 @@ export default function SignIn() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               borderRadius={12}
+              autoComplete="email"
             />
           </div>
           <div className={styles.inputFieldWrapper}>
@@ -43,12 +68,13 @@ export default function SignIn() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               borderRadius={12}
+              autoComplete="current-password"
             />
           </div>
-        </div>
-        <div className={styles.buttonWrapper}>
-          <SolidButton fullWidth={true}>로그인</SolidButton>
-        </div>
+          <div className={styles.buttonWrapper}>
+            <SolidButton fullWidth={true}>로그인</SolidButton>
+          </div>
+        </form>
 
         <p>
           아직 회원이 아니신가요?{' '}
