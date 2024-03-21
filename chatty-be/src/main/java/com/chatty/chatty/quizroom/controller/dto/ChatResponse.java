@@ -1,18 +1,25 @@
 package com.chatty.chatty.quizroom.controller.dto;
 
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
-public record ChatResponse(
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public class ChatResponse {
 
-        Long roomId,
+    private ChatType chatType;
 
-        Long userId,
+    private Long roomId;
 
-        String message,
+    private Long userId;
 
-        LocalDateTime time
+    private String message;
 
-) {
+    private LocalDateTime time;
+
 }
