@@ -38,48 +38,15 @@ uvicorn app:app --reload
 python3 main.py
 ```
 ---
-## API test (local)
-### Convert PDF to Vector
-**request** 
 
-```
-# post
-http://127.0.0.1:8000/convert
-```
+### Docker
 
-```json
-{
-    "file_path": "data/dummyData/초거대 언어모델 연구 동향.pdf"
-}
+build
+```shell
+sudo docker build -t wequiz-model .
 ```
 
-**response**
-
-```json
-{
-    "message": "PDF converted to vectors successfully.",
-    "db_url": "data/faiss_index2"
-}
-```
-### Inference Request
-
-**request** 
-
-```
-# post
-http://127.0.0.1:8000/ask
-```
-
-```json
-{
-    "message": "LLM의 등장으로 변화한 점 알려줘"
-}
-```
-
-**response**
-
-```json
-{
-    "response": "LLM의 등장으로 변화한 점은 다음과 같습니다:\n\n1. 다양한 태스크 수행 가능: LLM은 번역, 요약, 질의응답, 형태소분석 등 다양한 태스크를 하나의 모델로 수행할 수 있게 되었습니다. ..."
-}
+run
+```shell
+sudo docker run -p 8000:8000 --name wequiz-model wequiz-model
 ```
