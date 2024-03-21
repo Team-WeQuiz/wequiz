@@ -11,10 +11,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ChatRequest {
 
-    public enum ChatType {
-        TEXT, EMOJI
-    }
-
     private ChatType chatType;
 
     private Long roomId;

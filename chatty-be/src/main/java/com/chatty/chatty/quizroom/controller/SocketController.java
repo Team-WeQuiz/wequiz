@@ -22,7 +22,8 @@ public class SocketController {
     @SendTo("/sub/rooms/{roomId}")
     public ChatResponse chat(@DestinationVariable Long roomId, ChatRequest request) {
         return ChatResponse.builder()
-                .roomId(roomId)
+                .chatType(request.getChatType())
+                .roomId(request.getRoomId())
                 .userId(request.getUserId())
                 .message(request.getMessage())
                 .time(LocalDateTime.now())
