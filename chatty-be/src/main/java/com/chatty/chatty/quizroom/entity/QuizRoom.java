@@ -14,17 +14,21 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "quiz_rooms")
 public class QuizRoom extends BaseEntity {
+
+    public enum Status {
+        READY,
+        STARTED,
+        FINISHED
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
