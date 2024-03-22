@@ -4,6 +4,10 @@ TODO
 """
 
 from langchain_openai import OpenAIEmbeddings
+import os
+
+# Get the OpenAI API key from the environment variable
+openai_api_key = os.getenv("OPEN_API_KEY")
 # from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 
 class Embedding():
@@ -15,6 +19,6 @@ class Embedding():
         query: 사용자 질문 벡터화
         """
         if type == 'docs':
-            self.model = OpenAIEmbeddings()
+            self.model = OpenAIEmbeddings(openai_api_key=openai_api_key)
         else:
-            self.model = OpenAIEmbeddings()
+            self.model = OpenAIEmbeddings(openai_api_key=openai_api_key)
