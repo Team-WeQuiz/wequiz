@@ -23,13 +23,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "quiz_rooms")
 public class QuizRoom extends BaseEntity {
-
-    public enum Status {
-        READY,
-        STARTED,
-        FINISHED
-    }
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id")
