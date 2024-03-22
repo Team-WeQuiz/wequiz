@@ -36,8 +36,9 @@ def generate_prob(prob: ProbRequest):
         log('info', f'Prob Chain inference is successed.')
         data = {
             "id": prob.id,
-            "questions": f"""
+            "questions":
             [
+                f"""
                 {{
                     "id": {uuid.uuid4()},
                     "question_number": {1},
@@ -46,8 +47,8 @@ def generate_prob(prob: ProbRequest):
                     "options": {response["text"]["choices"]},
                     "answer": {response["text"]["answer"]}
                 }}
-            ]
-            """,
+                """,
+            ],
             "description": 'not yet',
         }
         return data
