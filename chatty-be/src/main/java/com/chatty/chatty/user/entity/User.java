@@ -37,7 +37,7 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(nullable = false)
@@ -47,7 +47,7 @@ public class User extends BaseEntity {
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private Provider loginType;
 
     @PrePersist
