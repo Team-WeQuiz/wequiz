@@ -1,5 +1,6 @@
 package com.chatty.chatty.auth.controller;
 
+import com.chatty.chatty.auth.controller.dto.RefreshTokenRequest;
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
 import com.chatty.chatty.auth.controller.dto.TokenResponse;
@@ -23,14 +24,16 @@ public class AuthController {
 
     @PostMapping("/signUp")
     public ResponseEntity<TokenResponse> signUp(@RequestBody SignUpRequest request) {
-        if (authService.findByEmail(request.email()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(request));
     }
 
     @PostMapping("/signIn")
     public ResponseEntity<TokenResponse> signIn(@RequestBody SignInRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(request));
     }
 }

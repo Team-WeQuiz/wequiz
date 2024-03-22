@@ -12,3 +12,16 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: wequizadmin
     password: 'wequizadmin'
+
+social:
+  client:
+    kakao:
+      client-id: 948b0f6cb65248afcd53e046c4e61145
+      client-secret: KtXGlrkvmLgT8KbvgVzmbvXt15bXXdp6
+      redirect-uri: http://localhost:3000/sign-in/kakao/callback
+      grant_type: authorization_code
+    google:
+      client-id: 98146529486-md3ri8vfvupsgokf1bup6smaeuj1bbuo.apps.googleusercontent.com
+      client-secret: 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
+      redirect-uri: http://localhost:3000/sign-in/google/callback
+      grant_type: authorization_code

@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  database:
+    container_name: wequiz_database
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: wequiz_db
+      POSTGRES_USER: wequizadmin
+      POSTGRES_PASSWORD: wequizadmin
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db:/var/lib/postgres
+
+  backend:
+    container_name: wequiz_backend
+    build:
+      context: chatty-be
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    environment:
+      PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/wequiz_db
+      SPRING_DATASOURCE_USERNAME: wequizadmin
+      SPRING_DATASOURCE_PASSWORD: wequizadmin
+
+  frontend:
+    container_name: wequiz_frontend
+    build:
+      context: chatty-fe
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend

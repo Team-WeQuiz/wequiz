@@ -1,5 +1,6 @@
 package com.chatty.chatty.auth.config;
 
+import static com.chatty.chatty.auth.interceptor.HttpMethod.GET;
 import static com.chatty.chatty.auth.interceptor.HttpMethod.OPTIONS;
 
 import com.chatty.chatty.auth.controller.AuthArgumentResolver;
@@ -30,7 +31,8 @@ public class AuthConfig implements WebMvcConfigurer {
      */
     private HandlerInterceptor loginInterceptor() {
         return new PathMatcherInterceptor(loginInterceptor)
-                .excludePathPattern("/**", OPTIONS);
+                .excludePathPattern("/**", OPTIONS)
+                .addPathPattern("/user", GET);
 //  예시            .addPathPattern("/test", GET, POST);
     }
 
