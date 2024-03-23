@@ -1,11 +1,11 @@
-package com.chatty.chatty.auth.exception;
+package com.chatty.chatty.quizroom.exception;
 
 import com.chatty.chatty.common.exception.BaseException;
 import com.chatty.chatty.common.exception.ExceptionType;
 
-public class AuthException extends BaseException {
+public class QuizRoomException extends BaseException {
 
-    public AuthException(ExceptionType exceptionType) {
+    public QuizRoomException(ExceptionType exceptionType) {
         super(exceptionType);
     }
 }
