@@ -5,6 +5,7 @@ import ContentsBox from './_components/ContentsBox';
 import TextInputField from '@/app/_components/TextInputField';
 import FileUploadBox from './_components/FileUploadBox';
 import RadioInputField from '@/app/_components/RadioInputField';
+import { postRoom } from '@/app/_api/createRoom';
 
 export default function CreateRoom() {
   const problemTypeOptions = [
@@ -16,26 +17,27 @@ export default function CreateRoom() {
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [numberOfParticipants, setNumberOfParticipants] = useState('');
+  const [numberOfParticipants, setNumberOfParticipants] = useState(0);
   const [password, setPassword] = useState('');
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState(0);
   const [problemType, setProblemType] = useState('객관식');
-  const [numberOfProblems, setNumberOfProblems] = useState('');
+  const [numberOfProblems, setNumberOfProblems] = useState(0);
 
   const handleRadioChange = (value: string) => {
     setProblemType(value);
   };
 
-  // 테스트 코드
-  const onSubmit = () => {
-    console.log('File Names: ', fileNames);
-    console.log('Title: ', title);
-    console.log('Description: ', description);
-    console.log('Number Of Participants: ', numberOfParticipants);
-    console.log('Password: ', password);
-    console.log('Time: ', time);
-    console.log('Problem Type: ', problemType);
-    console.log('Number Of Problems: ', numberOfProblems);
+  const onSubmit = async () => {
+    const response = await postRoom(
+      title,
+      numberOfProblems,
+      time,
+      numberOfParticipants,
+      password,
+      problemType,
+      fileNames,
+    );
+    console.log(response);
   };
 
   return (
@@ -75,8 +77,10 @@ export default function CreateRoom() {
             <div className={styles.defaultWrapper}>
               <TextInputField
                 type="number"
-                value={numberOfParticipants}
-                onChange={(e) => setNumberOfParticipants(e.target.value)}
+                value={String(numberOfParticipants)}
+                onChange={(e) =>
+                  setNumberOfParticipants(Number(e.target.value))
+                }
                 borderRadius={12}
               />
             </div>
@@ -100,9 +104,9 @@ export default function CreateRoom() {
             <ContentsBox imgSrc="/images/Tumer_fill.svg" title="시간" />
             <div className={styles.defaultWrapper}>
               <TextInputField
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
+                type="number"
+                value={String(time)}
+                onChange={(e) => setTime(Number(e.target.value))}
                 borderRadius={12}
               />
             </div>
@@ -135,8 +139,8 @@ export default function CreateRoom() {
             <div className={styles.defaultWrapper}>
               <TextInputField
                 type="number"
-                value={numberOfProblems}
-                onChange={(e) => setNumberOfProblems(e.target.value)}
+                value={String(numberOfProblems)}
+                onChange={(e) => setNumberOfProblems(Number(e.target.value))}
                 borderRadius={12}
               />
             </div>
