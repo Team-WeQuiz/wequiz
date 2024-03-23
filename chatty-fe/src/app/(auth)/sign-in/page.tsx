@@ -37,7 +37,13 @@ export default function SignIn() {
     <div className={styles.mainContainer}>
       <div className={styles.container}>
         <div className={styles.imageBox}>
-          <Image src="/images/logo.svg" width={360} height={167} alt="logo" />
+          <Image
+            src="/images/logo.svg"
+            width={360}
+            height={167}
+            alt="logo"
+            priority
+          />
         </div>
         <form className={styles.formWrapper} onSubmit={handleSubmit}>
           <div className={styles.inputFieldWrapper}>
@@ -99,7 +105,8 @@ export default function SignIn() {
         src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js"
         integrity="sha384-l+xbElFSnPZ2rOaPrU//2FF5B4LB8FiX5q4fXYTlfcG4PGpMkE1vcL7kNXI6Cci0"
         crossOrigin="anonymous"
-        onLoad={kakaoInit}
+        onLoad={() => kakaoInit()}
+        strategy="lazyOnload"
       />
     </div>
   );

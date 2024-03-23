@@ -27,7 +27,7 @@ function GoogleLoginComponent() {
   return <div>로그인 중입니다..</div>;
 }
 
-export default function KakaoLogin() {
+export default function GoogleLogin() {
   return (
     <Suspense>
       <GoogleLoginComponent />
