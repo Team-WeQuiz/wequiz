@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 export const kakaoInit = () => {
   if (window.Kakao && !window.Kakao.isInitialized()) {
     window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
@@ -23,19 +21,4 @@ export const googleLogin = (redirectUri: string) => {
     `redirect_uri=${redirectUri}&` +
     'response_type=code&' +
     'scope=email profile';
-};
-
-export const authHandler = async (data: object, url: string) => {
-  try {
-    const response = await axios.post(url, data);
-    const { accessToken, refreshToken } = response.data;
-    if (accessToken && refreshToken) {
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-    }
-    console.log(response);
-    window.location.href = 'http://localhost:3000/main-lobby';
-  } catch (error) {
-    console.error(error);
-  }
 };

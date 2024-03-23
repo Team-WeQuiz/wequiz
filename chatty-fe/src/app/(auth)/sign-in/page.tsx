@@ -6,16 +6,16 @@ import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
 import Link from 'next/link';
 import Script from 'next/script';
-import {
-  googleLogin,
-  kakaoInit,
-  kakaoLogin,
-  authHandler,
-} from '@/app/_lib/auth';
+import { googleLogin, kakaoInit, kakaoLogin } from '@/app/_lib/auth';
+import { postSignIn } from '@/app/_api/auth';
+import useAuthStore from '@/app/_store/useAuthStore';
+import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setTokens } = useAuthStore();
+  const router = useRouter();
 
   const handleKakaoLogin = () => {
     kakaoLogin('http://localhost:3000/sign-in/kakao/callback');
@@ -27,10 +27,12 @@ export default function SignIn() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    authHandler(
-      { email: email, password: password },
-      'http://localhost:8080/api/auth/signIn',
-    );
+    const response = await postSignIn({ email: email, password: password });
+    const { accessToken, refreshToken } = response;
+    setTokens(accessToken, refreshToken);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    router.push('/main-lobby');
   };
 
   return (

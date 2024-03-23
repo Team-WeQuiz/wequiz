@@ -1,7 +1,8 @@
 'use client';
 
-import { authHandler } from '@/app/_lib/auth';
-import { useSearchParams } from 'next/navigation';
+import { postKakaoLogin } from '@/app/_api/auth';
+import useAuthStore from '@/app/_store/useAuthStore';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import React, { Suspense, useEffect } from 'react';
 
@@ -9,16 +10,23 @@ function KakaoLoginComponent() {
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
   const kakaoServerError = searchParams.get('error');
+  const { setTokens } = useAuthStore();
+  const router = useRouter();
 
-  const handleSubmit = async (code: string | string[]) => {
-    authHandler({ code: code }, 'http://localhost:8080/api/oauth/kakao/signIn');
+  const handleLogin = async (authCode: string) => {
+    const response = await postKakaoLogin(authCode);
+    const { accessToken, refreshToken } = response;
+    setTokens(accessToken, refreshToken);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    router.push('/main-lobby');
   };
 
   useEffect(() => {
     if (authCode) {
-      handleSubmit(authCode);
+      handleLogin(authCode);
     } else if (kakaoServerError) {
-      console.log(kakaoServerError);
+      console.error(kakaoServerError);
     }
   });
 

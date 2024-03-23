@@ -4,7 +4,9 @@ import * as styles from './page.css';
 import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
 import { validateEmail, validatePassword } from '@/app/_lib/validation';
-import { authHandler } from '@/app/_lib/auth';
+import { postSignUp } from '@/app/_api/auth';
+import useAuthStore from '@/app/_store/useAuthStore';
+import { useRouter } from 'next/navigation';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -14,6 +16,8 @@ export default function SignUp() {
   const [hasPasswordCheckStarted, setHasPasswordCheckStarted] = useState(false);
   const isEmailValid = validateEmail(email);
   const isPasswordValid = validatePassword(password);
+  const { setTokens } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     if (hasPasswordCheckStarted) {
@@ -31,10 +35,13 @@ export default function SignUp() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isEmailValid && isPasswordValid && !isPasswordMismatch) {
-      authHandler(
-        { email: email, password: password },
-        'http://localhost:8080/api/auth/signUp',
-      );
+      const response = await postSignUp({ email: email, password: password });
+
+      const { accessToken, refreshToken } = response;
+      setTokens(accessToken, refreshToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      router.push('/main-lobby');
     }
   };
 
