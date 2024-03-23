@@ -6,6 +6,7 @@ import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -51,10 +52,14 @@ public class QuizRoomService {
         log.info("quizDocRequest : {}", quizDocRequest);
         MakeQuizResponse quizDocResponse = modelService.makeQuiz(quizDocRequest);
 
+        List<String> questions = new ArrayList<>();
+        questions.add("임시문제1");
+        questions.add("임시문제2");
+
         return MakeRoomResponse.builder()
                 .id(savedQuizRoom.getId())
-                .questions(quizDocResponse.questions())
-                .description(quizDocResponse.description())
+                .questions(questions)
+                .description("임시")
                 .build();
     }
 }
