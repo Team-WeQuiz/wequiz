@@ -27,12 +27,4 @@ const useAuthStore = create(
   ),
 );
 
-// const useAuthStore = create<AuthState & AuthActions>((set) => ({
-//   accessToken: '',
-//   refreshToken: '',
-
-//   setAuth: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
-//   deleteTokens: () => set({ accessToken: '', refreshToken: '' }),
-// }));
-
 export default useAuthStore;
