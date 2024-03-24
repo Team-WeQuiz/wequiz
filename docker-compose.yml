@@ -37,3 +37,12 @@ services:
       - 3000:3000
     depends_on:
       - backend
+
+  model:
+    container_name: wequiz_model
+    build:
+      context: model
+    restart: always
+    ports: 8000:8000
+    environment:
+      PORT: 8000
