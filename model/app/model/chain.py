@@ -13,9 +13,9 @@ from langchain_openai import OpenAIEmbeddings
 
 # LLM 체인 클래스
 class Chain():
-    def __init__(self, db_path, type, openai_api_key):
-        self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
-        self.retriever = self.vectorstore.as_retriever(search_kwargs=dict(k=3))
+    def __init__(self, indices, type, openai_api_key):
+        # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
+        self.retriever = indices.as_retriever(search_kwargs=dict(k=3))
         self.llm = OpenAI(openai_api_key=openai_api_key)
     
     # LLM inference 함수
