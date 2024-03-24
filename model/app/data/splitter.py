@@ -1,17 +1,18 @@
 import tiktoken
-from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.logger import log
-from utils.aws_security import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+from utils.security import get_aws_access_key
 from langchain_community.document_loaders import S3FileLoader
+import json
 
 
 class Splitter():
     def __init__(self, file_paths):
         self.bucket_name = 'kyuyeon-test'
         self.file_paths = file_paths
-        self.aws_access_key_id=AWS_ACCESS_KEY_ID
-        self.aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+        self.aws_access = json.loads(get_aws_access_key())
+        self.aws_access_key_id=self.aws_access["AWS_ACCESS_KEY_ID"]
+        self.aws_secret_access_key=self.aws_access["AWS_SECRET_ACCESS_KEY"]
 
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
@@ -33,6 +34,9 @@ class Splitter():
                 )
             
             # loader = PyMuPDFLoader(s3_file.load())
+            print('************************************')
+            print(self.aws_access)
+            print(self.aws_secret_access_key)
             data = s3_file.load()
             print(f"{len(data)}개의 페이지를 가지고 있습니다.")
             print(f"페이지에 {len(data[0].page_content)}개의 단어를 가지고 있습니다.")

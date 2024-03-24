@@ -1,10 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel 
 from model.chain import Chain
 from data.splitter import Splitter
 from data.vectorizer import Vectorizer
 from typing import List
 from utils.logger import log
+from utils.security import get_openai_api_key
 import uuid
 import json
 
@@ -30,7 +31,8 @@ class GenerateRequest(BaseModel):
 
 @app.post("/generate/prob")
 def generate_prob(prob: ProbRequest):
-    chain = Chain(prob.db_path, prob.type)
+    openai_api_key = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
+    chain = Chain(prob.db_path, prob.type, openai_api_key)
     try:
         response = chain.prob(prob.message)
         log('info', f'Prob Chain inference is successed.')
@@ -41,7 +43,7 @@ def generate_prob(prob: ProbRequest):
                 {
                     "id": uuid.uuid4(),
                     "question_number": 1,
-                    "type": "객관식",  # 1:객, 2:주, 3:단
+                    "type": prob.type,  # 1:객, 2:주, 3:단
                     "question": response["text"]["question"],
                     "options": response["text"]["choices"],
                     "answer": response["text"]["answer"]
@@ -58,8 +60,9 @@ def generate_prob(prob: ProbRequest):
 # API endpoint to convert PDF to vectors
 @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
+    openai_api_key = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
     splitter = Splitter(convert_request.files)
-    vectorizer = Vectorizer() 
+    vectorizer = Vectorizer(openai_api_key) 
     try:
         split_docs = splitter.split_docs()
         db_url = vectorizer.convert(split_docs)
