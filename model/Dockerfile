@@ -14,9 +14,6 @@ RUN pip install -r requirements.txt
 # Set the working directory in the container
 WORKDIR /app/app
 
-# Set environment variables
-ENV OPEN_API_KEY=
-
 # Expose the port that uvicorn will run on
 EXPOSE 8000
 
