@@ -38,16 +38,14 @@ def generate_prob(prob: ProbRequest):
             "id": prob.id,
             "questions":
             [
-                f"""
-                {{
-                    "id": {uuid.uuid4()},
-                    "question_number": {1},
-                    "type": {1},  # 1:객, 2:주, 3:단
-                    "question": {response["text"]["question"]},
-                    "options": {response["text"]["choices"]},
-                    "answer": {response["text"]["answer"]}
-                }}
-                """,
+                {
+                    "id": uuid.uuid4(),
+                    "question_number": 1,
+                    "type": "객관식",  # 1:객, 2:주, 3:단
+                    "question": response["text"]["question"],
+                    "options": response["text"]["choices"],
+                    "answer": response["text"]["answer"]
+                },
             ],
             "description": 'not yet',
         }
