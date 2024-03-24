@@ -1,6 +1,7 @@
 'use client';
 
 import { postKakaoLogin } from '@/app/_api/auth';
+import { setAuthTokenCookie } from '@/app/_lib/auth';
 import useAuthStore from '@/app/_store/useAuthStore';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -10,15 +11,15 @@ function KakaoLoginComponent() {
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
   const kakaoServerError = searchParams.get('error');
-  const { setTokens } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const router = useRouter();
 
   const handleLogin = async (authCode: string) => {
     const response = await postKakaoLogin(authCode);
     const { accessToken, refreshToken } = response;
-    setTokens(accessToken, refreshToken);
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    setAuth(accessToken, refreshToken);
+    setAuthTokenCookie(accessToken, refreshToken);
+
     router.push('/main-lobby');
   };
 

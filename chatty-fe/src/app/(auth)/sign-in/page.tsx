@@ -1,12 +1,17 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import * as styles from './page.css';
 import Image from 'next/image';
 import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
 import Link from 'next/link';
 import Script from 'next/script';
-import { googleLogin, kakaoInit, kakaoLogin } from '@/app/_lib/auth';
+import {
+  googleLogin,
+  kakaoInit,
+  kakaoLogin,
+  setAuthTokenCookie,
+} from '@/app/_lib/auth';
 import { postSignIn } from '@/app/_api/auth';
 import useAuthStore from '@/app/_store/useAuthStore';
 import { useRouter } from 'next/navigation';
@@ -14,8 +19,14 @@ import { useRouter } from 'next/navigation';
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { setTokens } = useAuthStore();
+  const { setAuth, isLogin } = useAuthStore();
   const router = useRouter();
+
+  useLayoutEffect(() => {
+    if (isLogin) {
+      router.push('/main-lobby');
+    }
+  });
 
   const handleKakaoLogin = () => {
     kakaoLogin('http://localhost:3000/sign-in/kakao/callback');
@@ -29,9 +40,9 @@ export default function SignIn() {
     event.preventDefault();
     const response = await postSignIn({ email: email, password: password });
     const { accessToken, refreshToken } = response;
-    setTokens(accessToken, refreshToken);
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    setAuth(accessToken, refreshToken);
+    setAuthTokenCookie(accessToken, refreshToken);
+
     router.push('/main-lobby');
   };
 
