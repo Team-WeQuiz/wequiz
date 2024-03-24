@@ -28,14 +28,17 @@ class GenerateRequest(BaseModel):
     type: str
     files: List[str]
 
+### credential key
+OPENAI_API_KEY = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
+AWS_ACCESS_KEY = json.loads(get_aws_access_key())
+
 
 # @app.post("/generate/prob")
 def generate_prob(prob: ProbRequest):
-    openai_api_key = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
-    chain = Chain(prob.indices, prob.type, openai_api_key)
+    chain = Chain(prob.indices, prob.type, OPENAI_API_KEY)
     try:
         response = chain.prob(prob.message)
-        log('info', f'Prob Chain inference is successed.')
+        log('info', f'Prob Chain inference is successed.', AWS_ACCESS_KEY)
         data = {
             "id": prob.id,
             "questions":
@@ -53,25 +56,23 @@ def generate_prob(prob: ProbRequest):
         }
         return data
     except Exception as e:
-        log('error', f'Failed to Prob Chain Inference: {str(e)}')
+        log('error', f'Failed to Prob Chain Inference: {str(e)}', AWS_ACCESS_KEY)
         raise e
 
 
 # API endpoint to convert PDF to vectors
 # @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
-    openai_api_key = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
-    aws_access_key = json.loads(get_aws_access_key())
-    splitter = Splitter(convert_request.files, aws_access_key)
-    vectorizer = Vectorizer(openai_api_key) 
+    splitter = Splitter(convert_request.files, AWS_ACCESS_KEY)
+    vectorizer = Vectorizer(OPENAI_API_KEY) 
     try:
         split_docs = splitter.split_docs()
         # db_url = vectorizer.convert(split_docs)
         indices = vectorizer.convert(split_docs)
-        log('info', 'PDF converted to vectors successfully.')
+        log('info', 'PDF converted to vectors successfully.', AWS_ACCESS_KEY)
         return indices
     except Exception as e:
-        log('error', f'Failed to Convert PDF to Vectors: {str(e)}')
+        log('error', f'Failed to Convert PDF to Vectors: {str(e)}', AWS_ACCESS_KEY)
         raise e
 
 
@@ -81,7 +82,7 @@ def generate(generate_request: GenerateRequest):
     convert_res = convert_pdf(
         ConvertRequest(files=generate_request.files)
     )
-    log('info', 'PDF converted to vectors successfully.')
+    log('info', 'PDF converted to vectors successfully.', AWS_ACCESS_KEY)
 
     prob_res = generate_prob(
         ProbRequest(
@@ -91,7 +92,7 @@ def generate(generate_request: GenerateRequest):
             type=generate_request.type
         )
     )
-    log('info', f'Prob Chain inference is successed.')
+    log('info', f'Prob Chain inference is successed.', AWS_ACCESS_KEY)
 
     return prob_res
 

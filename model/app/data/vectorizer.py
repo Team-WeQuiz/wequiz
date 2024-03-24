@@ -1,6 +1,5 @@
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from utils.logger import log
 
 class Vectorizer():
     def __init__(self, openai_api_key):
@@ -15,7 +14,6 @@ class Vectorizer():
             # indices.save_local(self.db_url)
             return indices
         except Exception as e:
-            log('error', f'Failed to Save Vectors: {str(e)}')
             raise e
 
     

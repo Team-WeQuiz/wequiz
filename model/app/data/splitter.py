@@ -8,8 +8,9 @@ class Splitter():
     def __init__(self, file_paths, aws_access_key):
         self.bucket_name = 'kyuyeon-test'
         self.file_paths = file_paths
-        self.aws_access_key_id=aws_access_key["AWS_ACCESS_KEY_ID"]
-        self.aws_secret_access_key=aws_access_key["AWS_SECRET_ACCESS_KEY"]
+        self.aws_access_key = aws_access_key
+        self.aws_access_key_id=self.aws_access_key["AWS_ACCESS_KEY_ID"]
+        self.aws_secret_access_key=self.aws_access_key["AWS_SECRET_ACCESS_KEY"]
 
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
@@ -21,9 +22,9 @@ class Splitter():
     # split docs
     def split_docs(self):
         if len(self.file_paths) == 0:
-            log('warning', 'List of File paths is Empty.')
+            log('warning', 'List of File paths is Empty.', self.aws_access_key)
         else:
-            log('info', f'There are {len(self.file_paths)} Files.')
+            log('info', f'There are {len(self.file_paths)} Files.', self.aws_access_key)
         docs = []
         for file_path in self.file_paths:
             s3_file = S3FileLoader(
@@ -41,5 +42,5 @@ class Splitter():
             docs += doc
 
         print(f"총 {len(docs)}개의 문서가 준비되었습니다.")
-        log('info', f'Total {len(docs)} Docs are ready.')
+        log('info', f'Total {len(docs)} Docs are ready.', self.aws_access_key)
         return docs
