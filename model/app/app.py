@@ -5,7 +5,7 @@ from data.splitter import Splitter
 from data.vectorizer import Vectorizer
 from typing import List
 from utils.logger import log
-from utils.security import get_openai_api_key
+from utils.security import get_openai_api_key, get_aws_access_key
 import uuid
 import json
 
@@ -15,7 +15,7 @@ app = FastAPI()
 class ProbRequest(BaseModel):
     id: int
     message: str
-    db_path: str
+    indices: object
     type: str  # "객관식", "주관식", "단답형"
 
 # Pydantic model for request body validation
@@ -29,10 +29,10 @@ class GenerateRequest(BaseModel):
     files: List[str]
 
 
-@app.post("/generate/prob")
+# @app.post("/generate/prob")
 def generate_prob(prob: ProbRequest):
     openai_api_key = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
-    chain = Chain(prob.db_path, prob.type, openai_api_key)
+    chain = Chain(prob.indices, prob.type, openai_api_key)
     try:
         response = chain.prob(prob.message)
         log('info', f'Prob Chain inference is successed.')
@@ -58,16 +58,18 @@ def generate_prob(prob: ProbRequest):
 
 
 # API endpoint to convert PDF to vectors
-@app.post("/convert")
+# @app.post("/convert")
 def convert_pdf(convert_request: ConvertRequest):
     openai_api_key = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
-    splitter = Splitter(convert_request.files)
+    aws_access_key = json.loads(get_aws_access_key())
+    splitter = Splitter(convert_request.files, aws_access_key)
     vectorizer = Vectorizer(openai_api_key) 
     try:
         split_docs = splitter.split_docs()
-        db_url = vectorizer.convert(split_docs)
+        # db_url = vectorizer.convert(split_docs)
+        indices = vectorizer.convert(split_docs)
         log('info', 'PDF converted to vectors successfully.')
-        return {"message": "PDF converted to vectors successfully.", "db_url": db_url}
+        return indices
     except Exception as e:
         log('error', f'Failed to Convert PDF to Vectors: {str(e)}')
         raise e
@@ -85,7 +87,7 @@ def generate(generate_request: GenerateRequest):
         ProbRequest(
             id=generate_request.id,
             message='원핫인코딩',
-            db_path=convert_res['db_url'],
+            indices=convert_res,
             type=generate_request.type
         )
     )
