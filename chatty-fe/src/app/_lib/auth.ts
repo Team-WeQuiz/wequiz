@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+
 export const kakaoInit = () => {
   if (window.Kakao && !window.Kakao.isInitialized()) {
     window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
@@ -21,4 +23,8 @@ export const googleLogin = (redirectUri: string) => {
     `redirect_uri=${redirectUri}&` +
     'response_type=code&' +
     'scope=email profile';
+};
+
+export const setAuthTokenCookie = (refreshToken: string) => {
+  Cookies.set('refreshToken', refreshToken, { expires: 300 });
 };

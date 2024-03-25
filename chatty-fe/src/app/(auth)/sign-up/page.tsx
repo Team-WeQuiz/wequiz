@@ -7,6 +7,7 @@ import { validateEmail, validatePassword } from '@/app/_lib/validation';
 import { postSignUp } from '@/app/_api/auth';
 import useAuthStore from '@/app/_store/useAuthStore';
 import { useRouter } from 'next/navigation';
+import { setAuthTokenCookie } from '@/app/_lib/auth';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ export default function SignUp() {
   const [hasPasswordCheckStarted, setHasPasswordCheckStarted] = useState(false);
   const isEmailValid = validateEmail(email);
   const isPasswordValid = validatePassword(password);
-  const { setTokens } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -38,9 +39,8 @@ export default function SignUp() {
       const response = await postSignUp({ email: email, password: password });
 
       const { accessToken, refreshToken } = response;
-      setTokens(accessToken, refreshToken);
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      setAuth(accessToken);
+      setAuthTokenCookie(refreshToken);
       router.push('/main-lobby');
     }
   };

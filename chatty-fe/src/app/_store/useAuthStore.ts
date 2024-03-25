@@ -2,21 +2,17 @@ import { create } from 'zustand';
 
 type AuthState = {
   accessToken: string;
-  refreshToken: string;
 };
 
 type AuthActions = {
-  setTokens: (accessToken: string, refreshToken: string) => void;
+  setAuth: (accessToken: string) => void;
   deleteTokens: () => void;
 };
 
-const defaultTokens = { accessToken: '', refreshToken: '' };
-
 const useAuthStore = create<AuthState & AuthActions>((set) => ({
-  ...defaultTokens,
-  setTokens: (accessToken: string, refreshToken: string) =>
-    set({ accessToken, refreshToken }),
-  deleteTokens: () => set({ ...defaultTokens }),
+  accessToken: '',
+  setAuth: (accessToken) => set({ accessToken }),
+  deleteTokens: () => set({ accessToken: '' }),
 }));
 
 export default useAuthStore;
