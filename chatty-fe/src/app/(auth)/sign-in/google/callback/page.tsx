@@ -16,8 +16,8 @@ function GoogleLoginComponent() {
   const handleLogin = async (authCode: string) => {
     const response = await postGoogleLogin(authCode);
     const { accessToken, refreshToken } = response;
-    setAuth(accessToken, refreshToken);
-    setAuthTokenCookie(accessToken, refreshToken);
+    setAuth(accessToken);
+    setAuthTokenCookie(refreshToken);
 
     router.push('/main-lobby');
   };

@@ -1,4 +1,6 @@
+import axios from 'axios';
 import client from './client';
+import Cookies from 'js-cookie';
 
 export const postKakaoLogin = async (code: string) => {
   try {
@@ -46,5 +48,25 @@ export const postSignIn = async (data: object) => {
   } catch (error) {
     console.error('error: ', error);
     throw new Error('Signin failed');
+  }
+};
+
+export const postRefreshToken = async (refreshToken: string) => {
+  try {
+    const response = await client.post('auth/refresh', {
+      refreshToken,
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.data.exceptionCode === 1005) {
+        Cookies.remove('refreshToken');
+        alert('토큰에 문제 발생. 다시 로그인');
+        location.reload();
+      }
+    } else {
+      console.error(error);
+    }
   }
 };

@@ -39,8 +39,8 @@ export default function SignUp() {
       const response = await postSignUp({ email: email, password: password });
 
       const { accessToken, refreshToken } = response;
-      setAuth(accessToken, refreshToken);
-      setAuthTokenCookie(accessToken, refreshToken);
+      setAuth(accessToken);
+      setAuthTokenCookie(refreshToken);
       router.push('/main-lobby');
     }
   };

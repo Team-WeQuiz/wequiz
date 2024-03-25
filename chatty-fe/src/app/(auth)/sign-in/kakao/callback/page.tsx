@@ -17,8 +17,8 @@ function KakaoLoginComponent() {
   const handleLogin = async (authCode: string) => {
     const response = await postKakaoLogin(authCode);
     const { accessToken, refreshToken } = response;
-    setAuth(accessToken, refreshToken);
-    setAuthTokenCookie(accessToken, refreshToken);
+    setAuth(accessToken);
+    setAuthTokenCookie(refreshToken);
 
     router.push('/main-lobby');
   };

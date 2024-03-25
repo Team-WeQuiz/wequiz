@@ -25,10 +25,6 @@ export const googleLogin = (redirectUri: string) => {
     'scope=email profile';
 };
 
-export const setAuthTokenCookie = (
-  accessToken: string,
-  refreshToken: string,
-) => {
-  Cookies.set('accessToken', accessToken, { expires: 300 });
+export const setAuthTokenCookie = (refreshToken: string) => {
   Cookies.set('refreshToken', refreshToken, { expires: 300 });
 };
