@@ -8,6 +8,7 @@ import com.chatty.chatty.auth.controller.oauth.dto.SocialAuthResponse;
 import com.chatty.chatty.auth.controller.oauth.dto.SocialLoginRequest;
 import com.chatty.chatty.auth.controller.oauth.dto.SocialUserResponse;
 import com.chatty.chatty.auth.entity.Provider;
+import com.chatty.chatty.auth.entity.RefreshToken;
 import com.chatty.chatty.auth.exception.AuthException;
 import com.chatty.chatty.auth.jwt.JwtUtil;
 import com.chatty.chatty.auth.repository.RefreshTokenRepository;
@@ -52,7 +53,16 @@ public class OAuthService {
         }
 
         String accessToken = jwtUtil.createAccessToken(user);
-        String refreshToken = getRefreshToken(user.getId());
+        String refreshToken;
+        try {
+            refreshToken = getRefreshToken(user.getId());
+        } catch (AuthException e) {
+            refreshToken = jwtUtil.createRefreshToken(user);
+            refreshTokenRepository.save(RefreshToken.builder()
+                    .user(user)
+                    .token(refreshToken)
+                    .build());
+        }
         return new TokenResponse(accessToken, refreshToken);
     }
 

@@ -26,7 +26,9 @@ function KakaoLoginComponent() {
   useEffect(() => {
     if (authCode) {
       handleLogin(authCode);
+      handleLogin(authCode);
     } else if (kakaoServerError) {
+      console.error(kakaoServerError);
       console.error(kakaoServerError);
     }
   });

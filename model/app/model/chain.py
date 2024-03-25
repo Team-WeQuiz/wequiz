@@ -1,7 +1,5 @@
-from re import template
 from model.prompt import PROB_TEMPLATE, MAP_TEMPLATE, REDUCE_TEMPLATE
 from model.schema import Output
-from model.embedding import Embedding
 from langchain_openai import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
@@ -10,16 +8,14 @@ from langchain_community.vectorstores import FAISS
 from langchain.chains import LLMChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
-import os
+from langchain_openai import OpenAIEmbeddings
 
-# Get the OpenAI API key from the environment variable
-openai_api_key = os.getenv("OPEN_API_KEY")
 
 # LLM 체인 클래스
 class Chain():
-    def __init__(self, db_path, type):
-        self.vectorstore= FAISS.load_local(db_path, embeddings=Embedding('query').model)
-        self.retriever = self.vectorstore.as_retriever(search_kwargs=dict(k=3))
+    def __init__(self, indices, type, openai_api_key):
+        # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
+        self.retriever = indices.as_retriever(search_kwargs=dict(k=3))
         self.llm = OpenAI(openai_api_key=openai_api_key)
     
     # LLM inference 함수
