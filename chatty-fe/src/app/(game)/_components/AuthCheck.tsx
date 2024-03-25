@@ -9,6 +9,8 @@ type AuthCheckProps = {
   children?: ReactNode;
 };
 
+// 탭 종료 혹은 브라우저 종료 시 액세스 토큰이 휘발되었을 때, 리프레쉬 토큰을 통해 다시 가져오는 컴포넌트
+
 export default function AuthCheck({ children }: AuthCheckProps) {
   const { accessToken, setAuth } = useAuthStore();
   const searchParams = useSearchParams();

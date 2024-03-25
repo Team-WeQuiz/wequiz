@@ -60,6 +60,7 @@ export const postRefreshToken = async (refreshToken: string) => {
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      // 토큰이 변형되었을 경우
       if (error.response?.data.exceptionCode === 1005) {
         Cookies.remove('refreshToken');
         alert('토큰에 문제 발생. 다시 로그인');
