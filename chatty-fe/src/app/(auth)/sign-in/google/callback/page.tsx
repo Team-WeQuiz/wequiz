@@ -1,6 +1,7 @@
 'use client';
 
 import { postGoogleLogin } from '@/app/_api/auth';
+import { setAuthTokenCookie } from '@/app/_lib/auth';
 import useAuthStore from '@/app/_store/useAuthStore';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -9,19 +10,20 @@ import React, { Suspense, useEffect } from 'react';
 function GoogleLoginComponent() {
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
-  const { setTokens } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const router = useRouter();
 
   const handleLogin = async (authCode: string) => {
     const response = await postGoogleLogin(authCode);
     const { accessToken, refreshToken } = response;
-    setTokens(accessToken, refreshToken);
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    setAuth(accessToken);
+    setAuthTokenCookie(refreshToken);
+
     router.push('/main-lobby');
   };
 
   useEffect(() => {
+    if (authCode) handleLogin(authCode);
     if (authCode) handleLogin(authCode);
   });
 

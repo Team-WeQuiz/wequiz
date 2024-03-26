@@ -1,17 +1,16 @@
 import tiktoken
-from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.logger import log
-from utils.aws_security import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from langchain_community.document_loaders import S3FileLoader
 
 
 class Splitter():
-    def __init__(self, file_paths):
+    def __init__(self, file_paths, aws_access_key):
         self.bucket_name = 'kyuyeon-test'
         self.file_paths = file_paths
-        self.aws_access_key_id=AWS_ACCESS_KEY_ID
-        self.aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+        self.aws_access_key = aws_access_key
+        self.aws_access_key_id=self.aws_access_key["AWS_ACCESS_KEY_ID"]
+        self.aws_secret_access_key=self.aws_access_key["AWS_SECRET_ACCESS_KEY"]
 
 
     def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
@@ -23,16 +22,15 @@ class Splitter():
     # split docs
     def split_docs(self):
         if len(self.file_paths) == 0:
-            log('warning', 'List of File paths is Empty.')
+            log('warning', 'List of File paths is Empty.', self.aws_access_key)
         else:
-            log('info', f'There are {len(self.file_paths)} Files.')
+            log('info', f'There are {len(self.file_paths)} Files.', self.aws_access_key)
         docs = []
         for file_path in self.file_paths:
             s3_file = S3FileLoader(
                 self.bucket_name, file_path, aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key
                 )
             
-            # loader = PyMuPDFLoader(s3_file.load())
             data = s3_file.load()
             print(f"{len(data)}개의 페이지를 가지고 있습니다.")
             print(f"페이지에 {len(data[0].page_content)}개의 단어를 가지고 있습니다.")
@@ -44,5 +42,5 @@ class Splitter():
             docs += doc
 
         print(f"총 {len(docs)}개의 문서가 준비되었습니다.")
-        log('info', f'Total {len(docs)} Docs are ready.')
+        log('info', f'Total {len(docs)} Docs are ready.', self.aws_access_key)
         return docs
