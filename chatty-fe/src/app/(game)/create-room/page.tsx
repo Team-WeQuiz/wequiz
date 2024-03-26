@@ -6,6 +6,7 @@ import TextInputField from '@/app/_components/TextInputField';
 import FileUploadBox from './_components/FileUploadBox';
 import RadioInputField from '@/app/_components/RadioInputField';
 import { postRoom } from '@/app/_api/createRoom';
+import { useRouter } from 'next/navigation';
 
 export default function CreateRoom() {
   const problemTypeOptions = [
@@ -23,21 +24,30 @@ export default function CreateRoom() {
   const [problemType, setProblemType] = useState('객관식');
   const [numberOfProblems, setNumberOfProblems] = useState(0);
 
+  const router = useRouter();
+
   const handleRadioChange = (value: string) => {
     setProblemType(value);
   };
 
   const onSubmit = async () => {
-    const response = await postRoom(
-      title,
-      numberOfProblems,
-      time,
-      numberOfParticipants,
-      password,
-      problemType,
-      fileNames,
-    );
-    console.log(response);
+    try {
+      const response = await postRoom(
+        title,
+        numberOfProblems,
+        time,
+        numberOfParticipants,
+        password,
+        problemType,
+        fileNames,
+      );
+      console.log(response);
+      if (response) {
+        router.push(`waiting-room/${response.id}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

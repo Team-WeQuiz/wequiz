@@ -8,8 +8,10 @@ import GradButton from '@/app/_components/GradButton';
 import GameListGrid from './_components/GameListGrid';
 import Image from 'next/image';
 import Header from '@/app/_components/Header';
+import { useRouter } from 'next/navigation';
 
 const MainLobby = () => {
+  const router = useRouter();
   const [search, setSearch] = React.useState('');
 
   return (
@@ -38,7 +40,11 @@ const MainLobby = () => {
             />
           </div>
           <div className={styles.createButton}>
-            <GradButton color="secondary" fullWidth>
+            <GradButton
+              color="secondary"
+              fullWidth
+              onClick={() => router.push('/create-room')}
+            >
               방 만들기
             </GradButton>
           </div>
