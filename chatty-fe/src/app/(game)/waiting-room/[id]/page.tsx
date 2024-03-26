@@ -3,6 +3,7 @@
 import TextInputField from '@/app/_components/TextInputField';
 import React from 'react';
 import client from './_utils/stomp';
+import useUserInfoStore from '@/app/_store/useUserInfoStore';
 
 enum ChatType {
   EMOJI = 'EMOJI',
@@ -12,12 +13,13 @@ enum ChatType {
 interface ChatMessage {
   chatType: ChatType;
   roomId: number;
-  userId: number;
+  userId: number | undefined;
   message: string;
 }
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const [message, setMessage] = React.useState('');
+  const { id: userId } = useUserInfoStore();
 
   React.useEffect(() => {
     const subscribeToRoom = (roomId: number) => {
@@ -37,7 +39,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     return () => {
       client.deactivate();
     };
-  });
+  }, []);
 
   // 채팅 메시지 보내기
   const sendChatMessage = ({
@@ -46,6 +48,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     userId,
     message,
   }: ChatMessage) => {
+    console.log('user id: ', userId);
     const chatMessage = {
       chatType,
       roomId,
@@ -71,7 +74,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
                 sendChatMessage({
                   chatType: ChatType.TEXT,
                   roomId: params.id,
-                  userId: 1,
+                  userId: userId,
                   message,
                 })
               }

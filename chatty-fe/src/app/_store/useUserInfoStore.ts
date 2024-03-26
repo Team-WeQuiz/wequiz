@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 type UserInfoState = {
-  userId: number | undefined;
+  id: number | undefined;
   email: string;
   profileImage: string;
   loginType: string;
@@ -14,7 +14,7 @@ type UserInfoActions = {
 };
 
 const useUserInfoStore = create<UserInfoState & UserInfoActions>((set) => ({
-  userId: undefined,
+  id: undefined,
   email: '',
   profileImage: '',
   loginType: '',
@@ -22,7 +22,7 @@ const useUserInfoStore = create<UserInfoState & UserInfoActions>((set) => ({
   setUserInfo: (userInfo: UserInfoState) => set(userInfo),
   deleteUserInfo: () =>
     set({
-      userId: 0,
+      id: undefined,
       email: '',
       profileImage: '',
       loginType: '',

@@ -14,10 +14,9 @@ type AuthCheckProps = {
 
 export default function AuthCheck({ children }: AuthCheckProps) {
   const { accessToken, setAuth } = useAuthStore();
-  const { setUserInfo } = useUserInfoStore();
+  const { id, setUserInfo } = useUserInfoStore();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
-
 
   const setAccessToken = async () => {
     const refreshToken = Cookies.get('refreshToken');
@@ -33,6 +32,7 @@ export default function AuthCheck({ children }: AuthCheckProps) {
   };
 
   const setUser = async () => {
+    const accessToken = useAuthStore.getState().accessToken;
     if (accessToken) {
       try {
         const response = await getUserIfo(accessToken);
@@ -41,7 +41,7 @@ export default function AuthCheck({ children }: AuthCheckProps) {
         console.error('error: ', error);
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (message) {
@@ -49,9 +49,11 @@ export default function AuthCheck({ children }: AuthCheckProps) {
     }
     if (Cookies.get('refreshToken') && accessToken === '') {
       setAccessToken();
+    }
+    if (id == undefined) {
       setUser();
     }
-  }, []);
+  }, [accessToken, id]);
 
   return <>{children}</>;
 }
