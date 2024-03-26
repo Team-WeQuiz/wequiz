@@ -71,3 +71,18 @@ export const postRefreshToken = async (refreshToken: string) => {
     }
   }
 };
+
+export const getUserIfo = async (accessToken: string) => {
+  try {
+    const response = await client.get('auth/userInfo', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    });
+    console.log("user info", response);
+    return response.data;
+  } catch (error) {
+    console.error('error: ', error);
+    throw new Error('Get user info failed');
+  }
+}

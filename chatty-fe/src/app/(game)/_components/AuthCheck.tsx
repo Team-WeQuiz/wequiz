@@ -2,7 +2,8 @@
 import React, { ReactNode, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import useAuthStore from '@/app/_store/useAuthStore';
-import { postRefreshToken } from '@/app/_api/auth';
+import useUserInfoStore from '@/app/_store/useUserInfoStore';
+import { getUserIfo, postRefreshToken } from '@/app/_api/auth';
 import { useSearchParams } from 'next/navigation';
 
 type AuthCheckProps = {
@@ -13,8 +14,10 @@ type AuthCheckProps = {
 
 export default function AuthCheck({ children }: AuthCheckProps) {
   const { accessToken, setAuth } = useAuthStore();
+  const { setUserInfo } = useUserInfoStore();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
+
 
   const setAccessToken = async () => {
     const refreshToken = Cookies.get('refreshToken');
@@ -29,12 +32,24 @@ export default function AuthCheck({ children }: AuthCheckProps) {
     }
   };
 
+  const setUser = async () => {
+    if (accessToken) {
+      try {
+        const response = await getUserIfo(accessToken);
+        setUserInfo(response);
+      } catch (error) {
+        console.error('error: ', error);
+      }
+    }
+  }
+
   useEffect(() => {
     if (message) {
       alert(message);
     }
     if (Cookies.get('refreshToken') && accessToken === '') {
       setAccessToken();
+      setUser();
     }
   }, []);
 
