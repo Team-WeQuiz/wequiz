@@ -4,9 +4,6 @@ import * as StompJs from '@stomp/stompjs';
 
 const client = new StompJs.Client({
   brokerURL: 'ws://localhost:8080/api/ws',
-  connectHeaders: {
-    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-  },
   debug: function (str) {
     console.log(str);
   },
