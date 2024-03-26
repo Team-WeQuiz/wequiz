@@ -2,7 +2,7 @@
 
 import * as StompJs from '@stomp/stompjs';
 
-const client = new StompJs.Client({
+const stompClient = new StompJs.Client({
   brokerURL: 'ws://localhost:8080/api/ws',
   debug: function (str) {
     console.log(str);
@@ -12,4 +12,4 @@ const client = new StompJs.Client({
   heartbeatOutgoing: 4000,
 });
 
-export default client;
+export default stompClient;

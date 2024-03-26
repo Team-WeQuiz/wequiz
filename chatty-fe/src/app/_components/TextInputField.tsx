@@ -51,7 +51,17 @@ export default function TextInputField({
           className={styles.chatInput}
           type={type}
         />
-        <Image src="/images/Send_fill.svg" alt="send" width={48} height={48} />
+        {endAdornment && (
+          <>
+            <div className={styles.endAdornment}>{endAdornment}</div>
+            <Image
+              src="/images/Send_fill.svg"
+              alt="send"
+              width={48}
+              height={48}
+            />
+          </>
+        )}
       </div>
     );
   } else {
