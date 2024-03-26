@@ -7,7 +7,6 @@ import SolidButton from '@/app/_components/SolidButton';
 import GradButton from '@/app/_components/GradButton';
 import GameListGrid from './_components/GameListGrid';
 import Image from 'next/image';
-import Header from '@/app/_components/Header';
 import { useRouter } from 'next/navigation';
 
 const MainLobby = () => {
@@ -16,7 +15,6 @@ const MainLobby = () => {
 
   return (
     <div className={styles.lobbyContainer}>
-      <Header />
       <div className={styles.centerContainer}>
         <div className={styles.toolBar}>
           <div className={styles.searchInput}>

@@ -1,88 +1,48 @@
 'use client';
 
-import TextInputField from '@/app/_components/TextInputField';
 import React from 'react';
-import client from './_utils/stomp';
+import stompClient from './_utils/stomp';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
-
-enum ChatType {
-  EMOJI = 'EMOJI',
-  TEXT = 'TEXT',
-}
-
-interface ChatMessage {
-  chatType: ChatType;
-  roomId: number;
-  userId: number | undefined;
-  message: string;
-}
+import * as styles from './page.css';
+import UserList from './_components/UserList/UserList';
+import ChatInput from './_components/ChatInput/ChatInput';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
-  const [message, setMessage] = React.useState('');
   const { id: userId } = useUserInfoStore();
 
   React.useEffect(() => {
     const subscribeToRoom = (roomId: number) => {
-      client.subscribe(`/sub/rooms/${roomId}`, (message) => {
+      stompClient.subscribe(`/sub/rooms/${roomId}`, (message) => {
         const chatMessage = JSON.parse(message.body);
         console.log('Received message:', chatMessage);
       });
     };
 
-    client.onConnect = () => {
+    stompClient.onConnect = () => {
       console.log('Connected to WebSocket');
       subscribeToRoom(params.id);
     };
 
-    client.activate();
+    stompClient.activate();
 
     return () => {
-      client.deactivate();
+      stompClient.deactivate();
     };
   }, []);
 
-  // 채팅 메시지 보내기
-  const sendChatMessage = ({
-    chatType,
-    roomId,
-    userId,
-    message,
-  }: ChatMessage) => {
-    console.log('user id: ', userId);
-    const chatMessage = {
-      chatType,
-      roomId,
-      userId,
-      message,
-    };
-    client.publish({
-      destination: `/pub/rooms/${roomId}/chat`,
-      body: JSON.stringify(chatMessage),
-    });
-  };
-
   return (
-    <div>
-      <h1>Waiting Room</h1>
-      <div>
-        <TextInputField
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          endAdornment={
-            <button
-              onClick={() =>
-                sendChatMessage({
-                  chatType: ChatType.TEXT,
-                  roomId: params.id,
-                  userId: userId,
-                  message,
-                })
-              }
-            >
-              Send
-            </button>
-          }
-        />
+    <div className={styles.roomContainer}>
+      <div className={styles.wideArea}>
+        <div className={styles.userList}>
+          <UserList />
+        </div>
+        <div className={styles.chattingArea}>
+          <ChatInput roomId={params.id} userId={userId} />
+        </div>
+      </div>
+      <div className={styles.narrowArea}>
+        <div className={styles.detailArea}>방 정보</div>
+        <div className={styles.buttonArea}>버튼</div>
       </div>
     </div>
   );

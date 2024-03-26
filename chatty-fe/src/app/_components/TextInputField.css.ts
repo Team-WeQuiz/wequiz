@@ -21,6 +21,7 @@ export const container = style({
 export const chatContainer = style([
   container,
   {
+    position: 'relative',
     justifyContent: 'space-between',
     backgroundColor: globals.color.blue_6,
     borderRadius: 20,
