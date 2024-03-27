@@ -46,7 +46,7 @@ export default function SignIn() {
     if (message) {
       alert(message);
     }
-  });
+  },[]);
 
   return (
     <div className={styles.mainContainer}>

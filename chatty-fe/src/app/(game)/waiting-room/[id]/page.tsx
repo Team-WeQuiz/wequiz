@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import stompClient from './_utils/stomp';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import * as styles from './page.css';
@@ -9,8 +9,9 @@ import ChatInput from './_components/ChatInput/ChatInput';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
+  const [isConnected, setIsConnected] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const subscribeToRoom = (roomId: number) => {
       stompClient.subscribe(`/sub/rooms/${roomId}`, (message) => {
         const chatMessage = JSON.parse(message.body);
@@ -20,7 +21,13 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
 
     stompClient.onConnect = () => {
       console.log('Connected to WebSocket');
+      setIsConnected(true);
       subscribeToRoom(params.id);
+    };
+
+    stompClient.onDisconnect = () => {
+      setIsConnected(false);
+      console.log('Disconnected from WebSocket');
     };
 
     stompClient.activate();
@@ -37,7 +44,11 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
           <UserList />
         </div>
         <div className={styles.chattingArea}>
-          <ChatInput roomId={params.id} userId={userId} />
+          <ChatInput
+            roomId={params.id}
+            userId={userId}
+            disabled={!isConnected}
+          />
         </div>
       </div>
       <div className={styles.narrowArea}>
