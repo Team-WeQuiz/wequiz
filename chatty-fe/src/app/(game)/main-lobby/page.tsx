@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
 import * as styles from './page.css';
 import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 
 const MainLobby = () => {
   const router = useRouter();
-  const [search, setSearch] = React.useState('');
+  const [search, setSearch] = useState('');
 
   return (
     <div className={styles.lobbyContainer}>

@@ -47,6 +47,9 @@ export default function AuthCheck({ children }: AuthCheckProps) {
     if (message) {
       alert(message);
     }
+  }, []);
+
+  useEffect(() => {
     if (Cookies.get('refreshToken') && accessToken === '') {
       setAccessToken();
     }
