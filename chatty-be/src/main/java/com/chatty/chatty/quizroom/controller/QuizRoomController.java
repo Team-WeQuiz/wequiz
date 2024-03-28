@@ -33,13 +33,13 @@ public class QuizRoomController {
     }
 
     @GetMapping("/{roomId}/lobby")
-    public ResponseEntity<LobbyResponse> findLobby(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.findLobby(id));
+    public ResponseEntity<LobbyResponse> findLobby(@PathVariable Long roomId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.findLobby(roomId));
     }
 
     @GetMapping("/{roomId}/quiz")
-    public ResponseEntity<QuizResponse> findQuiz(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.findQuiz(id));
+    public ResponseEntity<QuizResponse> findQuiz(@PathVariable Long roomId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.findQuiz(roomId));
     }
 
     @PostMapping

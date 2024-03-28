@@ -35,8 +35,8 @@ public class QuizRoomService {
         return quizRoomRepository.findAll();
     }
 
-    public LobbyResponse findLobby(Long id) {
-        QuizRoom quizRoom = quizRoomRepository.findById(id)
+    public LobbyResponse findLobby(Long roomId) {
+        QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         isRoomStarted(quizRoom.getStatus());
         isRoomFinished(quizRoom.getStatus());
@@ -46,7 +46,7 @@ public class QuizRoomService {
         String description = "example_description";
 
         return LobbyResponse.builder()
-                .id(quizRoom.getId())
+                .roomId(quizRoom.getId())
                 .name(quizRoom.getName())
                 .timeLimit(quizRoom.getTimeLimit())
                 .playerLimitNum(quizRoom.getPlayerLimitNum())
@@ -54,8 +54,8 @@ public class QuizRoomService {
                 .build();
     }
 
-    public QuizResponse findQuiz(Long id) {
-        QuizRoom quizRoom = quizRoomRepository.findById(id)
+    public QuizResponse findQuiz(Long roomId) {
+        QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         isRoomFinished(quizRoom.getStatus());
 
@@ -64,7 +64,7 @@ public class QuizRoomService {
         List<?> questions = Arrays.asList("questionId:1, ...", "questionId:2, ...");
 
         return QuizResponse.builder()
-                .id(quizRoom.getId())
+                .roomId(quizRoom.getId())
                 .name(quizRoom.getName())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
                 .timeLimit(quizRoom.getTimeLimit())
