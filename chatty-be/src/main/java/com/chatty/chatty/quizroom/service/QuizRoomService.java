@@ -1,6 +1,8 @@
 package com.chatty.chatty.quizroom.service;
 
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_FINISHED;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
 import com.chatty.chatty.model.controller.dto.MakeQuizRequest;
 import com.chatty.chatty.model.controller.dto.MakeQuizResponse;
@@ -10,6 +12,7 @@ import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import java.util.Arrays;
@@ -31,9 +34,13 @@ public class QuizRoomService {
     public List<QuizRoom> findAll() {
         return quizRoomRepository.findAll();
     }
-    
+
     public LobbyResponse findLobby(Long id) {
-        QuizRoom quizRoom = quizRoomRepository.findById(id).orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        QuizRoom quizRoom = quizRoomRepository.findById(id)
+                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        isRoomStarted(quizRoom.getStatus());
+        isRoomFinished(quizRoom.getStatus());
+
         Long quizDocId = quizRoom.getQuizDocId();
         // TODO: noSQL db에서 description 읽어오는 코드
         String description = "example_description";
@@ -48,7 +55,10 @@ public class QuizRoomService {
     }
 
     public QuizResponse findQuiz(Long id) {
-        QuizRoom quizRoom = quizRoomRepository.findById(id).orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        QuizRoom quizRoom = quizRoomRepository.findById(id)
+                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        isRoomFinished(quizRoom.getStatus());
+
         Long quizDocId = quizRoom.getQuizDocId();
         // TODO: noSQL db에서 questions 읽어오는 코드
         List<?> questions = Arrays.asList("questionId:1, ...", "questionId:2, ...");
@@ -89,11 +99,15 @@ public class QuizRoomService {
                 .build();
     }
 
-    public Boolean isQuizStarted() {
-
+    private void isRoomStarted(Status status) {
+        if (status == Status.STARTED) {
+            throw new QuizRoomException(ROOM_STARTED);
+        }
     }
 
-    public Boolean isQuizFinished() {
-
+    private void isRoomFinished(Status status) {
+        if (status == Status.FINISHED) {
+            throw new QuizRoomException(ROOM_FINISHED);
+        }
     }
 }

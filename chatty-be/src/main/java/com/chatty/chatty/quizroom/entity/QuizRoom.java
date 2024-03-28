@@ -62,4 +62,8 @@ public class QuizRoom extends BaseEntity {
     public void setQuizDocId(Long id) {
         this.quizDocId = id;
     }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }
