@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record MakeRoomResponse(
 
-        Long id
+        Long roomId
 ) {
 
 }

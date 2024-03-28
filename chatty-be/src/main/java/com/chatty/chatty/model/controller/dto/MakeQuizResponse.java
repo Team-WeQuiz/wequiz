@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record MakeQuizResponse(
 
-        Long id,
+        Long roomId,
 
         Long quizDocId
 ) {
