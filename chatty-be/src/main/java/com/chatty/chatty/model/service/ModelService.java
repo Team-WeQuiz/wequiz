@@ -1,10 +1,10 @@
-package com.chatty.chatty.quizroom.service;
+package com.chatty.chatty.model.service;
 
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.FAILED_TO_MAKE_QUIZ;
 
-import com.chatty.chatty.quizroom.config.RestClientConfig;
-import com.chatty.chatty.quizroom.controller.dto.MakeQuizRequest;
-import com.chatty.chatty.quizroom.controller.dto.MakeQuizResponse;
+import com.chatty.chatty.model.config.RestClientConfig;
+import com.chatty.chatty.model.controller.dto.MakeQuizRequest;
+import com.chatty.chatty.model.controller.dto.MakeQuizResponse;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

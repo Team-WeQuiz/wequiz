@@ -14,6 +14,7 @@ type TextInputFiledProps = {
   endAdornment?: React.ReactNode;
   type?: string;
   autoComplete?: string;
+  disabled?: boolean;
 };
 
 export default function TextInputField({
@@ -27,6 +28,7 @@ export default function TextInputField({
   onChange,
   endAdornment,
   autoComplete,
+  disabled,
 }: TextInputFiledProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleChatDivClick = () => {
@@ -50,8 +52,19 @@ export default function TextInputField({
           onChange={onChange}
           className={styles.chatInput}
           type={type}
+          disabled={disabled}
         />
-        <Image src="/images/Send_fill.svg" alt="send" width={48} height={48} />
+        {endAdornment && (
+          <>
+            <div className={styles.endAdornment}>{endAdornment}</div>
+            <Image
+              src="/images/Send_fill.svg"
+              alt="send"
+              width={48}
+              height={48}
+            />
+          </>
+        )}
       </div>
     );
   } else {
@@ -64,6 +77,7 @@ export default function TextInputField({
           onChange={onChange}
           type={type}
           autoComplete={autoComplete}
+          disabled={disabled}
           className={`${styles.container}`}
           style={{
             borderRadius: `${borderRadius}px`,

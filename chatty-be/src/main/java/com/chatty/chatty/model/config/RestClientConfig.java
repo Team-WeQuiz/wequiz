@@ -1,4 +1,4 @@
-package com.chatty.chatty.quizroom.config;
+package com.chatty.chatty.model.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

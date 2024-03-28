@@ -1,20 +1,20 @@
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
 import * as styles from './page.css';
 import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
 import GradButton from '@/app/_components/GradButton';
 import GameListGrid from './_components/GameListGrid';
 import Image from 'next/image';
-import Header from '@/app/_components/Header';
+import { useRouter } from 'next/navigation';
 
 const MainLobby = () => {
-  const [search, setSearch] = React.useState('');
+  const router = useRouter();
+  const [search, setSearch] = useState('');
 
   return (
     <div className={styles.lobbyContainer}>
-      <Header />
       <div className={styles.centerContainer}>
         <div className={styles.toolBar}>
           <div className={styles.searchInput}>
@@ -38,7 +38,11 @@ const MainLobby = () => {
             />
           </div>
           <div className={styles.createButton}>
-            <GradButton color="secondary" fullWidth>
+            <GradButton
+              color="secondary"
+              fullWidth
+              onClick={() => router.push('/create-room')}
+            >
               방 만들기
             </GradButton>
           </div>

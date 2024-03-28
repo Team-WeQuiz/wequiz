@@ -15,7 +15,7 @@ export const centerContainer = style({
   width: '100%',
   height: '100%',
   maxWidth: 1124,
-  padding: '52px 20px',
+  padding: '0 20px',
   gap: 30,
 });
 
