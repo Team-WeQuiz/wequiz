@@ -1,21 +1,25 @@
-# 🎮 WeQuiz
-| Shall we quiz?
+<div align='center'>
+<h3>Shall</h3>
+
+<h3>.</h3>
+<h3>.</h3>
+<h3>.</h3>
+<img src="https://github.com/Team-WeQuiz/.github/blob/main/profile/wequiz.PNG">
+</div>
 
 ## 🤔 Overview
 AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 
 ## 🛠️ Architecture
 
-🎨 **Front-End**
-- NextJS
+🎨 **Front-End**  
+`NEXT.JS` `Vanilla-extract` `Zustand` `Web-Socket`
   
-⚙️ **Back-End**
-- Spring
-- PostgreSQL
+⚙️ **Back-End**  
+`Spring-boot` `PostgreSQL` `Redis` `Web-Socket`
   
-🤖 **ML**
-- LangChain
-- FastAPI
+🤖 **ML**  
+`LangChain` `FastAPI`  `S3`  `DynamoDB`
 
 ## 📖 Documentation
 ## 🚀 Team
