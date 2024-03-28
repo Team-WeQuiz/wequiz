@@ -1,4 +1,4 @@
-package com.chatty.chatty.quizroom.controller.dto;
+package com.chatty.chatty.model.controller.dto;
 
 import java.util.List;
 import lombok.Builder;
