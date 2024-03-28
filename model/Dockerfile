@@ -11,6 +11,9 @@ COPY . /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
+# Install AWS CLI
+RUN pip install awscli
+
 # Set the working directory in the container
 WORKDIR /app/app
 
