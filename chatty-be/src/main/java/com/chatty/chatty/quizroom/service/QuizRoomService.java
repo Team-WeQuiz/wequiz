@@ -1,12 +1,12 @@
 package com.chatty.chatty.quizroom.service;
 
-import com.chatty.chatty.quizroom.controller.dto.MakeQuizRequest;
-import com.chatty.chatty.quizroom.controller.dto.MakeQuizResponse;
+import com.chatty.chatty.model.controller.dto.MakeQuizRequest;
+import com.chatty.chatty.model.controller.dto.MakeQuizResponse;
+import com.chatty.chatty.model.service.ModelService;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -43,23 +43,17 @@ public class QuizRoomService {
                 .build();
         QuizRoom savedQuizRoom = quizRoomRepository.save(newQuizRoom);
 
-        MakeQuizRequest quizDocRequest = MakeQuizRequest.builder()
+        MakeQuizRequest makeQuizRequest = MakeQuizRequest.builder()
                 .id(savedQuizRoom.getId())
-                .files(request.files())
-                .type(request.type())
                 .numOfQuiz(request.numOfQuiz())
+                .type(request.type())
+                .files(request.files())
                 .build();
-        log.info("quizDocRequest : {}", quizDocRequest);
-        MakeQuizResponse quizDocResponse = modelService.makeQuiz(quizDocRequest);
-
-        List<String> questions = new ArrayList<>();
-        questions.add("임시문제1");
-        questions.add("임시문제2");
+        MakeQuizResponse makeQuizResponse = modelService.makeQuiz(makeQuizRequest);
+        savedQuizRoom.setQuizDocId(makeQuizResponse.quizDocId());
 
         return MakeRoomResponse.builder()
                 .id(savedQuizRoom.getId())
-                .questions(questions)
-                .description("임시")
                 .build();
     }
 }

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "quiz_rooms")
 public class QuizRoom extends BaseEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id")
@@ -50,9 +50,16 @@ public class QuizRoom extends BaseEntity {
     @Column(nullable = false)
     private Status status;
 
+    @Column
+    private Long quizDocId;
+
     @PrePersist
     public void setDefaultColumns() {
         this.playerNum = this.playerNum == null ? 1 : this.playerNum;
         this.status = this.status == null ? Status.READY : this.status;
+    }
+
+    public void setQuizDocId(Long id) {
+        this.quizDocId = id;
     }
 }
