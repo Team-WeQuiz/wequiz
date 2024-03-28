@@ -1,14 +1,19 @@
 package com.chatty.chatty.quizroom.service;
 
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
+
 import com.chatty.chatty.model.controller.dto.MakeQuizRequest;
 import com.chatty.chatty.model.controller.dto.MakeQuizResponse;
 import com.chatty.chatty.model.service.ModelService;
+import com.chatty.chatty.quizroom.controller.dto.LobbyResponse;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
+import com.chatty.chatty.quizroom.controller.dto.QuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,9 +31,36 @@ public class QuizRoomService {
     public List<QuizRoom> findAll() {
         return quizRoomRepository.findAll();
     }
+    
+    public LobbyResponse findLobby(Long id) {
+        QuizRoom quizRoom = quizRoomRepository.findById(id).orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        Long quizDocId = quizRoom.getQuizDocId();
+        // TODO: noSQL db에서 description 읽어오는 코드
+        String description = "example_description";
 
-    public Optional<QuizRoom> findById(Long id) {
-        return quizRoomRepository.findById(id);
+        return LobbyResponse.builder()
+                .id(quizRoom.getId())
+                .name(quizRoom.getName())
+                .timeLimit(quizRoom.getTimeLimit())
+                .playerLimitNum(quizRoom.getPlayerLimitNum())
+                .description(description)
+                .build();
+    }
+
+    public QuizResponse findQuiz(Long id) {
+        QuizRoom quizRoom = quizRoomRepository.findById(id).orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        Long quizDocId = quizRoom.getQuizDocId();
+        // TODO: noSQL db에서 questions 읽어오는 코드
+        List<?> questions = Arrays.asList("questionId:1, ...", "questionId:2, ...");
+
+        return QuizResponse.builder()
+                .id(quizRoom.getId())
+                .name(quizRoom.getName())
+                .numOfQuiz(quizRoom.getNumOfQuiz())
+                .timeLimit(quizRoom.getTimeLimit())
+                .playerNum(quizRoom.getPlayerNum())
+                .questions(questions)
+                .build();
     }
 
     @Transactional
@@ -44,7 +76,7 @@ public class QuizRoomService {
         QuizRoom savedQuizRoom = quizRoomRepository.save(newQuizRoom);
 
         MakeQuizRequest makeQuizRequest = MakeQuizRequest.builder()
-                .id(savedQuizRoom.getId())
+                .roomId(savedQuizRoom.getId())
                 .numOfQuiz(request.numOfQuiz())
                 .type(request.type())
                 .files(request.files())
@@ -53,7 +85,15 @@ public class QuizRoomService {
         savedQuizRoom.setQuizDocId(makeQuizResponse.quizDocId());
 
         return MakeRoomResponse.builder()
-                .id(savedQuizRoom.getId())
+                .roomId(savedQuizRoom.getId())
                 .build();
+    }
+
+    public Boolean isQuizStarted() {
+
+    }
+
+    public Boolean isQuizFinished() {
+
     }
 }
