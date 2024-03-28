@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record MakeQuizRequest(
 
-        Long id,
+        Long roomId,
 
         Integer numOfQuiz,
 
