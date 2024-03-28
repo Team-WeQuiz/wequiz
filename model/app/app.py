@@ -7,12 +7,15 @@ from typing import List
 from utils.logger import log
 from utils.security import get_openai_api_key, get_aws_access_key
 import uuid
+import datetime
 import json
+import boto3
 
 app = FastAPI()
 
 # Pydantic model for request body validation
 class ProbRequest(BaseModel):
+    timestamp: str
     id: int
     message: str
     indices: object
@@ -20,6 +23,7 @@ class ProbRequest(BaseModel):
 
 # Pydantic model for request body validation
 class ConvertRequest(BaseModel):
+    timestamp: str
     files: List[str]
 
 class GenerateRequest(BaseModel):
@@ -32,14 +36,50 @@ class GenerateRequest(BaseModel):
 OPENAI_API_KEY = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
 AWS_ACCESS_KEY = json.loads(get_aws_access_key())
 
+## DynamoDB
+REGION_NAME = 'ap-northeast-2'
+TABLE_NAME = 'wequiz-quiz'
+dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
+
 
 # @app.post("/generate/prob")
 def generate_prob(prob: ProbRequest):
-    chain = Chain(prob.indices, prob.type, OPENAI_API_KEY)
     try:
+        chain = Chain(prob.indices, prob.type, OPENAI_API_KEY)
         response = chain.prob(prob.message)
         log('info', f'Prob Chain inference is successed.', AWS_ACCESS_KEY)
+
+        print(f'prob.timestamp: {prob.timestamp}')
+
+        # DynamoDB에 삽입할 데이터 구성
         data = {
+            "id": {"S": str(prob.id)},  # id를 문자열로 변환하여 저장
+            "timestamp": {"S": prob.timestamp},  # 변환하지 않고 그대로 사용
+            "day": {"N": str(datetime.datetime.strptime(prob.timestamp, "%Y-%m-%d %H:%M:%S").day)},
+            "month": {"N": str(datetime.datetime.strptime(prob.timestamp, "%Y-%m-%d %H:%M:%S").month)},
+            "year": {"N": str(datetime.datetime.strptime(prob.timestamp, "%Y-%m-%d %H:%M:%S").year)},
+            "questions": {"L": [
+                {
+                    "M": {
+                        "id": {"S": str(uuid.uuid4())},
+                        "question_number": {"N": "1"},
+                        "type": {"S": str(prob.type)}, 
+                        "question": {"S": response["text"]["question"]},
+                        "options": {"L": [{"S": option} for option in response["text"]["choices"]]},
+                        "answer": {"S": response["text"]["answer"]}
+                    }
+                }
+            ]},
+            "description": {"S": 'not yet'}
+        }
+
+        # DynamoDB에 데이터 삽입
+        dynamodb.put_item(
+            TableName=TABLE_NAME,
+            Item=data
+        )
+
+        res = {
             "id": prob.id,
             "questions":
             [
@@ -54,7 +94,9 @@ def generate_prob(prob: ProbRequest):
             ],
             "description": 'not yet',
         }
-        return data
+
+
+        return res
     except Exception as e:
         log('error', f'Failed to Prob Chain Inference: {str(e)}', AWS_ACCESS_KEY)
         raise e
@@ -79,13 +121,17 @@ def convert_pdf(convert_request: ConvertRequest):
 # integration API
 @app.post("/generate")
 def generate(generate_request: GenerateRequest):
+    # 현재 날짜 및 시간 정보 가져오기
+    current_datetime = datetime.datetime.utcnow()
+
     convert_res = convert_pdf(
-        ConvertRequest(files=generate_request.files)
+        ConvertRequest(timestamp=current_datetime.strftime("%Y-%m-%d %H:%M:%S"), files=generate_request.files)
     )
     log('info', 'PDF converted to vectors successfully.', AWS_ACCESS_KEY)
 
     prob_res = generate_prob(
         ProbRequest(
+            timestamp=current_datetime.strftime("%Y-%m-%d %H:%M:%S"),
             id=generate_request.id,
             message='원핫인코딩',
             indices=convert_res,
