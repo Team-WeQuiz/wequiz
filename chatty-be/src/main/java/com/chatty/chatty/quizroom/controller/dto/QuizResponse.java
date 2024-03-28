@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record QuizResponse(
 
-        Long id,
+        Long roomId,
 
         String name,
 

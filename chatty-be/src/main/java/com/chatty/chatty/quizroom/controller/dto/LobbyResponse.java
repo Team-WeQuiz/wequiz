@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record LobbyResponse(
 
-        Long id,
+        Long roomId,
 
         String name,
 
