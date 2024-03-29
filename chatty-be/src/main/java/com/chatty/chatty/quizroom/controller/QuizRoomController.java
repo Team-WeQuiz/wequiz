@@ -1,9 +1,9 @@
 package com.chatty.chatty.quizroom.controller;
 
-import com.chatty.chatty.quizroom.controller.dto.LobbyResponse;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
-import com.chatty.chatty.quizroom.controller.dto.QuizResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.util.List;
@@ -27,19 +27,19 @@ public class QuizRoomController {
     }
 
     @GetMapping
-    public ResponseEntity<List<QuizRoom>> findRooms() {
-        List<QuizRoom> rooms = quizRoomService.findAll();
+    public ResponseEntity<List<QuizRoom>> getRooms() {
+        List<QuizRoom> rooms = quizRoomService.getRooms();
         return ResponseEntity.status(HttpStatus.OK).body(rooms);
     }
 
-    @GetMapping("/{roomId}/lobby")
-    public ResponseEntity<LobbyResponse> findLobby(@PathVariable Long roomId) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.findLobby(roomId));
+    @GetMapping("/{roomId}")
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomDetail(roomId));
     }
 
     @GetMapping("/{roomId}/quiz")
-    public ResponseEntity<QuizResponse> findQuiz(@PathVariable Long roomId) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.findQuiz(roomId));
+    public ResponseEntity<RoomQuizResponse> getRoomQuiz(@PathVariable Long roomId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomQuiz(roomId));
     }
 
     @PostMapping
