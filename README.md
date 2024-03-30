@@ -10,18 +10,39 @@
 ## 🤔 Overview
 AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 
+## 🎨 User Interface
+<table>
+    <tbody>
+        <tr>
+          <tr>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/906cc180-fa7d-4d1b-9705-b1c19f422b50" width="320"></td>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/5740c0a0-0352-4161-ac6f-854e0f8c4563" width="320"></td>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/ad07f448-9791-4a0e-83a0-e4814f270eaa" width="320"></td>
+          </tr>
+          <tr>
+            <td align='center'>시작 페이지</td>
+            <td align='center'>메인 로비</td>
+            <td align='center'>방 만들기</td>
+          </tr>
+          <tr>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/ac3b2e52-5a5f-4806-b0c7-f29ce377f149" width="320"></td>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/893daebb-1c11-4083-843b-a9daf50cc908" width="320"></td>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/072351f1-e2b8-4894-b656-8e650708636e" width="320"></td>
+          </tr>
+          <tr>
+            <td align='center'>방 접속</td>
+            <td align='center'>퀴즈 풀이</td>
+            <td align='center'>정답 확인</td>
+          </tr>
+        </tr>
+    </tbody>
+</table>
+
+
 ## 🛠️ Architecture
 
-🎨 **Front-End**  
-`NEXT.JS` `Vanilla-extract` `Zustand` `Web-Socket`
-  
-⚙️ **Back-End**  
-`Spring-boot` `PostgreSQL` `Redis` `Web-Socket`
-  
-🤖 **ML**  
-`LangChain` `FastAPI`  `S3`  `DynamoDB`
+![아키텍쳐 drawio](https://github.com/Team-WeQuiz/wequiz/assets/66217855/39d8a6b5-59fb-4b61-8c73-c42c3ff54ac4)
 
-## 📖 Documentation
 ## 🚀 Team
 
 <div align='center'>
