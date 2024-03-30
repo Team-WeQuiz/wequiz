@@ -6,6 +6,7 @@ import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import * as styles from './page.css';
 import UserList from './_components/UserList/UserList';
 import ChatInput from './_components/ChatInput/ChatInput';
+import QuizInfoCard from './_components/QuizInfoCard/QuizInfoCard';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
@@ -52,7 +53,9 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         </div>
       </div>
       <div className={styles.narrowArea}>
-        <div className={styles.detailArea}>방 정보</div>
+        <div className={styles.detailArea}>
+          <QuizInfoCard roomId={params.id} />
+        </div>
         <div className={styles.buttonArea}>버튼</div>
       </div>
     </div>

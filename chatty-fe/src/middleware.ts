@@ -4,7 +4,7 @@ export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|fonts|images).*)'],
 };
 
-const protectedRoutes = ['/main-lobby', '/create-room', '/waiting-room/:id'];
+const protectedRoutes = ['/main-lobby', '/create-room', '/waiting-room'];
 const publicRoutes = ['/sign-in', '/sign-up'];
 
 export function middleware(request: NextRequest) {
