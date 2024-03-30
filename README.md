@@ -4,7 +4,7 @@
 <h3>.</h3>
 <h3>.</h3>
 <h3>.</h3>
-<img src="https://github.com/Team-WeQuiz/.github/blob/main/profile/wequiz.PNG">
+<a href='https://github.com/Team-WeQuiz/wequiz'><img src="https://github.com/Team-WeQuiz/.github/blob/main/profile/wequiz.PNG"></a>
 </div>
 
 ## 🤔 Overview
