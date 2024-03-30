@@ -52,12 +52,12 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 
 ---
 
-![bg 100%](https://github.com/Team-WeQuiz/wequiz/assets/66217855/bc694516-8983-435e-8d55-159f3d102969)
+![bg 100%](https://github.com/Team-WeQuiz/wequiz/assets/66217855/911c4d26-578f-49aa-ae48-af28bac3243a)
 
 
 ---
 
-![bg 100%](https://github.com/Team-WeQuiz/wequiz/assets/66217855/f0aafb7c-6ddb-4c5f-8fcd-989ab2f6ba43)
+![bg 100%](https://github.com/Team-WeQuiz/wequiz/assets/66217855/5946f12a-ff0f-4e25-95a6-609c0a50aadd)
 
 ---
 
