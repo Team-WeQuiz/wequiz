@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel 
-from model.chain import Chain
+from model.chain import Chain, SummaryChain
 from data.splitter import Splitter
 from data.vectorizer import Vectorizer
 from typing import List
@@ -101,6 +101,20 @@ def generate_prob(prob: ProbRequest):
         log('error', f'Failed to Prob Chain Inference: {str(e)}', AWS_ACCESS_KEY)
         raise e
 
+@app.post("/summary")
+def summary_pdf(convert_request: ConvertRequest):
+    splitter = Splitter(convert_request.files, AWS_ACCESS_KEY)
+    split_docs = splitter.split_docs()
+    try:
+        chain = SummaryChain(OPENAI_API_KEY)
+        response = chain.summary(split_docs)
+        print(response)
+        return response
+    except Exception as e:
+        log('error', f'Failed to Summarize PDF: {str(e)}', AWS_ACCESS_KEY)
+        raise e
+
+    
 
 # API endpoint to convert PDF to vectors
 # @app.post("/convert")
@@ -116,7 +130,6 @@ def convert_pdf(convert_request: ConvertRequest):
     except Exception as e:
         log('error', f'Failed to Convert PDF to Vectors: {str(e)}', AWS_ACCESS_KEY)
         raise e
-
 
 # integration API
 @app.post("/generate")

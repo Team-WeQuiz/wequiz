@@ -1,14 +1,10 @@
-from model.prompt import PROB_TEMPLATE, MAP_TEMPLATE, REDUCE_TEMPLATE
+from model.prompt import PROB_TEMPLATE
 from model.schema import Output
 from langchain_openai import OpenAI
 from langchain.prompts import PromptTemplate
-from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.output_parsers import JsonOutputParser
 from langchain.memory import VectorStoreRetrieverMemory
-from langchain_community.vectorstores import FAISS
 from langchain.chains import LLMChain
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
-from langchain_openai import OpenAIEmbeddings
 
 
 # LLM 체인 클래스
@@ -30,7 +26,24 @@ class Chain():
         chain = LLMChain(llm=self.llm, prompt=prompt, memory=memory, output_parser=parser)
         
         return chain.invoke(message)
-    
+
+
+#######################################################################################################
+
+
+from model.prompt import MAP_TEMPLATE, REDUCE_TEMPLATE
+from langchain_openai import OpenAI
+from langchain.prompts import PromptTemplate
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
+from langchain_core.output_parsers import StrOutputParser
+from langchain.chains import LLMChain
+
+
+class SummaryChain():
+    def __init__(self, openai_api_key):
+        self.llm = OpenAI(openai_api_key=openai_api_key)
+
     # meta data generate, map reduce 방식으로 문서를 쪼개서 요약하고 합침.
     def summary(self, split_docs):
         parser = StrOutputParser()
@@ -56,7 +69,7 @@ class Chain():
             # 문서가 `StuffDocumentsChain`의 컨텍스트를 초과하는 경우
             collapse_documents_chain=combine_documents_chain,
             # 문서를 그룹화할 때의 토큰 최대 개수입니다.
-            token_max=4000,
+            token_max=3000,
         )
 
         # 문서들에 체인을 매핑하여 결합하고, 그 다음 결과들을 결합합니다.
@@ -71,4 +84,4 @@ class Chain():
             return_intermediate_steps=False,
         )
 
-        return map_reduce_chain.run(split_docs)
+        return map_reduce_chain.invoke(split_docs)
