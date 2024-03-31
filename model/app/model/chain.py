@@ -9,12 +9,12 @@ from langchain.chains import LLMChain
 
 # LLM 체인 클래스
 class Chain():
-    def __init__(self, indices, type, openai_api_key):
+    def __init__(self, indices, openai_api_key):
         # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
         self.retriever = indices.as_retriever(search_kwargs=dict(k=3))
         self.llm = OpenAI(openai_api_key=openai_api_key)
     
-    # LLM inference 함수
+    # 객관식 문제 생성 함수
     def prob(self, message):
         parser = JsonOutputParser(pydantic_object=Output)
         prompt = PromptTemplate(
@@ -32,12 +32,9 @@ class Chain():
 
 
 from model.prompt import MAP_TEMPLATE, REDUCE_TEMPLATE
-from langchain_openai import OpenAI
-from langchain.prompts import PromptTemplate
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
 from langchain_core.output_parsers import StrOutputParser
-from langchain.chains import LLMChain
 
 
 class SummaryChain():
@@ -85,3 +82,23 @@ class SummaryChain():
         )
 
         return map_reduce_chain.invoke(split_docs)
+
+
+#######################################################################################################
+
+
+from model.prompt import MARK_TEMPLATE
+
+class MarkChain():
+    def __init__(self, openai_api_key):
+        self.llm = OpenAI(openai_api_key=openai_api_key)
+    
+    def mark(self, answer, user):
+        prompt = PromptTemplate(
+            template=MARK_TEMPLATE,
+            input_variables=["answer", "user"],
+        )
+
+        chain = LLMChain(llm=self.llm, prompt=prompt)
+
+        return chain.invoke({"answer": answer, "user": user})
