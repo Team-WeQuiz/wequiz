@@ -45,7 +45,14 @@ dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
 def mark(mark_request: MarkRequest):
     marker = Marker(OPENAI_API_KEY)
     try:
-        return marker.mark(mark_request.answer, mark_request.user)
+        marking = marker.mark(mark_request.answer, mark_request.user)
+        data = {
+            "id": mark_request.id,
+            "answer": mark_request.answer,
+            "user": mark_request.user,
+            "marking": marking
+        }
+        return data
     except Exception as e:
         log('error', f'Failed to Mark answer: {str(e)}', AWS_ACCESS_KEY)
         raise e
