@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from data.splitter import Splitter
 from data.prob_generator import ProbGenerator
 from data.summarizer import Summarizer
+from data.marker import Marker
 from typing import List
 from utils.logger import log
 from utils.security import get_openai_api_key, get_aws_access_key
@@ -25,6 +26,11 @@ class GenerateRequest(BaseModel):
     type: str
     files: List[str]
 
+class MarkRequest(BaseModel):
+    id: int
+    answer: str
+    user: str
+
 ### credential key
 OPENAI_API_KEY = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
 AWS_ACCESS_KEY = json.loads(get_aws_access_key())
@@ -33,6 +39,16 @@ AWS_ACCESS_KEY = json.loads(get_aws_access_key())
 REGION_NAME = 'ap-northeast-2'
 TABLE_NAME = 'wequiz-quiz'
 dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
+
+
+@app.post("/mark")
+def mark(mark_request: MarkRequest):
+    marker = Marker(OPENAI_API_KEY)
+    try:
+        return marker.mark(mark_request.answer, mark_request.user)
+    except Exception as e:
+        log('error', f'Failed to Mark answer: {str(e)}', AWS_ACCESS_KEY)
+        raise e
 
 
 @app.post("/generate")

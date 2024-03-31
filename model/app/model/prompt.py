@@ -27,3 +27,16 @@ Please make an integrated summary based on these.
 Be sure to answer in Korean.
 
 YOUR ANSWER:"""
+
+######################################################################
+
+MARK_TEMPLATE = """
+Here is correct answer.
+{answer}
+
+Here is user's answer.
+{user}
+
+If the user answer is correct, return True or False.
+
+YOUR ANSWER:"""
