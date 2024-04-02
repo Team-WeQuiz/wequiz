@@ -4,16 +4,16 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
-public class ChatResponse {
+public record ChatResponse(
+        ChatType chatType,
 
-    private ChatType chatType;
+        Long roomId,
 
-    private Long roomId;
+        Long userId,
 
-    private Long userId;
+        String message,
 
-    private String message;
-
-    private LocalDateTime time;
+        LocalDateTime time
+) {
 
 }
