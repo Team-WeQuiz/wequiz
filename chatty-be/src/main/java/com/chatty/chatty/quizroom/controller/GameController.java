@@ -2,7 +2,9 @@ package com.chatty.chatty.quizroom.controller;
 
 import com.chatty.chatty.quizroom.controller.dto.ChatRequest;
 import com.chatty.chatty.quizroom.controller.dto.ChatResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomUsersStatusResponse;
 import com.chatty.chatty.quizroom.service.SocketService;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -26,5 +28,12 @@ public class SocketController {
                 .message(request.getMessage())
                 .time(LocalDateTime.now())
                 .build();
+    }
+
+    @MessageMapping("/rooms/{roomId}/join")
+    @SendTo("/sub/rooms/{roomId}")
+    public RoomUsersStatusResponse join(@DestinationVariable Long roomId, Principal principal) {
+        String userId = principal.getName();
+        return socketService.join(roomId, principal);
     }
 }
