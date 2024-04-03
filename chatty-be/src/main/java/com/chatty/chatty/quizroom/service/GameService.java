@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
     private final RoomUsersStatusRepository roomUsersStatusRepository;
-
-    public RoomUsersStatus join(Long roomId, Long userId) {
+    
+    public RoomUsersStatus joinRoom(Long roomId, Long userId) {
         return roomUsersStatusRepository.addUserToRoom(roomId, userId);
     }
 }

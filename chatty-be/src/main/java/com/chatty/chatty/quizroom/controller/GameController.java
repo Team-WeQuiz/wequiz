@@ -4,13 +4,14 @@ import com.chatty.chatty.quizroom.controller.dto.ChatRequest;
 import com.chatty.chatty.quizroom.controller.dto.ChatResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomUsersStatus;
 import com.chatty.chatty.quizroom.service.GameService;
-import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,18 +25,21 @@ public class GameController {
     @SendTo("/sub/rooms/{roomId}")
     public ChatResponse chat(@DestinationVariable Long roomId, ChatRequest request) {
         return ChatResponse.builder()
-                .chatType(request.getChatType())
-                .roomId(request.getRoomId())
-                .userId(request.getUserId())
-                .message(request.getMessage())
+                .chatType(request.chatType())
+                .roomId(request.roomId())
+                .userId(request.userId())
+                .message(request.message())
                 .time(LocalDateTime.now())
                 .build();
     }
 
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}")
-    public RoomUsersStatus join(@DestinationVariable Long roomId, Principal principal) {
-        Long userId = Long.parseLong(principal.getName());
-        return gameService.join(roomId, userId);
+    public RoomUsersStatus joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor));
+    }
+
+    private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
+        return (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
     }
 }
