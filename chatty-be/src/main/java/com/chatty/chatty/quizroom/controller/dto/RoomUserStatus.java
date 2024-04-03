@@ -8,9 +8,10 @@ public record RoomUserStatus(
         Boolean isReady
 ) {
 
-    public RoomUserStatus {
-        if (isReady == null) {
-            isReady = false;
-        }
+    public static RoomUserStatus createStatus(Long userId) {
+        return RoomUserStatus.builder()
+                .userId(userId)
+                .isReady(false)
+                .build();
     }
 }
