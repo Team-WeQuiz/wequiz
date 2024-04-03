@@ -5,7 +5,6 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
 import com.chatty.chatty.model.controller.dto.MakeQuizRequest;
-import com.chatty.chatty.model.controller.dto.MakeQuizResponse;
 import com.chatty.chatty.model.service.ModelService;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
@@ -15,6 +14,7 @@ import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import com.chatty.chatty.quizroom.repository.RoomUsersStatusRepository;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class QuizRoomService {
 
     private final QuizRoomRepository quizRoomRepository;
-
     private final ModelService modelService;
+    private final RoomUsersStatusRepository roomUsersStatusRepository;
 
     public List<QuizRoom> getRooms() {
         return quizRoomRepository.findAll();
@@ -74,8 +74,7 @@ public class QuizRoomService {
     }
 
     @Transactional
-    public MakeRoomResponse makeRoom(MakeRoomRequest request) {
-        log.info("request : {}", request);
+    public MakeRoomResponse makeRoom(MakeRoomRequest request, Long userId) {
         QuizRoom newQuizRoom = QuizRoom.builder()
                 .name(request.name())
                 .numOfQuiz(request.numOfQuiz())
@@ -91,8 +90,10 @@ public class QuizRoomService {
                 .type(request.type())
                 .files(request.files())
                 .build();
-        MakeQuizResponse makeQuizResponse = modelService.makeQuiz(makeQuizRequest);
-        savedQuizRoom.setQuizDocId(makeQuizResponse.quizDocId());
+        // 사용자 룸 입장 테스트 하려고 주석해뒀음
+//        MakeQuizResponse makeQuizResponse = modelService.makeQuiz(makeQuizRequest);
+//        savedQuizRoom.setQuizDocId(makeQuizResponse.quizDocId());
+        roomUsersStatusRepository.initializeRoomWithManager(savedQuizRoom.getId(), userId);
 
         return MakeRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())
