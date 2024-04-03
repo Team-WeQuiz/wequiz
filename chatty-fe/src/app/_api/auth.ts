@@ -88,3 +88,15 @@ export const getUserIfo = async (accessToken: string) => {
     throw new Error('Get user info failed');
   }
 };
+
+export const getAWSKeys = async () => {
+  try {
+    const response = await axios.get(
+      'http://localhost:3000/api/s3-keys/getSecrets',
+    );
+    return response.data;
+  } catch (error) {
+    console.error('error: ', error);
+    throw new Error('Get AWS keys failed');
+  }
+};
