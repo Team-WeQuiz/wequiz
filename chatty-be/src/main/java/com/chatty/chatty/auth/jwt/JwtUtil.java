@@ -19,6 +19,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Optional;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
@@ -92,6 +93,13 @@ public class JwtUtil {
             throw new AuthException(INVALID_SIGNATURE);
         }
     }
+
+    public Optional<Long> getUserIdFromTokenWithoutException(String token) {
+        return Optional.ofNullable(token)
+                .map(this::getClaimFromToken)
+                .map(claims -> claims.get("id", Long.class));
+    }
+
 
     private Claims getClaimFromToken(String token) {
         return Jwts.parser()

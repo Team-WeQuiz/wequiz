@@ -17,6 +17,13 @@ public class AuthenticationExtractor {
         return checkMatch(header.split(" "));
     }
 
+    public static Optional<String> extract(String header) {
+        if (!StringUtils.hasText(header)) {
+            return Optional.empty();
+        }
+        return checkMatch(header.split(" "));
+    }
+
     private static Optional<String> checkMatch(String[] parts) {
         if (parts.length == 2 && parts[0].equals(BEARER)) {
             return Optional.ofNullable(parts[1]);
