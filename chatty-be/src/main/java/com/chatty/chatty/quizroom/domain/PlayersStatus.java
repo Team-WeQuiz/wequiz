@@ -1,6 +1,5 @@
 package com.chatty.chatty.quizroom.domain;
 
-import com.chatty.chatty.quizroom.controller.dto.PlayerStatus;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Builder;
@@ -9,14 +8,17 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @Slf4j
 public record PlayersStatus(
-        Long roomId,
-        Set<PlayerStatus> playerStatuses
+        Set<PlayerStatus> playerStatusSet
 ) {
 
-    public PlayersStatus join(Long userId) {
-        Set<PlayerStatus> newPlayerStatuses = ConcurrentHashMap.newKeySet();
-        newPlayerStatuses.addAll(playerStatuses);
-        newPlayerStatuses.add(PlayerStatus.createStatus(userId));
-        return new PlayersStatus(roomId, newPlayerStatuses);
+    public static PlayersStatus init() {
+        return PlayersStatus.builder()
+                .playerStatusSet(ConcurrentHashMap.newKeySet())
+                .build();
+    }
+
+    public PlayersStatus updateWithNewUser(Long userId) {
+        playerStatusSet.add(PlayerStatus.initNewUser(userId));
+        return new PlayersStatus(playerStatusSet);
     }
 }
