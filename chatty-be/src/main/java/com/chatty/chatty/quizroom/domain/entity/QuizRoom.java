@@ -1,4 +1,4 @@
-package com.chatty.chatty.quizroom.entity;
+package com.chatty.chatty.quizroom.domain.entity;
 
 import com.chatty.chatty.common.entity.BaseEntity;
 import jakarta.persistence.Column;

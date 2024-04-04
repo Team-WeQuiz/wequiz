@@ -5,7 +5,7 @@ import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
-import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.util.List;
 import org.springframework.http.HttpStatus;

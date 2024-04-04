@@ -1,7 +1,7 @@
 package com.chatty.chatty.quizroom.repository;
 
 import com.chatty.chatty.quizroom.controller.dto.RoomUserStatus;
-import com.chatty.chatty.quizroom.controller.dto.RoomUsersStatus;
+import com.chatty.chatty.quizroom.domain.RoomUsersStatus;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

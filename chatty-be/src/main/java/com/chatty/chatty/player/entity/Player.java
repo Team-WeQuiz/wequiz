@@ -1,7 +1,7 @@
 package com.chatty.chatty.player.entity;
 
 import com.chatty.chatty.common.entity.BaseEntity;
-import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
 import com.chatty.chatty.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

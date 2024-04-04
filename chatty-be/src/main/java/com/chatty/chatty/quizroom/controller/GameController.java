@@ -2,7 +2,7 @@ package com.chatty.chatty.quizroom.controller;
 
 import com.chatty.chatty.quizroom.controller.dto.ChatRequest;
 import com.chatty.chatty.quizroom.controller.dto.ChatResponse;
-import com.chatty.chatty.quizroom.controller.dto.RoomUsersStatus;
+import com.chatty.chatty.quizroom.domain.RoomUsersStatus;
 import com.chatty.chatty.quizroom.service.GameService;
 import java.time.LocalDateTime;
 import java.util.Objects;

@@ -1,5 +1,6 @@
-package com.chatty.chatty.quizroom.controller.dto;
+package com.chatty.chatty.quizroom.domain;
 
+import com.chatty.chatty.quizroom.controller.dto.RoomUserStatus;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Builder;
