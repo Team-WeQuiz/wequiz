@@ -14,7 +14,7 @@ import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
 import com.chatty.chatty.quizroom.domain.entity.Status;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import com.chatty.chatty.quizroom.repository.RoomUsersStatusRepository;
+import com.chatty.chatty.quizroom.repository.PlayersStatusRepository;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class QuizRoomService {
 
     private final QuizRoomRepository quizRoomRepository;
     private final ModelService modelService;
-    private final RoomUsersStatusRepository roomUsersStatusRepository;
+    private final PlayersStatusRepository playersStatusRepository;
 
     public List<QuizRoom> getRooms() {
         return quizRoomRepository.findAll();
@@ -90,10 +90,9 @@ public class QuizRoomService {
                 .type(request.type())
                 .files(request.files())
                 .build();
-        // 사용자 룸 입장 테스트 하려고 주석해뒀음
+        // 룸 생성 테스트를 위해 주석 처리
 //        MakeQuizResponse makeQuizResponse = modelService.makeQuiz(makeQuizRequest);
 //        savedQuizRoom.setQuizDocId(makeQuizResponse.quizDocId());
-        roomUsersStatusRepository.initializeRoomWithManager(savedQuizRoom.getId(), userId);
 
         return MakeRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())

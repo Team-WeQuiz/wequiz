@@ -1,4 +1,4 @@
-package com.chatty.chatty.quizroom.controller.dto;
+package com.chatty.chatty.quizroom.domain;
 
 import lombok.Builder;
 
@@ -8,10 +8,12 @@ public record PlayerStatus(
         Boolean isReady
 ) {
 
-    public static PlayerStatus createStatus(Long userId) {
+    private static final Boolean DEFAULT_READY_STATUS = false;
+
+    public static PlayerStatus initNewUser(Long userId) {
         return PlayerStatus.builder()
                 .userId(userId)
-                .isReady(false)
+                .isReady(DEFAULT_READY_STATUS)
                 .build();
     }
 }

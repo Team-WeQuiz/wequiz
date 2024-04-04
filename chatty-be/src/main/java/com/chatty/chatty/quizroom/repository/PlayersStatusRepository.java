@@ -1,10 +1,8 @@
 package com.chatty.chatty.quizroom.repository;
 
-import com.chatty.chatty.quizroom.domain.PlayerStatus;
 import com.chatty.chatty.quizroom.domain.PlayersStatus;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,21 +11,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class RoomUsersStatusRepository {
+public class PlayersStatusRepository {
 
     private static final Map<Long, PlayersStatus> roomUsersStatuses = new ConcurrentHashMap<>();
 
     public Optional<PlayersStatus> findByRoomId(Long roomId) {
-        return roomUsersStatuses.get(roomId);
+        return Optional.ofNullable(roomUsersStatuses.get(roomId));
     }
 
-    public PlayersStatus addUserToRoom(Long roomId, Long userId) {
-
-    }
-
-    public PlayersStatus initRoom(Long roomId) {
-        return PlayersStatus.builder()
-                .playerStatuses(Set.of())
-                .build();
+    public PlayersStatus saveUserToRoom(Long roomId, Long userId) {
+        PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
+        roomUsersStatuses.put(roomId, playersStatus.updateWithNewUser(userId));
+        return playersStatus;
     }
 }
