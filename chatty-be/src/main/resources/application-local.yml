@@ -6,7 +6,7 @@ spring:
         show_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   datasource:
     url: jdbc:postgresql://localhost:5432/wequiz
     driver-class-name: org.postgresql.Driver

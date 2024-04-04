@@ -1,4 +1,4 @@
-package com.chatty.chatty.quizroom.entity;
+package com.chatty.chatty.quizroom.domain.entity;
 
 public enum Status {
 

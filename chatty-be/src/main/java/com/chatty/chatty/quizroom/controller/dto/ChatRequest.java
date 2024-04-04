@@ -1,16 +1,13 @@
 package com.chatty.chatty.quizroom.controller.dto;
 
-import lombok.Getter;
+public record ChatRequest(
+        ChatType chatType,
 
-@Getter
-public class ChatRequest {
+        Long roomId,
 
-    private ChatType chatType;
+        Long userId,
 
-    private Long roomId;
-
-    private Long userId;
-
-    private String message;
+        String message
+) {
 
 }

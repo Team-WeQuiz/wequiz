@@ -1,10 +1,11 @@
 package com.chatty.chatty.quizroom.controller;
 
+import com.chatty.chatty.auth.support.AuthUser;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
-import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -43,8 +44,7 @@ public class QuizRoomController {
     }
 
     @PostMapping
-    public ResponseEntity<MakeRoomResponse> makeRoom(@RequestBody MakeRoomRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.makeRoom(request));
+    public ResponseEntity<MakeRoomResponse> makeRoom(@RequestBody MakeRoomRequest request, @AuthUser Long userId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.makeRoom(request, userId));
     }
-
 }
