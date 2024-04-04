@@ -89,7 +89,7 @@ export const getUserIfo = async (accessToken: string) => {
   }
 };
 
-export const getAWSKeys = async () => {
+export const getSecretKeys = async () => {
   try {
     const response = await axios.get(
       'http://localhost:3000/api/s3-keys/getSecrets',
