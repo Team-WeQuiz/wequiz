@@ -13,15 +13,15 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class PlayersStatusRepository {
 
-    private static final Map<Long, PlayersStatus> roomUsersStatuses = new ConcurrentHashMap<>();
+    private static final Map<Long, PlayersStatus> playersStatusMap = new ConcurrentHashMap<>();
 
     public Optional<PlayersStatus> findByRoomId(Long roomId) {
-        return Optional.ofNullable(roomUsersStatuses.get(roomId));
+        return Optional.ofNullable(playersStatusMap.get(roomId));
     }
 
     public PlayersStatus saveUserToRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
-        roomUsersStatuses.put(roomId, playersStatus.updateWithNewUser(userId));
+        playersStatusMap.put(roomId, playersStatus.updateWithNewUser(userId));
         return playersStatus;
     }
 }
