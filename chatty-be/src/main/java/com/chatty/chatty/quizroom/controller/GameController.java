@@ -22,7 +22,7 @@ public class GameController {
     private final GameService gameService;
 
     @MessageMapping("/rooms/{roomId}/chat")
-    @SendTo("/sub/rooms/{roomId}")
+    @SendTo("/sub/rooms/{roomId}/chat")
     public ChatResponse chat(@DestinationVariable Long roomId, ChatRequest request) {
         return ChatResponse.builder()
                 .chatType(request.chatType())
@@ -34,7 +34,7 @@ public class GameController {
     }
 
     @MessageMapping("/rooms/{roomId}/join")
-    @SendTo("/sub/rooms/{roomId}")
+    @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor));
     }
