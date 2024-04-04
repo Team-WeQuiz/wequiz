@@ -1,7 +1,7 @@
 package com.chatty.chatty.quizroom.repository;
 
-import com.chatty.chatty.quizroom.controller.dto.RoomUserStatus;
-import com.chatty.chatty.quizroom.domain.RoomUsersStatus;
+import com.chatty.chatty.quizroom.controller.dto.PlayerStatus;
+import com.chatty.chatty.quizroom.domain.PlayersStatus;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,22 +14,22 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class RoomUsersStatusRepository {
 
-    private static final Map<Long, RoomUsersStatus> roomUsersStatuses = new ConcurrentHashMap<>();
+    private static final Map<Long, PlayersStatus> roomUsersStatuses = new ConcurrentHashMap<>();
 
-    public RoomUsersStatus findByRoomId(Long roomId) {
+    public PlayersStatus findByRoomId(Long roomId) {
         return roomUsersStatuses.get(roomId);
     }
 
-    public RoomUsersStatus addUserToRoom(Long roomId, Long userId) {
+    public PlayersStatus addUserToRoom(Long roomId, Long userId) {
         return roomUsersStatuses.computeIfPresent(
                 roomId, (id, existingStatus) -> existingStatus.join(userId)
         );
     }
 
     public void initializeRoomWithManager(Long roomId, Long roomManagerId) {
-        RoomUsersStatus newStatus = RoomUsersStatus.builder()
+        PlayersStatus newStatus = PlayersStatus.builder()
                 .roomId(roomId)
-                .roomUserStatuses(Set.of(RoomUserStatus.createStatus(roomManagerId)))
+                .roomUserStatuses(Set.of(PlayerStatus.createStatus(roomManagerId)))
                 .build();
         roomUsersStatuses.put(roomId, newStatus);
     }

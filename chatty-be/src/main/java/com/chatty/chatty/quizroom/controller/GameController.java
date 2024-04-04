@@ -2,7 +2,7 @@ package com.chatty.chatty.quizroom.controller;
 
 import com.chatty.chatty.quizroom.controller.dto.ChatRequest;
 import com.chatty.chatty.quizroom.controller.dto.ChatResponse;
-import com.chatty.chatty.quizroom.domain.RoomUsersStatus;
+import com.chatty.chatty.quizroom.domain.PlayersStatus;
 import com.chatty.chatty.quizroom.service.GameService;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -35,7 +35,7 @@ public class GameController {
 
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}")
-    public RoomUsersStatus joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+    public PlayersStatus joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor));
     }
 
