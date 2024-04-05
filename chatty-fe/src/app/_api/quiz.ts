@@ -1,6 +1,6 @@
 import client from './client';
 
-export const getQuizIfo = async (id: number) => {
+export const getQuizInfo = async (id: number) => {
   try {
     const response = await client.get(`rooms/${id}/lobby`);
     return response.data;
@@ -18,4 +18,4 @@ export const getQuiz = async (id: number) => {
     console.error('error: ', error);
     throw new Error('Failed to get quiz data');
   }
-}
+};

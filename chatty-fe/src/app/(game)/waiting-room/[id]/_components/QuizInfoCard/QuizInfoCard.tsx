@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import * as styles from './QuizInfoCard.css';
-import { getQuizIfo } from '@/app/_api/quiz';
+import { getQuizInfo } from '@/app/_api/quiz';
 import { useState, useEffect } from 'react';
 
 type QuizInfo = {
@@ -25,7 +25,7 @@ const QuizInfoCard = ({ roomId }: { roomId: number }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getQuizIfo(roomId);
+        const response = await getQuizInfo(roomId);
         setData(response);
       } catch (error) {
         console.error('error: ', error);

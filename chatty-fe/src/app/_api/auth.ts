@@ -75,7 +75,7 @@ export const postRefreshToken = async (refreshToken: string) => {
   }
 };
 
-export const getUserIfo = async (accessToken: string) => {
+export const getUserInfo = async (accessToken: string) => {
   try {
     const response = await client.get('/user', {
       headers: {
