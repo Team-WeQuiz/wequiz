@@ -3,16 +3,24 @@ import * as styles from './QuizInfoCard.css';
 import { getQuizIfo } from '@/app/_api/quiz';
 import { useState, useEffect } from 'react';
 
-const tmpData = {
-  roomId: 1,
-  name: '퀴즈방',
-  timeLimit: 60,
-  playerLimitNums: 4,
-  description: '퀴즈방입니다.',
+type QuizInfo = {
+  roomId: number;
+  name: string;
+  timeLimit: number;
+  playerLimitNums: number;
+  description: string;
+};
+
+const initialData: QuizInfo = {
+  roomId: 0,
+  name: '',
+  timeLimit: 0,
+  playerLimitNums: 0,
+  description: '',
 };
 
 const QuizInfoCard = ({ roomId }: { roomId: number }) => {
-  const [data, setData] = useState(tmpData);
+  const [data, setData] = useState<QuizInfo>(initialData);
 
   useEffect(() => {
     const fetchData = async () => {
