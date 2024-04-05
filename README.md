@@ -60,8 +60,24 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 
 
 ## 🛠️ Architecture
+### 🎨 Front-end
+`NEXT.JS`
+### ⚙️ Back-end
+`Spring boot`, `PostgreSQL`
+### 🤖 ML
+`LangChain`, `FastAPI`
 
-![아키텍쳐 drawio](https://github.com/Team-WeQuiz/wequiz/assets/90228925/f23261b6-5f4a-44fc-bb3c-d5fcab6dfe42)
+<table>
+    <tbody>
+        <tr>
+          <tr>
+            <td align='center'>전체 아키텍처</td>
+          </tr>
+          <tr>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/8d998787-7b41-4371-9dcf-127e94c13ec3"></td>
+          </tr>
+    </tbody>
+</table>
 
 
 ## 🚀 Team
