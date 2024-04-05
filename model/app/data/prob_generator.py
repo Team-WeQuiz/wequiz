@@ -10,24 +10,34 @@ class ProbGenerator():
             self.indices = self.vectorizer.convert(split_docs)
         except Exception as e:
             raise e
-        self.chain = Chain(self.indices, type, self.openai_api_key)
+        self.chain = Chain(self.indices, self.openai_api_key)
     
     def generate(self, type, keyword, question_number):
+        retry = 0
         if type == "객관식":
-            response = self.chain.prob(keyword)
+            while retry < 3:
+                try:
+                    response = self.chain.prob(keyword)
+                    data = {
+                        "id": uuid.uuid4(),
+                        "question_number": question_number,
+                        "type": type,  # 1:객, 2:주, 3:단
+                        "question": response["text"]["question"],
+                        "options": response["text"]["choices"],
+                        "answer": response["text"]["answer"]
+                    }
+                    break
+                except KeyError:
+                    print("retry generating quiz due to KeyError")
+                    continue
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    continue
+            return data
+        
         else:
             raise NotImplementedError("주관식, 단답형에 대한 chain을 구성해야합니다.")
-        
-        data = {
-                    "id": uuid.uuid4(),
-                    "question_number": question_number,
-                    "type": type,  # 1:객, 2:주, 3:단
-                    "question": response["text"]["question"],
-                    "options": response["text"]["choices"],
-                    "answer": response["text"]["answer"]
-            }
-        
-        return data
+
     
        
 
