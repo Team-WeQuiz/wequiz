@@ -14,6 +14,15 @@ public class GameService {
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId);
+        return buildDTO(roomId, playersStatus);
+    }
+
+    public PlayersStatusDTO leaveRoom(Long roomId, Long userId) {
+        PlayersStatus playersStatus = playersStatusRepository.leaveRoom(roomId, userId);
+        return buildDTO(roomId, playersStatus);
+    }
+
+    private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()
                 .roomId(roomId)
                 .playerStatuses(playersStatus.playerStatusSet())

@@ -39,6 +39,12 @@ public class GameController {
         return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor));
     }
 
+    @MessageMapping("/rooms/{roomId}/leave")
+    @SendTo("/sub/rooms/{roomId}/status")
+    public PlayersStatusDTO leaveRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        return gameService.leaveRoom(roomId, getUserIdFromHeader(headerAccessor));
+    }
+
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
         return (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
     }
