@@ -4,7 +4,11 @@ export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|fonts|images).*)'],
 };
 
-const protectedRoutes = ['/main-lobby', '/create-room', '/waiting-room'];
+const protectedPatterns = [
+  new URLPattern({ pathname: '/main-lobby' }),
+  new URLPattern({ pathname: '/create-room' }),
+  new URLPattern({ pathname: '/waiting-room/:id' }),
+];
 const publicRoutes = ['/sign-in', '/sign-up'];
 
 export function middleware(request: NextRequest) {
@@ -12,7 +16,11 @@ export function middleware(request: NextRequest) {
   const currentPath = request.nextUrl.pathname;
   console.log(token);
 
-  if (!token && protectedRoutes.includes(currentPath)) {
+  const isProtectedRoute = protectedPatterns.some((pattern) =>
+    pattern.test(request.nextUrl),
+  );
+
+  if (!token && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/sign-in';
     url.searchParams.set('message', '로그인이 필요한 페이지입니다.');
