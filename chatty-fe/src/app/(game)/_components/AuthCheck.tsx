@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import useAuthStore from '@/app/_store/useAuthStore';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
-import { getUserIfo, postRefreshToken } from '@/app/_api/auth';
+import { getUserInfo, postRefreshToken } from '@/app/_api/auth';
 import { useSearchParams } from 'next/navigation';
 
 type AuthCheckProps = {
@@ -35,7 +35,7 @@ export default function AuthCheck({ children }: AuthCheckProps) {
     const accessToken = useAuthStore.getState().accessToken;
     if (accessToken) {
       try {
-        const response = await getUserIfo(accessToken);
+        const response = await getUserInfo(accessToken);
         setUserInfo(response);
       } catch (error) {
         console.error('error: ', error);
