@@ -29,9 +29,11 @@ class ProbGenerator():
                     break
                 except KeyError:
                     print("retry generating quiz due to KeyError")
+                    retry += 1
                     continue
                 except Exception as e:
                     print(f"An unexpected error occurred: {e}")
+                    retry += 1
                     continue
             return data
         
