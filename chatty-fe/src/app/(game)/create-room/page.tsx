@@ -43,7 +43,7 @@ export default function CreateRoom() {
       );
       console.log(response);
       if (response) {
-        router.push(`waiting-room/${response.id}`);
+        router.push(`waiting-room/${response.roomId}`);
       }
     } catch (error) {
       console.error(error);
