@@ -1,5 +1,6 @@
 package com.chatty.chatty.quizroom.domain;
 
+import java.util.Objects;
 import lombok.Builder;
 
 @Builder
@@ -15,5 +16,26 @@ public record PlayerStatus(
                 .userId(userId)
                 .isReady(DEFAULT_READY_STATUS)
                 .build();
+    }
+
+    public PlayerStatus toggleReady() {
+        return new PlayerStatus(userId, !isReady);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PlayerStatus that = (PlayerStatus) o;
+        return Objects.equals(userId, that.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
     }
 }

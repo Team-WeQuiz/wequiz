@@ -21,4 +21,20 @@ public record PlayersStatus(
         playerStatusSet.add(PlayerStatus.initNewUser(userId));
         return new PlayersStatus(playerStatusSet);
     }
+
+    public PlayersStatus removeUser(Long userId) {
+        playerStatusSet.removeIf(playerStatus -> playerStatus.userId().equals(userId));
+        return new PlayersStatus(playerStatusSet);
+    }
+
+    public PlayersStatus toggleReady(Long userId) {
+        playerStatusSet.stream()
+                .filter(playerStatus -> playerStatus.userId().equals(userId))
+                .findFirst()
+                .ifPresent(playerStatus -> {
+                    playerStatusSet.remove(playerStatus);
+                    playerStatusSet.add(playerStatus.toggleReady());
+                });
+        return new PlayersStatus(playerStatusSet);
+    }
 }

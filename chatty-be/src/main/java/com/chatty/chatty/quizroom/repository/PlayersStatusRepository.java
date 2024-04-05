@@ -21,7 +21,23 @@ public class PlayersStatusRepository {
 
     public PlayersStatus saveUserToRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
-        playersStatusMap.put(roomId, playersStatus.updateWithNewUser(userId));
+        updateStatus(roomId, playersStatus.updateWithNewUser(userId));
         return playersStatus;
+    }
+
+    public PlayersStatus leaveRoom(Long roomId, Long userId) {
+        PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
+        updateStatus(roomId, playersStatus.removeUser(userId));
+        return playersStatus;
+    }
+
+    public PlayersStatus toggleReady(Long roomId, Long userId) {
+        PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
+        updateStatus(roomId, playersStatus.toggleReady(userId));
+        return playersStatus;
+    }
+
+    private void updateStatus(Long roomId, PlayersStatus playersStatus) {
+        playersStatusMap.put(roomId, playersStatus);
     }
 }
