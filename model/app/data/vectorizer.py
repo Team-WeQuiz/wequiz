@@ -10,8 +10,6 @@ class Vectorizer():
     def vectorize(self, split_docs):
         try:
             indices = FAISS.from_documents(split_docs, self.embedding)
-            # self.db.as_retriever()
-            # indices.save_local(self.db_url)
             return indices
         except Exception as e:
             raise e

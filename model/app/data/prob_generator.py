@@ -1,5 +1,6 @@
 from model.chain import Chain
 from data.vectorizer import Vectorizer
+from data.settings import QUIZ_GENERATE_RETRY
 import uuid
 
 class ProbGenerator():
@@ -15,7 +16,7 @@ class ProbGenerator():
     def generate(self, type, keyword, question_number):
         retry = 0
         if type == "객관식":
-            while retry < 3:
+            while retry < QUIZ_GENERATE_RETRY:
                 try:
                     response = self.chain.prob(keyword)
                     data = {
