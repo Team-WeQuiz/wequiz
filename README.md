@@ -61,7 +61,8 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 
 ## 🛠️ Architecture
 
-![아키텍쳐 drawio](https://github.com/Team-WeQuiz/wequiz/assets/66217855/39d8a6b5-59fb-4b61-8c73-c42c3ff54ac4)
+![아키텍쳐 drawio](https://github.com/Team-WeQuiz/wequiz/assets/90228925/f23261b6-5f4a-44fc-bb3c-d5fcab6dfe42)
+
 
 ## 🚀 Team
 
