@@ -22,6 +22,11 @@ public class GameService {
         return buildDTO(roomId, playersStatus);
     }
 
+    public PlayersStatusDTO toggleReady(Long roomId, Long userId) {
+        PlayersStatus playersStatus = playersStatusRepository.toggleReady(roomId, userId);
+        return buildDTO(roomId, playersStatus);
+    }
+
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()
                 .roomId(roomId)

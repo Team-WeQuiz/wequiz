@@ -31,6 +31,12 @@ public class PlayersStatusRepository {
         return playersStatus;
     }
 
+    public PlayersStatus toggleReady(Long roomId, Long userId) {
+        PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
+        updateStatus(roomId, playersStatus.toggleReady(userId));
+        return playersStatus;
+    }
+
     private void updateStatus(Long roomId, PlayersStatus playersStatus) {
         playersStatusMap.put(roomId, playersStatus);
     }

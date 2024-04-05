@@ -45,6 +45,12 @@ public class GameController {
         return gameService.leaveRoom(roomId, getUserIdFromHeader(headerAccessor));
     }
 
+    @MessageMapping("/rooms/{roomId}/ready")
+    @SendTo("/sub/rooms/{roomId}/status")
+    public PlayersStatusDTO toggleReady(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        return gameService.toggleReady(roomId, getUserIdFromHeader(headerAccessor));
+    }
+
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
         return (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
     }
