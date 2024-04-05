@@ -2,11 +2,11 @@ import tiktoken
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.logger import log
 from langchain_community.document_loaders import S3FileLoader
+from data.settings import BUCKET_NAME, CHUNK_SIZE, CHUNK_OVERLAP
 
 
 class Splitter():
     def __init__(self, file_paths, aws_access_key):
-        self.bucket_name = 'kyuyeon-test'
         self.file_paths = file_paths
         self.aws_access_key = aws_access_key
         self.aws_access_key_id=self.aws_access_key["AWS_ACCESS_KEY_ID"]
@@ -28,7 +28,7 @@ class Splitter():
         docs = []
         for file_path in self.file_paths:
             s3_file = S3FileLoader(
-                self.bucket_name, file_path, aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key
+                BUCKET_NAME, file_path, aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key
                 )
             
             data = s3_file.load()
@@ -36,7 +36,7 @@ class Splitter():
             print(f"페이지에 {len(data[0].page_content)}개의 단어를 가지고 있습니다.")
             print(f'예상되는 토큰 수 {self.num_tokens_from_string(data[0].page_content, "cl100k_base")}')
 
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
             doc = text_splitter.split_documents(data)
             print(f"파일에 {len(doc)}개의 문서를 가지고 있습니다.")
             docs += doc
