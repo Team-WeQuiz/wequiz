@@ -1,23 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import UserCard from '../UserCard/UserCard';
 import * as styles from './UserList.css';
-import { UserStatus } from '@/app/_types/UserStatus';
+import useWaitingStore from '@/app/_store/useWaitingStore';
 
-const UserList = ({ userList }: { userList: UserStatus[] }) => {
-  const [updatedUserList, setUpdatedUserList] =
-    useState<UserStatus[]>(userList);
-
-  useEffect(() => {
-    console.log('new userList:', userList);
-    setUpdatedUserList(userList);
-  }, [userList]);
+const UserList = () => {
+  const {userStatuses} = useWaitingStore();
 
   return (
     <div className={styles.mainContainer}>
-      {updatedUserList &&
-        updatedUserList.map(
+      {userStatuses &&
+        userStatuses.map(
           (user) =>
             user.userId && (
               <UserCard
