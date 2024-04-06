@@ -1,7 +1,34 @@
-import * as styles from './UserList.css';
+'use client';
 
-const UserList = () => {
-  return <div className={styles.mainContainer}>유저 목록</div>;
+import { useState, useEffect } from 'react';
+import UserCard from '../UserCard/UserCard';
+import * as styles from './UserList.css';
+import { UserStatus } from '@/app/_types/UserStatus';
+
+const UserList = ({ userList }: { userList: UserStatus[] }) => {
+  const [updatedUserList, setUpdatedUserList] =
+    useState<UserStatus[]>(userList);
+
+  useEffect(() => {
+    console.log('new userList:', userList);
+    setUpdatedUserList(userList);
+  }, [userList]);
+
+  return (
+    <div className={styles.mainContainer}>
+      {updatedUserList &&
+        updatedUserList.map(
+          (user) =>
+            user.userId && (
+              <UserCard
+                key={user.userId}
+                userId={user.userId}
+                message={user.message}
+              />
+            ),
+        )}
+    </div>
+  );
 };
 
 export default UserList;

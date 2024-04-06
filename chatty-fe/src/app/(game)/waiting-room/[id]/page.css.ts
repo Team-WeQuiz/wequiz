@@ -20,7 +20,6 @@ export const narrowArea = style({
   width: 'calc(28% - 15px)',
   display: 'flex',
   position: 'relative',
-  border: '1px solid #000',
 });
 
 export const userList = style({
@@ -37,7 +36,6 @@ export const detailArea = style({
   display: 'flex',
   width: '100%',
   top: 0,
-  border: '1px solid #000',
 });
 
 export const buttonArea = style({

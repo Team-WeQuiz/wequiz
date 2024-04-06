@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 'use client';
+=======
+import { headers } from 'next/headers';
+>>>>>>> 00982ad4 ([feat/#171] ✨ Feat: 유저 입장, 채팅 띄우기)
 import client from './client';
 import useAuthStore from '@/app/_store/useAuthStore';
 
