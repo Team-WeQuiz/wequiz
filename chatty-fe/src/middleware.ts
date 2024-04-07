@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, URLPattern } from 'next/server';
 
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|fonts|images).*)'],
