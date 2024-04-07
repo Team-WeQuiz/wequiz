@@ -18,15 +18,27 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { updateUsers, setMessage } = useWaitingStore();
 
   useEffect(() => {
+    const disconnect = () => {
+      console.log('Disconnecting from WebSocket');
+      stompClient.publish({
+        destination: `/pub/rooms/${params.id}/leave`,
+      });
+      stompClient.deactivate();
+    };
+    window.addEventListener('beforeunload', disconnect);
+    return () => {
+      window.removeEventListener('beforeunload', disconnect);
+    };
+  }, []);
+
+  useEffect(() => {
     console.log('WaitingRoom mounted');
     const subscribeToStatus = (roomId: number) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);
         console.log('Received status message:', chatMessage);
         // join 신호
-        if (chatMessage.roomUserStatuses) {
-          updateUsers(chatMessage.roomUserStatuses);
-        }
+        updateUsers(chatMessage.playerStatuses);
       });
     };
 
@@ -34,7 +46,8 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/chat`, (message) => {
         const chatMessage = JSON.parse(message.body);
         console.log('Received chatting message:', chatMessage);
-        setMessage(chatMessage.userId, chatMessage.message);
+        if (chatMessage.chatType === 'TEXT')
+          setMessage(chatMessage.userId, chatMessage.message);
       });
     };
 
@@ -51,17 +64,19 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       });
     };
 
+    stompClient.onDisconnect = () => {
+      stompClient.publish({
+        destination: `/pub/rooms/${params.id}/leave`,
+      });
+    };
+
     stompClient.onConnect = () => {
       console.log('Connected to WebSocket');
+      updateUsers([]);
       setIsConnected(true);
       subscribeToStatus(params.id);
       subscribeToChat(params.id);
       joinRoom(params.id);
-    };
-
-    stompClient.onDisconnect = () => {
-      setIsConnected(false);
-      console.log('Disconnected from WebSocket');
     };
 
     stompClient.activate();
