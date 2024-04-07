@@ -1,7 +1,7 @@
 'use client';
 
 import GradButton from '@/app/_components/GradButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import { UserStatus } from '@/app/_types/WaitingStatus';
 import stompClient from '../../_utils/stomp';
@@ -14,10 +14,14 @@ const ReadyButton = ({
   userId: number | undefined;
 }) => {
   const { userStatuses } = useWaitingStore();
-  const [isReady] = useState<boolean>(
-    userStatuses.find((user: UserStatus) => user.userId === userId)?.isReady ||
-      false,
-  );
+  const [isReady, setIsReady] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsReady(
+      userStatuses.find((user: UserStatus) => user.userId === userId)
+        ?.isReady || false,
+    );
+  }, [userStatuses]);
 
   const toggleReady = () => {
     stompClient.publish({
