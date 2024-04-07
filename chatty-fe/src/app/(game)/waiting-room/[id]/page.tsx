@@ -9,6 +9,7 @@ import ChatInput from './_components/ChatInput/ChatInput';
 import QuizInfoCard from './_components/QuizInfoCard/QuizInfoCard';
 import useAuthStore from '@/app/_store/useAuthStore';
 import useWaitingStore from '@/app/_store/useWaitingStore';
+import ReadyButton from './_components/ReadyButton/ReadyButton';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
@@ -18,18 +19,22 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
 
   useEffect(() => {
     console.log('WaitingRoom mounted');
-    const subscribeToRoom = (roomId: number) => {
-      stompClient.subscribe(`/sub/rooms/${roomId}`, (message) => {
+    const subscribeToStatus = (roomId: number) => {
+      stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);
-        console.log('Received message:', chatMessage);
+        console.log('Received status message:', chatMessage);
         // join 신호
         if (chatMessage.roomUserStatuses) {
           updateUsers(chatMessage.roomUserStatuses);
         }
-        // 채팅 메시지
-        else if (chatMessage.chatType && chatMessage.chatType === 'TEXT') {
-          setMessage(chatMessage.userId, chatMessage.message);
-        }
+      });
+    };
+
+    const subscribeToChat = (roomId: number) => {
+      stompClient.subscribe(`/sub/rooms/${roomId}/chat`, (message) => {
+        const chatMessage = JSON.parse(message.body);
+        console.log('Received chatting message:', chatMessage);
+        setMessage(chatMessage.userId, chatMessage.message);
       });
     };
 
@@ -49,7 +54,8 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     stompClient.onConnect = () => {
       console.log('Connected to WebSocket');
       setIsConnected(true);
-      subscribeToRoom(params.id);
+      subscribeToStatus(params.id);
+      subscribeToChat(params.id);
       joinRoom(params.id);
     };
 
@@ -83,7 +89,9 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         <div className={styles.detailArea}>
           <QuizInfoCard roomId={params.id} />
         </div>
-        <div className={styles.buttonArea}>버튼</div>
+        <div className={styles.buttonWrapper}>
+          <ReadyButton roomId={params.id} userId={userId} />
+        </div>
       </div>
     </div>
   );

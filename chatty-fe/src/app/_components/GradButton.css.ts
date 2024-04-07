@@ -48,7 +48,7 @@ export const gradButton = recipe({
     },
     rounded: {
       true: {
-        borderRadius: 30,
+        borderRadius: 50,
         padding: '18px 24px',
       },
     },

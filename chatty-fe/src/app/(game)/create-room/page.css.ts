@@ -43,3 +43,14 @@ export const titleWrapper = style({
 export const defaultWrapper = style({
   width: 404,
 });
+
+export const buttonContainer = style({
+  display: 'flex',
+  justifyContent: 'center',
+  width: '100%',
+  height: 60,
+});
+
+export const buttonWrapper = style({
+  width: 252,
+});

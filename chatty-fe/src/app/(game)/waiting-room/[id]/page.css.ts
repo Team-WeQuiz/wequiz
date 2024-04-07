@@ -29,6 +29,7 @@ export const userList = style({
 export const chattingArea = style({
   width: '100%',
   height: 80,
+  alignItems: 'center',
 });
 
 export const detailArea = style({
@@ -38,10 +39,10 @@ export const detailArea = style({
   top: 0,
 });
 
-export const buttonArea = style({
+export const buttonWrapper = style({
   position: 'absolute',
   display: 'flex',
+  height: 80,
   width: '100%',
   bottom: 0,
-  border: '1px solid #000',
 });

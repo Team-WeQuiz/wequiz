@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { UserStatus } from '@/app/_types/UserStatus';
+import { UserStatus } from '@/app/_types/WaitingStatus';
 
 type WatingStore = {
   userStatuses: UserStatus[];
@@ -16,14 +16,24 @@ const useWaitingStore = create<WatingStore>((set) => ({
         (user) => user.userId && !existingUserIds.includes(user.userId),
       );
       // 새로운 유저만 추가
-      const updatedUserStatuses = [...state.userStatuses, ...newUserStatuses];
+      let updatedUserStatuses = [...state.userStatuses, ...newUserStatuses];
 
-      // 없어진 유저 삭제
-      const filteredUserStatuses = updatedUserStatuses.filter((user) =>
-        userStatuses.find((newUser) => newUser.userId === user.userId),
-      );
+      // 기존 유저 상태 업데이트, 없어진 유저 삭제
+      updatedUserStatuses = updatedUserStatuses
+        .map((user) => {
+          const updatedUser = userStatuses.find(
+            (newUser) => newUser.userId === user.userId,
+          );
+          if (updatedUser) {
+            if (updatedUser.isReady !== user.isReady)
+              return { ...user, isReady: updatedUser.isReady };
+            return user;
+          }
+          return null;
+        })
+        .filter(Boolean) as UserStatus[];
 
-      return { userStatuses: filteredUserStatuses };
+      return { userStatuses: updatedUserStatuses };
     });
   },
   setMessage: (userId, message) => {

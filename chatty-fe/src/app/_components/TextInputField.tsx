@@ -42,6 +42,7 @@ export default function TextInputField({
         style={{
           borderRadius: `${borderRadius}px`,
           backgroundColor: `${backgroundColor}`,
+          height: 80,
         }}
       >
         <input
