@@ -7,6 +7,7 @@ import FileUploadBox from './_components/FileUploadBox';
 import RadioInputField from '@/app/_components/RadioInputField';
 import { postRoom } from '@/app/_api/createRoom';
 import { useRouter } from 'next/navigation';
+import GradButton from '@/app/_components/GradButton';
 
 export default function CreateRoom() {
   const problemTypeOptions = [
@@ -156,7 +157,13 @@ export default function CreateRoom() {
             </div>
           </div>
         </div>
-        <button onClick={onSubmit}>생성하기</button>
+        <div className={styles.buttonContainer}>
+          <div className={styles.buttonWrapper}>
+            <GradButton rounded onClick={onSubmit} fullWidth>
+              생성하기
+            </GradButton>
+          </div>
+        </div>
       </div>
     </div>
   );
