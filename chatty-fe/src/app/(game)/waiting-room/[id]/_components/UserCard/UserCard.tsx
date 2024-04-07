@@ -2,18 +2,13 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import * as styles from './UserCard.css';
+import { UserStatus } from '@/app/_types/WaitingStatus';
 
-const UserCard = ({
-  userId,
-  message,
-}: {
-  userId: number;
-  message?: string;
-}) => {
+const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
   const [showMessage, setShowMessage] = useState<boolean>(false);
 
   useEffect(() => {
-    if (message) {
+    if (userStatus.message) {
       setShowMessage(true);
       const timer = setTimeout(() => {
         setShowMessage(false);
@@ -21,14 +16,16 @@ const UserCard = ({
 
       return () => clearTimeout(timer);
     }
-  }, [message]);
+  }, [userStatus.message]);
 
   return (
-    <div className={styles.cardContainer}>
+    <div
+      className={`${styles.cardContainer} ${userStatus.isReady && styles.readyContainer}`}
+    >
       <div className={styles.avatar}>
-        {message && (
+        {userStatus.message && (
           <div className={styles.chatContainer({ fadeOut: !showMessage })}>
-            <div className={styles.chatMessage}>{message}</div>
+            <div className={styles.chatMessage}>{userStatus.message}</div>
           </div>
         )}
         <Image
@@ -41,7 +38,7 @@ const UserCard = ({
       </div>
       <div className={styles.userInfo}>
         <div className={styles.line}></div>
-        <div className={styles.userName}>{userId}</div>
+        <div className={styles.userName}>{userStatus.userId}</div>
         <div className={styles.line}></div>
       </div>
     </div>

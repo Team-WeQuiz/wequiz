@@ -14,7 +14,12 @@ export const cardContainer = style({
   backgroundColor: globals.color.blue_5,
   borderRadius: 20,
   border: '2px solid #fff',
+  position: 'relative',
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+});
+
+export const readyContainer = style({
+  boxShadow: '0 0 18px 0 #2692FF',
 });
 
 export const avatar = style({
