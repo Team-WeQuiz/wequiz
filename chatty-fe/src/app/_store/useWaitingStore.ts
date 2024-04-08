@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { UserStatus } from '@/app/_types/WaitingStatus';
 
-type WatingStore = {
+type WaitingStore = {
   userStatuses: UserStatus[];
   updateUsers: (userStatuses: UserStatus[]) => void; // 접속 유저 업데이트 함수
   setMessage: (userId: number, message: string) => void; // 메시지 설정 함수
 };
 
-const useWaitingStore = create<WatingStore>((set) => ({
+const useWaitingStore = create<WaitingStore>((set) => ({
   userStatuses: [],
   updateUsers: (userStatuses) => {
     set((state) => {
