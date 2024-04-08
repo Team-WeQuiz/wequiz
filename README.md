@@ -63,7 +63,7 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 ### 🎨 Front-end
 `NEXT.JS`
 ### ⚙️ Back-end
-`Spring boot`, `PostgreSQL`
+`Spring boot`, `MySQL`
 ### 🤖 ML
 `LangChain`, `FastAPI`
 
@@ -74,7 +74,7 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
             <td align='center'>전체 아키텍처</td>
           </tr>
           <tr>
-            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/8d998787-7b41-4371-9dcf-127e94c13ec3"></td>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/38226d66-7087-4e15-a334-a6047bcde66e"></td>
           </tr>
     </tbody>
 </table>
