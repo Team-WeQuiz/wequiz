@@ -21,20 +21,26 @@ public class PlayersStatusRepository {
 
     public PlayersStatus saveUserToRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
+        log.info("saveUserToRoom: {}", playersStatus);
+        log.info("roomId: {}", roomId);
         updateStatus(roomId, playersStatus.updateWithNewUser(userId));
         return playersStatus;
     }
 
     public PlayersStatus leaveRoom(Long roomId, Long userId) {
-        PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
+        PlayersStatus playersStatus = findByRoomId(roomId).get();
         updateStatus(roomId, playersStatus.removeUser(userId));
         return playersStatus;
     }
 
     public PlayersStatus toggleReady(Long roomId, Long userId) {
-        PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
+        PlayersStatus playersStatus = findByRoomId(roomId).get();
         updateStatus(roomId, playersStatus.toggleReady(userId));
         return playersStatus;
+    }
+
+    public void clear(Long roomId) {
+        playersStatusMap.remove(roomId);
     }
 
     private void updateStatus(Long roomId, PlayersStatus playersStatus) {

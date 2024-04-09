@@ -8,10 +8,14 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -49,6 +53,12 @@ public class GameController {
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO toggleReady(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         return gameService.toggleReady(roomId, getUserIdFromHeader(headerAccessor));
+    }
+
+    @DeleteMapping("/rooms/{roomId}/end")
+    public ResponseEntity<Void> endGame(@PathVariable Long roomId) {
+        gameService.endGame(roomId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
