@@ -5,8 +5,6 @@ public record ChatRequest(
 
         Long roomId,
 
-        Long userId,
-
         String message
 ) {
 

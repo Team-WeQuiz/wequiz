@@ -27,11 +27,15 @@ public class GameController {
 
     @MessageMapping("/rooms/{roomId}/chat")
     @SendTo("/sub/rooms/{roomId}/chat")
-    public ChatResponse chat(@DestinationVariable Long roomId, ChatRequest request) {
+    public ChatResponse chat(
+            @DestinationVariable Long roomId,
+            SimpMessageHeaderAccessor headerAccessor,
+            ChatRequest request
+    ) {
         return ChatResponse.builder()
                 .chatType(request.chatType())
                 .roomId(request.roomId())
-                .userId(request.userId())
+                .userId(getUserIdFromHeader(headerAccessor))
                 .message(request.message())
                 .time(LocalDateTime.now())
                 .build();
