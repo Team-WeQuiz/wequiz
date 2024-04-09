@@ -4,12 +4,12 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:postgresql://localhost:5432/wequiz
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:mysql://localhost:3306/wequiz
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: wequizadmin
     password: 'wequizadmin'
 
