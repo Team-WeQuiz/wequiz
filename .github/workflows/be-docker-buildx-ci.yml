@@ -33,3 +33,4 @@ jobs:
           push: true
           context: ./chatty-be
           tags: leahpar0401/wequiz-be:latest
+          platforms: linux/amd64,linux/arm64
