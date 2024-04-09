@@ -19,4 +19,9 @@ public class UserController {
     public ResponseEntity<UserInfoResponse> getUserInfo(@AuthUser Long userId) {
         return ResponseEntity.ok(userService.getUserInfo(userId));
     }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
 }
