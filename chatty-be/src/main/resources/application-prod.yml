@@ -8,7 +8,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://mysql:3306/wequiz
+    url: jdbc:mysql://0.0.0.0:3306/wequiz
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: wequizadmin
     password: wequizadmin
