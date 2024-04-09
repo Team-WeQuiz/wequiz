@@ -5,20 +5,15 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class DynamoDBConfig {
 
-    @Value("${spring.aws.access-key}")
-    private String accessKey;
-
-    @Value("${spring.aws.secret-access-key}")
-    private String secretKey;
-
-    private static final String REGION = "ap-northeast-2";
+    private final AWSKey awsKey;
 
     @Bean
     public DynamoDBMapper dynamoDBMapper() {
@@ -26,9 +21,9 @@ public class DynamoDBConfig {
     }
 
     private AmazonDynamoDBClient amazonDynamoDBClient() {
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsKey.getAccessKey(), awsKey.getSecretKey());
         return (AmazonDynamoDBClient) AmazonDynamoDBAsyncClientBuilder.standard()
-                .withRegion(REGION)
+                .withRegion(awsKey.getRegion())
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .build();
     }
