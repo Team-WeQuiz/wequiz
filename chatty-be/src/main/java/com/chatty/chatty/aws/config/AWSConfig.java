@@ -1,4 +1,4 @@
-package com.chatty.chatty.config;
+package com.chatty.chatty.aws.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
