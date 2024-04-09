@@ -20,5 +20,5 @@ ENTRYPOINT ["java", \
             "-Xms1400m", \
             "-Xmx1400m", \
             "-jar", \
-            "-Dspring.profiles.active=local", \
+            "-Dspring.profiles.active=prod", \
             "/app.jar"]
