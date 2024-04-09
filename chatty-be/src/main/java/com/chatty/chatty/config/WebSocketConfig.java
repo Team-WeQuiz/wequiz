@@ -1,6 +1,7 @@
 package com.chatty.chatty.config;
 
 import com.chatty.chatty.config.interceptor.StompHandler;
+import com.chatty.chatty.exception.StompExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -15,12 +16,14 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
+    private final StompExceptionHandler stompExceptionHandler;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*");
         // TODO .withSockJS();
+        registry.setErrorHandler(stompExceptionHandler);
     }
 
     @Override
