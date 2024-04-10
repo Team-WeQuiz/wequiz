@@ -1,51 +1,50 @@
 package com.chatty.chatty.aws.service;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.chatty.chatty.aws.entity.DBQuizResponse;
-import com.chatty.chatty.aws.entity.Question;
-import java.util.ArrayList;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class DynamoDBService {
 
-    @Autowired
-    private DynamoDBMapper mapper;
+    private final AmazonDynamoDB amazonDynamoDB;
+    private final DynamoDB dynamoDB;
 
-    public DBQuizResponse getData() {
-        DBQuizResponse response = mapper.load(DBQuizResponse.class, 22222222, "2024-04-10");
-        if (response == null) {
-            throw new RuntimeException("Data not found for id: ");
-        }
-
-        List<Question> questions = convert(response.getQuestions());
-        System.out.println(questions);
-
-        return response;
+    public DynamoDBService(AmazonDynamoDB amazonDynamoDB) {
+        this.amazonDynamoDB = amazonDynamoDB;
+        this.dynamoDB = new DynamoDB(amazonDynamoDB);
     }
 
-    public List<Question> convert(List<Map<String, AttributeValue>> items) {
-        List<Question> questions = new ArrayList<>();
+    public String getDescriptionFromDB(Integer hashKey, String rangeKey) {
+        Table table = dynamoDB.getTable("wequiz-quiz");
+        GetItemSpec spec = new GetItemSpec()
+                .withPrimaryKey("id", hashKey, "timestamp", rangeKey)
+                .withProjectionExpression("description");
 
-        for (Map<String, AttributeValue> item : items) {
-            String id = item.get("id").getS();
-            Integer questionNumber = Integer.parseInt(item.get("question_number").getN());
-            String type = item.get("type").getS();
-            String question = item.get("question").getS();
-            List<String> options = item.get("options").getL().stream()
-                    .map(AttributeValue::getS)
-                    .toList();
-            String answer = item.get("answer").getS();
+        Item item = table.getItem(spec);
 
-            Question q = new Question(id, questionNumber, type, question, options, answer);
-            questions.add(q);
-        }
+        String description = item.getString("description");
+        log.info("description: {}", description);
+        return description;
+    }
 
+    public List<Map<String, Object>> getQuizFromDB(Integer hashKey, String rangeKey) {
+        Table table = dynamoDB.getTable("wequiz-quiz");
+        GetItemSpec spec = new GetItemSpec()
+                .withPrimaryKey("id", hashKey, "timestamp", rangeKey)
+                .withProjectionExpression("questions");
+
+        Item item = table.getItem(spec);
+        
+        List<Map<String, Object>> questions = item.getList("questions");
+        System.out.println(questions);
         return questions;
     }
-
 }
