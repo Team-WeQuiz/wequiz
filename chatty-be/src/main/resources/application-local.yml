@@ -1,6 +1,4 @@
 spring:
-  config:
-    import: 'aws-secretsmanager:wequiz/aws/back'
   jpa:
     properties:
       hibernate:
@@ -14,10 +12,6 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: wequizadmin
     password: 'wequizadmin'
-  aws:
-    access-key: ${AWS_ACCESS_KEY}
-    secret-access-key: ${AWS_SECRET_ACCESS_KEY}
-    region: 'ap-northeast-2'
 
 social:
   client:

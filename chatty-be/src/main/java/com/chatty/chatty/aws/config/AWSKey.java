@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AWSKey {
 
-    @Value("${spring.aws.access-key}")
+    @Value("${aws.access-key}")
     private String accessKey;
 
-    @Value("${spring.aws.secret-access-key}")
+    @Value("${aws.secret-access-key}")
     private String secretKey;
 
-    @Value("${spring.aws.region}")
+    @Value("${aws.region}")
     private String region;
 
 }
