@@ -24,13 +24,13 @@ class GenerateRequest(BaseModel):
 
 class Answer(BaseModel):
     user_id: int # user_id
-    correct: str # 답안
     user: str # 유저가 작성한 답안
 
 class MarkRequest(BaseModel):
     id: int   # 퀴즈방 id
     quiz_id: str # quiz_id
     question_number: int # 퀴즈방 내에서의 quiz number
+    correct: str # 답안
     answers: List[Answer]
 
 ### credential key
@@ -56,10 +56,9 @@ def mark(mark_request: MarkRequest):
     answers = []
     for answer in mark_request.answers:
         try:
-            marking = marker.mark(answer.correct, answer.user)
+            marking = marker.mark(mark_request.correct, answer.user)
             data = {
                 "user_id": answer.user_id,
-                "correct": answer.correct,
                 "user": answer.user,
                 "marking": marking
             }
@@ -95,9 +94,9 @@ def mark(mark_request: MarkRequest):
                     {
                         "id": {"S": str(mark_request.quiz_id)},
                         "question_number": {"N": str(mark_request.question_number)},
+                        "correct": {"S": mark_request.correct},
                         "markeds": {"L": [{"M": {
                             "user_id": {"N": str(answer['user_id'])},
-                            "correct": {"S": answer['correct']},
                             "user": {"S": answer['user']},
                             "marking": {"BOOL": answer['marking']}
                         }} for answer in answers]}
@@ -121,10 +120,10 @@ def mark(mark_request: MarkRequest):
                 ":new_answer": [{
                     "id": {"S": str(mark_request.quiz_id)},
                     "question_number": {"N": str(mark_request.question_number)},
+                    "correct": {"S": mark_request.correct},
                     "markeds": {"L":[{"M":
                         {
                             "user_id": {"N": str(answer['user_id'])},
-                            "correct": {"S": answer['correct']},
                             "user": {"S": answer['user']},
                             "marking": {"BOOL": answer['marking']}
                         } for answer in answers
