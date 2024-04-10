@@ -30,11 +30,11 @@ def ping():
 @app.post("/mark")
 def mark(mark_request: MarkRequest):
     marker = Marker(OPENAI_API_KEY)
-
-    # 채점
     answers = []
-    for answer in mark_request.answers:
-        try:
+
+    try:
+        # 채점 및 답변 리스트 생성
+        for answer in mark_request.answers:
             marking = marker.mark(mark_request.correct, answer.user)
             data = {
                 "user_id": answer.user_id,
@@ -42,70 +42,55 @@ def mark(mark_request: MarkRequest):
                 "marking": marking
             }
             answers.append(data)
-        except Exception as e:
-            log('error', f'Failed to Mark answer: {str(e)}', AWS_ACCESS_KEY)
-            raise e
-    response = {
-        "id": mark_request.id,
-        "quiz_id": mark_request.quiz_id,
-        "answers": answers
+    except Exception as e:
+        log('error', f'Failed to Mark answer: {str(e)}', AWS_ACCESS_KEY)
+        raise e
+
+    # DynamoDB에 채점 결과 업데이트
+    marked_item = {
+        "id": {"S": str(mark_request.quiz_id)},
+        "question_number": {"N": str(mark_request.question_number)},
+        "correct": {"S": mark_request.correct},
+        "markeds": {"L": [{"M": {
+            "user_id": {"N": str(answer['user_id'])},
+            "user": {"S": answer['user']},
+            "marking": {"BOOL": answer['marking']}
+        }} for answer in answers]}
     }
 
-    yield response
-
-
-    # DynamoDB예 채점 결과 업데이트
-    marked_item = {
-                    "id": {"S": str(mark_request.quiz_id)},
-                    "question_number": {"N": str(mark_request.question_number)},
-                    "correct": {"S": mark_request.correct},
-                    "markeds": {"L": [{"M": {
-                        "user_id": {"N": str(answer['user_id'])},
-                        "user": {"S": answer['user']},
-                        "marking": {"BOOL": answer['marking']}
-                    }} for answer in answers]}
-                }
-
-    # mark_request.id가 있는지 확인
-    table = dynamodb.get_item(
-        TableName=MARK_TABLE,
-        Key={
-            'id': {'N': str(mark_request.id)}
-        }
-    )
-
-    # mark_request.id가 테이블에 없는 경우
     try:
+        # mark_request.id가 있는지 확인
+        table = dynamodb.get_item(
+            TableName=MARK_TABLE,
+            Key={'id': {'N': str(mark_request.id)}}
+        )
+
+        # mark_request.id가 테이블에 없는 경우
         if 'Item' not in table:
-            # 새로운 아이템을 추가
+            # 새로운 아이템 추가
             dynamodb.put_item(
                 TableName=MARK_TABLE,
-                Item={
-                    "id": {"N": str(mark_request.id)},
-                    "answers": {"L": [{"M": marked_item}]}
-                }
+                Item={"id": {"N": str(mark_request.id)}, "answers": {"L": [{"M": marked_item}]}}
             )
         else:
-            # 이미 존재하는 아이템을 업데이트
-            # markeds 리스트에 새로운 데이터 추가
+            # 이미 존재하는 아이템 업데이트
             dynamodb.update_item(
                 TableName=MARK_TABLE,
-                Key={
-                    'id': {'N': str(mark_request.id)}
-                },
-                UpdateExpression="SET #answers = list_append(if_not_exists(#answers, :empty_list), :new_answer)",
-                ExpressionAttributeNames={
-                    "#answers": "answers"
-                },
-                ExpressionAttributeValues={
-                    ":new_answer": [marked_item],
-                    ":empty_list": []
-                }
+                Key={'id': {'N': str(mark_request.id)}},
+                UpdateExpression="SET #answers = list_append(#answers, :new_answer)",
+                ExpressionAttributeNames={"#answers": "answers"},
+                ExpressionAttributeValues={":new_answer": {"L": [{"M": marked_item}]}}
             )
     except Exception as e:
         log('error', f'Failed to push marked result to dynamodb: {str(e)}', AWS_ACCESS_KEY)
         raise e
 
+    # 응답 반환
+    return {
+        "id": mark_request.id,
+        "quiz_id": mark_request.quiz_id,
+        "answers": answers
+    }
 
 @app.post("/generate")
 def generate(generate_request: GenerateRequest):
