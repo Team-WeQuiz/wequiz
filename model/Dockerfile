@@ -1,5 +1,5 @@
 # Use the official Python image as a base
-FROM python:3.9
+FROM python:3.9-slim-buster
 
 # Set the working directory in the container
 WORKDIR /
@@ -18,7 +18,7 @@ RUN pip install awscli
 WORKDIR /app/app
 
 # Expose the port that uvicorn will run on
-EXPOSE 8000
+EXPOSE 7999
 
 # Command to run uvicorn with auto-reload
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7999", "--reload"]
