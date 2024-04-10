@@ -1,0 +1,17 @@
+name: ml-portainer-webhook
+
+on:
+  workflow_run:
+    workflows: [ "ml-docker-buildx-ci" ]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Send Trigger
+        run: |
+          curl -X POST ${{ secrets.ML_PORTAINER_WEBHOOK_URL }}
