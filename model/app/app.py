@@ -9,6 +9,7 @@ from utils.logger import log
 from utils.security import get_openai_api_key, get_aws_access_key
 import json
 import boto3
+import random
 
 app = FastAPI()
 
@@ -120,7 +121,10 @@ def generate(generate_request: GenerateRequest):
             item = response['Item']
             questions = item.get('questions', {'L': []})['L']  # 기존의 questions 리스트를 가져옵니다.
 
-            question = prob_generator.generate(generate_request.type, keyword, idx+1)  # 새 문제를 생성합니다.
+            # 객관식(0) or 단답형(1) 랜덤 선택
+            type = random.randrange(0, 2)
+
+            question = prob_generator.generate(type, keyword, idx+1)  # 새 문제를 생성합니다.
             new_question = {
                 "M": {
                     "id": {"S": str(question["id"])},

@@ -1,5 +1,5 @@
-from model.prompt import PROB_TEMPLATE
-from model.schema import Output
+from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE
+from model.schema import ChoiceOutput, ShortOutput
 from langchain_openai import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
@@ -13,12 +13,14 @@ class Chain():
         # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
         self.retriever = indices.as_retriever(search_kwargs=dict(k=3))
         self.llm = OpenAI(openai_api_key=openai_api_key)
+        self.types = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
+        self.schems = [ChoiceOutput, ShortOutput]
     
     # 객관식 문제 생성 함수
-    def prob(self, message):
-        parser = JsonOutputParser(pydantic_object=Output)
+    def prob(self, type, message):
+        parser = JsonOutputParser(pydantic_object=self.schems[type])
         prompt = PromptTemplate(
-            template=PROB_TEMPLATE,
+            template=self.types[type],
             input_variables=["message"],
             partial_variables={"format_instructions": parser.get_format_instructions()}
         )

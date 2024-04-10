@@ -15,14 +15,15 @@ class ProbGenerator():
     
     def generate(self, type, keyword, question_number):
         retry = 0
-        if type == "객관식":
+        types = ["객관식", "단답형", "주관식"]
+        if type in [0, 1]: # 객관식, 단답형
             while retry < QUIZ_GENERATE_RETRY:
                 try:
-                    response = self.chain.prob(keyword)
+                    response = self.chain.prob(type, keyword)
                     data = {
                         "id": uuid.uuid4(),
                         "question_number": question_number,
-                        "type": type,  # 1:객, 2:주, 3:단
+                        "type": types[type],
                         "question": response["text"]["question"],
                         "options": response["text"]["choices"],
                         "answer": response["text"]["answer"]
@@ -39,7 +40,7 @@ class ProbGenerator():
             return data
         
         else:
-            raise NotImplementedError("주관식, 단답형에 대한 chain을 구성해야합니다.")
+            raise NotImplementedError("주관식에 대한 chain을 구성해야합니다.")
 
     
        
