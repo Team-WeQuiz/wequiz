@@ -83,7 +83,6 @@ def mark(mark_request: MarkRequest):
     # mark_request.id가 테이블에 없는 경우
     if 'Item' not in table:
         # 새로운 아이템을 추가
-        print(mark_request)
         dynamodb.put_item(
             TableName=MARK_TABLE,
             Item={
