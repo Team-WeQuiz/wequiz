@@ -8,11 +8,12 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://localhost:3306/wequiz
+    url: jdbc:mysql://mysql:3306/wequiz
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: wequizadmin
     password: wequizadmin
 
+# TODO: 소셜 로그인 토큰 재발급 후 수정 필요
 social:
   client:
     kakao:
