@@ -5,6 +5,9 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
+import com.chatty.chatty.aws.entity.Question;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -35,16 +38,26 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<Map<String, Object>> getQuizFromDB(Integer hashKey, String rangeKey) {
+    public List<Question> getQuizFromDB(Integer hashKey, String rangeKey) {
         Table table = dynamoDB.getTable("wequiz-quiz");
         GetItemSpec spec = new GetItemSpec()
                 .withPrimaryKey("id", hashKey, "timestamp", rangeKey)
                 .withProjectionExpression("questions");
 
         Item item = table.getItem(spec);
-        
+
         List<Map<String, Object>> questions = item.getList("questions");
-        System.out.println(questions);
+        return convertToList(questions);
+    }
+
+    private List<Question> convertToList(List<Map<String, Object>> listMap) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Question> questions = new ArrayList<>();
+
+        for (Map<String, Object> value : listMap) {
+            Question question = mapper.convertValue(value, Question.class);
+            questions.add(question);
+        }
         return questions;
     }
 }
