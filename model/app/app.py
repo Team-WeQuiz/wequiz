@@ -1,37 +1,16 @@
 from fastapi import FastAPI
-from pydantic import BaseModel 
+import json, random
+import boto3
+
+from schema import *
 from data.splitter import Splitter
 from data.prob_generator import ProbGenerator
 from data.summarizer import Summarizer
 from data.marker import Marker
-from typing import List
 from utils.logger import log
 from utils.security import get_openai_api_key, get_aws_access_key
-import json
-import boto3
-import random
 
 app = FastAPI()
-
-
-class GenerateRequest(BaseModel):
-    id: int
-    timestamp: str
-    user_id: int
-    numOfQuiz: int
-    type: str
-    files: List[str]
-
-class Answer(BaseModel):
-    user_id: int # user_id
-    user: str # 유저가 작성한 답안
-
-class MarkRequest(BaseModel):
-    id: int   # 퀴즈방 id
-    quiz_id: str # quiz_id
-    question_number: int # 퀴즈방 내에서의 quiz number
-    correct: str # 답안
-    answers: List[Answer]
 
 ### credential key
 OPENAI_API_KEY = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
@@ -75,6 +54,18 @@ def mark(mark_request: MarkRequest):
     yield response
 
 
+    # DynamoDB예 채점 결과 업데이트
+    marked_item = {
+                    "id": {"S": str(mark_request.quiz_id)},
+                    "question_number": {"N": str(mark_request.question_number)},
+                    "correct": {"S": mark_request.correct},
+                    "markeds": {"L": [{"M": {
+                        "user_id": {"N": str(answer['user_id'])},
+                        "user": {"S": answer['user']},
+                        "marking": {"BOOL": answer['marking']}
+                    }} for answer in answers]}
+                }
+
     # mark_request.id가 있는지 확인
     table = dynamodb.get_item(
         TableName=MARK_TABLE,
@@ -84,54 +75,36 @@ def mark(mark_request: MarkRequest):
     )
 
     # mark_request.id가 테이블에 없는 경우
-    if 'Item' not in table:
-        # 새로운 아이템을 추가
-        dynamodb.put_item(
-            TableName=MARK_TABLE,
-            Item={
-                "id": {"N": str(mark_request.id)},
-                "answers": {"L": [{"M":
-                    {
-                        "id": {"S": str(mark_request.quiz_id)},
-                        "question_number": {"N": str(mark_request.question_number)},
-                        "correct": {"S": mark_request.correct},
-                        "markeds": {"L": [{"M": {
-                            "user_id": {"N": str(answer['user_id'])},
-                            "user": {"S": answer['user']},
-                            "marking": {"BOOL": answer['marking']}
-                        }} for answer in answers]}
-                    }
-                }]}
-            }
-        )
-    else:
-        # 이미 존재하는 아이템을 업데이트
-        # markeds 리스트에 새로운 데이터 추가
-        dynamodb.update_item(
-            TableName=MARK_TABLE,
-            Key={
-                'id': {'N': str(mark_request.id)}
-            },
-            UpdateExpression="SET #answers = list_append(if_not_exists(#answers, :empty_list), :new_answer)",
-            ExpressionAttributeNames={
-                "#answers": "answers"
-            },
-            ExpressionAttributeValues={
-                ":new_answer": [{
-                    "id": {"S": str(mark_request.quiz_id)},
-                    "question_number": {"N": str(mark_request.question_number)},
-                    "correct": {"S": mark_request.correct},
-                    "markeds": {"L":[{"M":
-                        {
-                            "user_id": {"N": str(answer['user_id'])},
-                            "user": {"S": answer['user']},
-                            "marking": {"BOOL": answer['marking']}
-                        } for answer in answers
-                    }]}
-                }],
-                ":empty_list": []
-            }
-        )
+    try:
+        if 'Item' not in table:
+            # 새로운 아이템을 추가
+            dynamodb.put_item(
+                TableName=MARK_TABLE,
+                Item={
+                    "id": {"N": str(mark_request.id)},
+                    "answers": {"L": [{"M": marked_item}]}
+                }
+            )
+        else:
+            # 이미 존재하는 아이템을 업데이트
+            # markeds 리스트에 새로운 데이터 추가
+            dynamodb.update_item(
+                TableName=MARK_TABLE,
+                Key={
+                    'id': {'N': str(mark_request.id)}
+                },
+                UpdateExpression="SET #answers = list_append(if_not_exists(#answers, :empty_list), :new_answer)",
+                ExpressionAttributeNames={
+                    "#answers": "answers"
+                },
+                ExpressionAttributeValues={
+                    ":new_answer": [marked_item],
+                    ":empty_list": []
+                }
+            )
+    except Exception as e:
+        log('error', f'Failed to push marked result to dynamodb: {str(e)}', AWS_ACCESS_KEY)
+        raise e
 
 
 @app.post("/generate")
