@@ -1,8 +1,6 @@
 server:
   port: 8080
   shutdown: graceful
-  servlet:
-    context-path: /api
   compression:
     enabled: true
     mime-types: application/json
