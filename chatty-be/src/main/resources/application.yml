@@ -13,9 +13,18 @@ springdoc:
     path=/:
 
 spring:
+  config:
+    import: 'aws-secretsmanager:wequiz/aws/back'
   profiles:
     active: local
+
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+  region: 'ap-northeast-2'
+
 jwt:
   secret: qwerasdfzxcvdsafdsaffdasafdfdsafdsafdsafdsasfda
   access-token-expiration: 86400000
   refresh-token-expiration: 2592000000
+

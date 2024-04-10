@@ -40,6 +40,10 @@ dependencies {
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
+    implementation("io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4")
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
+    implementation 'com.amazonaws:aws-java-sdk-dynamodb'
+    
     implementation 'mysql:mysql-connector-java:8.0.23'
 
     compileOnly 'org.projectlombok:lombok'
