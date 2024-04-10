@@ -38,7 +38,7 @@ dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
 
 @app.get("/ping")
 def ping():
-    return {"ping": "pongg"}
+    return {"ping": "pong"}
 
 
 @app.post("/mark")

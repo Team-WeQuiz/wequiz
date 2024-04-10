@@ -1,5 +1,5 @@
 # Use the official Python image as a base
-FROM python:3.9
+FROM python:3.9-slim-buster
 
 # Set the working directory in the container
 WORKDIR /
