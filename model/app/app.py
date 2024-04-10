@@ -22,10 +22,16 @@ class GenerateRequest(BaseModel):
     type: str
     files: List[str]
 
+class Answer(BaseModel):
+    user_id: int # user_id
+    correct: str # 답안
+    user: str # 유저가 작성한 답안
+
 class MarkRequest(BaseModel):
-    id: int
-    answer: str
-    user: str
+    id: int   # 퀴즈방 id
+    quiz_id: str # quiz_id
+    question_number: int # 퀴즈방 내에서의 quiz number
+    answers: List[Answer]
 
 ### credential key
 OPENAI_API_KEY = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
@@ -33,7 +39,8 @@ AWS_ACCESS_KEY = json.loads(get_aws_access_key())
 
 ## DynamoDB
 REGION_NAME = 'ap-northeast-2'
-TABLE_NAME = 'wequiz-quiz'
+QUIZ_TABLE = 'wequiz-quiz'
+MARK_TABLE = 'wequiz-mark'
 dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
 
 @app.get("/ping")
@@ -44,18 +51,89 @@ def ping():
 @app.post("/mark")
 def mark(mark_request: MarkRequest):
     marker = Marker(OPENAI_API_KEY)
-    try:
-        marking = marker.mark(mark_request.answer, mark_request.user)
-        data = {
-            "id": mark_request.id,
-            "answer": mark_request.answer,
-            "user": mark_request.user,
-            "marking": marking
+
+    # 채점
+    answers = []
+    for answer in mark_request.answers:
+        try:
+            marking = marker.mark(answer.correct, answer.user)
+            data = {
+                "user_id": answer.user_id,
+                "correct": answer.correct,
+                "user": answer.user,
+                "marking": marking
+            }
+            answers.append(data)
+        except Exception as e:
+            log('error', f'Failed to Mark answer: {str(e)}', AWS_ACCESS_KEY)
+            raise e
+    response = {
+        "id": mark_request.id,
+        "quiz_id": mark_request.quiz_id,
+        "answers": answers
+    }
+
+    yield response
+
+
+    # mark_request.id가 있는지 확인
+    table = dynamodb.get_item(
+        TableName=MARK_TABLE,
+        Key={
+            'id': {'N': str(mark_request.id)}
         }
-        return data
-    except Exception as e:
-        log('error', f'Failed to Mark answer: {str(e)}', AWS_ACCESS_KEY)
-        raise e
+    )
+
+    # mark_request.id가 테이블에 없는 경우
+    if 'Item' not in table:
+        # 새로운 아이템을 추가
+        print(mark_request)
+        dynamodb.put_item(
+            TableName=MARK_TABLE,
+            Item={
+                "id": {"N": str(mark_request.id)},
+                "answers": {"L": [{"M":
+                    {
+                        "id": {"S": str(mark_request.quiz_id)},
+                        "question_number": {"N": str(mark_request.question_number)},
+                        "markeds": {"L": [{"M": {
+                            "user_id": {"N": str(answer['user_id'])},
+                            "correct": {"S": answer['correct']},
+                            "user": {"S": answer['user']},
+                            "marking": {"BOOL": answer['marking']}
+                        }} for answer in answers]}
+                    }
+                }]}
+            }
+        )
+    else:
+        # 이미 존재하는 아이템을 업데이트
+        # markeds 리스트에 새로운 데이터 추가
+        dynamodb.update_item(
+            TableName=MARK_TABLE,
+            Key={
+                'id': {'N': str(mark_request.id)}
+            },
+            UpdateExpression="SET #answers = list_append(if_not_exists(#answers, :empty_list), :new_answer)",
+            ExpressionAttributeNames={
+                "#answers": "answers"
+            },
+            ExpressionAttributeValues={
+                ":new_answer": [{
+                    "id": {"S": str(mark_request.quiz_id)},
+                    "question_number": {"N": str(mark_request.question_number)},
+                    "markeds": {"L":[{"M":
+                        {
+                            "user_id": {"N": str(answer['user_id'])},
+                            "correct": {"S": answer['correct']},
+                            "user": {"S": answer['user']},
+                            "marking": {"BOOL": answer['marking']}
+                        } for answer in answers
+                    }]}
+                }],
+                ":empty_list": []
+            }
+        )
 
 
 @app.post("/generate")
@@ -88,7 +166,7 @@ def generate(generate_request: GenerateRequest):
     try:
         # DynamoDB에 데이터 삽입
         dynamodb.put_item(
-            TableName=TABLE_NAME,
+            TableName=QUIZ_TABLE,
             Item=data
         )
 
@@ -115,7 +193,7 @@ def generate(generate_request: GenerateRequest):
         try:
             # DynamoDB에서 아이템을 읽어옵니다.
             response = dynamodb.get_item(
-                TableName=TABLE_NAME,
+                TableName=QUIZ_TABLE,
                 Key={
                     'id': {'N': str(generate_request.id)},  # Partition key
                     'timestamp': {'S': generate_request.timestamp}  # Sort key
@@ -143,7 +221,7 @@ def generate(generate_request: GenerateRequest):
 
             # 변경된 아이템을 DynamoDB에 다시 업데이트합니다.
             response = dynamodb.update_item(
-                TableName=TABLE_NAME,
+                TableName=QUIZ_TABLE,
                 Key={
                     'id': {'N': str(generate_request.id)},  # Partition key
                     'timestamp': {'S': generate_request.timestamp}  # Sort key
