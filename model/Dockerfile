@@ -18,7 +18,7 @@ RUN pip install awscli
 WORKDIR /app/app
 
 # Expose the port that uvicorn will run on
-EXPOSE 8000
+EXPOSE 7999
 
 # Command to run uvicorn with auto-reload
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7999", "--reload"]

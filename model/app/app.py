@@ -36,6 +36,10 @@ REGION_NAME = 'ap-northeast-2'
 TABLE_NAME = 'wequiz-quiz'
 dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
 
+@app.get("/ping")
+def ping():
+    return {"ping": "pongg"}
+
 
 @app.post("/mark")
 def mark(mark_request: MarkRequest):
@@ -156,4 +160,4 @@ def generate(generate_request: GenerateRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=7999)
