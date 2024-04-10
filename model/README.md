@@ -1,7 +1,9 @@
-# Chatty ML Server
+# WeQuiz ML Server
 
 ## Overview
-챗봇 생성
+1. 문제 생성
+2. 문서 요약
+3. 답안 채점
 
 ## Architecture
 
@@ -12,6 +14,8 @@
 - FastAPI
 
 ## Usage
+
+### local
 가상 환경 activate
 ```
 source ./.env/bin/activate
@@ -29,15 +33,8 @@ cd app
 
 API 앱 실행
 ```
-export OPENAI_API_KEY=your_openai_api_key_here
 uvicorn app:app --reload
 ```
-
-챗봇 클라이언트 실행
-```
-python3 main.py
-```
----
 
 ### Docker
 
