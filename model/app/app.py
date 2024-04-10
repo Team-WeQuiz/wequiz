@@ -89,7 +89,7 @@ def generate(generate_request: GenerateRequest):
 
         res = {
             "id": generate_request.id,
-            "summary": summary
+            "description": summary
         }
 
         yield res
