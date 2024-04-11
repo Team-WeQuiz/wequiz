@@ -5,7 +5,6 @@ class GenerateRequest(BaseModel):
     timestamp: str
     user_id: int
     numOfQuiz: int
-    files: List[str]
 
 class Answer(BaseModel):
     user_id: int # user_id
