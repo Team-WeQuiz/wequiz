@@ -21,7 +21,7 @@ class ProbGenerator():
                 try:
                     response = self.chain.prob(type, keyword)
                     data = {
-                        "id": uuid.uuid4(),
+                        "id": f'quiz-{uuid.uuid4()}',
                         "question_number": question_number,
                         "type": types[type],
                         "question": response["text"]["question"],

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import json, random
 import boto3
+import uuid
 
 from schema import *
 from data.splitter import Splitter
@@ -25,6 +26,17 @@ dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
 @app.get("/ping")
 def ping():
     return {"ping": "pong"}
+
+@app.post("/test")
+def test(generate_request: GenerateRequest):
+    # Parsing and split file
+    splitter = Splitter(generate_request.files, AWS_ACCESS_KEY)
+    split_docs = splitter.split_docs()
+
+    with open('../log/pdf_parser/s3loader.txt', 'w') as f:
+        f.write(split_docs)
+
+    return split_docs
 
 
 @app.post("/mark")
@@ -62,7 +74,7 @@ def mark(mark_request: MarkRequest):
         # mark_request.id가 있는지 확인
         table = dynamodb.get_item(
             TableName=MARK_TABLE,
-            Key={'id': {'N': str(mark_request.id)}}
+            Key={'id': {'S': str(mark_request.id)}}
         )
 
         # mark_request.id가 테이블에 없는 경우
@@ -70,13 +82,13 @@ def mark(mark_request: MarkRequest):
             # 새로운 아이템 추가
             dynamodb.put_item(
                 TableName=MARK_TABLE,
-                Item={"id": {"N": str(mark_request.id)}, "answers": {"L": [{"M": marked_item}]}}
+                Item={"id": {"S": str(mark_request.id)}, "answers": {"L": [{"M": marked_item}]}}
             )
         else:
             # 이미 존재하는 아이템 업데이트
             dynamodb.update_item(
                 TableName=MARK_TABLE,
-                Key={'id': {'N': str(mark_request.id)}},
+                Key={'id': {'S': str(mark_request.id)}},
                 UpdateExpression="SET #answers = list_append(#answers, :new_answer)",
                 ExpressionAttributeNames={"#answers": "answers"},
                 ExpressionAttributeValues={":new_answer": {"L": [{"M": marked_item}]}}
@@ -94,6 +106,7 @@ def mark(mark_request: MarkRequest):
 
 @app.post("/generate")
 def generate(generate_request: GenerateRequest):
+    id = f'quizset-{uuid.uuid4()}'
     try:
         # Parsing and split file
         splitter = Splitter(generate_request.files, AWS_ACCESS_KEY)
@@ -105,7 +118,7 @@ def generate(generate_request: GenerateRequest):
 
         # Prepare data for DynamoDB insertion
         data = {
-            "id": {"N": str(generate_request.id)},
+            "id": {"S": id},
             "timestamp": {"S": generate_request.timestamp},
             "user_id": {"N": str(generate_request.user_id)},
             "questions": {"L": []},
@@ -116,7 +129,7 @@ def generate(generate_request: GenerateRequest):
         dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
 
         # Yield response
-        yield {"id": generate_request.id, "description": summary}
+        yield {"id": id, "description": summary}
 
         # Generate quiz
         prob_generator = ProbGenerator(split_docs, OPENAI_API_KEY)
@@ -127,7 +140,7 @@ def generate(generate_request: GenerateRequest):
         for idx, keyword in enumerate(keywords):
             response = dynamodb.get_item(
                 TableName=QUIZ_TABLE,
-                Key={'id': {'N': str(generate_request.id)}, 'timestamp': {'S': generate_request.timestamp}}
+                Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
             )
             item = response.get('Item', {})
             questions = item.get('questions', {'L': []})['L']
@@ -152,7 +165,7 @@ def generate(generate_request: GenerateRequest):
             # Update item in DynamoDB
             dynamodb.update_item(
                 TableName=QUIZ_TABLE,
-                Key={'id': {'N': str(generate_request.id)}, 'timestamp': {'S': generate_request.timestamp}},
+                Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
                 UpdateExpression='SET questions = :val',
                 ExpressionAttributeValues={':val': {'L': questions}}
             )
