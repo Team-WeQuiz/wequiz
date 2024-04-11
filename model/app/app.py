@@ -33,8 +33,17 @@ def test(generate_request: GenerateRequest):
     splitter = Splitter(generate_request.files, AWS_ACCESS_KEY)
     split_docs = splitter.split_docs()
 
+    meta = {
+        "file": generate_request.files,
+        "length": split_docs[0]
+    }
+
     with open('../log/pdf_parser/s3loader.txt', 'w') as f:
-        f.write(split_docs)
+        f.write(json.dumps(meta))
+        f.write('\n')
+        f.write('*************************************')
+        f.write('\n')
+        f.write(split_docs[1])
 
     return split_docs
 
