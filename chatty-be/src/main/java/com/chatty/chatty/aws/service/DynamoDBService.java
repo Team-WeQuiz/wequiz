@@ -17,6 +17,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DynamoDBService {
 
+    private static final String TABLE_NAME = "wequiz-quiz";
+    private static final String HASH_KEY = "id";
+    private static final String RANGE_KEY = "timestamp";
+    private static final String DESCRIPTION_ATTR_NAME = "description";
+    private static final String QUESTIONS_ATTR_NAME = "questions";
+
     private final AmazonDynamoDB amazonDynamoDB;
     private final DynamoDB dynamoDB;
 
@@ -25,28 +31,28 @@ public class DynamoDBService {
         this.dynamoDB = new DynamoDB(amazonDynamoDB);
     }
 
-    public String getDescriptionFromDB(Integer hashKey, String rangeKey) {
-        Table table = dynamoDB.getTable("wequiz-quiz");
+    public String getDescriptionFromDB(Integer itemId, String timestamp) {
+        Table table = dynamoDB.getTable(TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
-                .withPrimaryKey("id", hashKey, "timestamp", rangeKey)
-                .withProjectionExpression("description");
+                .withPrimaryKey(HASH_KEY, itemId, RANGE_KEY, timestamp)
+                .withProjectionExpression(DESCRIPTION_ATTR_NAME);
 
         Item item = table.getItem(spec);
 
-        String description = item.getString("description");
+        String description = item.getString(DESCRIPTION_ATTR_NAME);
         log.info("description: {}", description);
         return description;
     }
 
-    public List<Question> getQuizFromDB(Integer hashKey, String rangeKey) {
-        Table table = dynamoDB.getTable("wequiz-quiz");
+    public List<Question> getQuizFromDB(Integer itemId, String timestamp) {
+        Table table = dynamoDB.getTable(TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
-                .withPrimaryKey("id", hashKey, "timestamp", rangeKey)
-                .withProjectionExpression("questions");
+                .withPrimaryKey(HASH_KEY, itemId, RANGE_KEY, timestamp)
+                .withProjectionExpression(QUESTIONS_ATTR_NAME);
 
         Item item = table.getItem(spec);
 
-        List<Map<String, Object>> questions = item.getList("questions");
+        List<Map<String, Object>> questions = item.getList(QUESTIONS_ATTR_NAME);
         return convertToList(questions);
     }
 
