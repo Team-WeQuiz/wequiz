@@ -1,10 +1,10 @@
 package com.chatty.chatty.game.service.model;
 
-import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.FAILED_TO_MAKE_QUIZ;
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.FAILED_TO_CREATE_QUIZ;
 
 import com.chatty.chatty.game.config.model.RestClientConfig;
-import com.chatty.chatty.game.controller.dto.model.MakeQuizRequest;
-import com.chatty.chatty.game.controller.dto.model.MakeQuizResponse;
+import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
+import com.chatty.chatty.game.controller.dto.model.CreateQuizResponse;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,18 +25,18 @@ public class ModelService {
         this.restClient = restClientConfig.restClient();
     }
 
-    public MakeQuizResponse makeQuiz(MakeQuizRequest request) {
-        ResponseEntity<MakeQuizResponse> makeQuizResponse;
+    public CreateQuizResponse createQuizData(CreateQuizRequest request) {
+        ResponseEntity<CreateQuizResponse> createQuizResponse;
         try {
-            makeQuizResponse = restClient.post()
+            createQuizResponse = restClient.post()
                     .uri("/generate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .toEntity(MakeQuizResponse.class);
+                    .toEntity(CreateQuizResponse.class);
         } catch (RestClientException e) {
-            throw new QuizRoomException(FAILED_TO_MAKE_QUIZ);
+            throw new QuizRoomException(FAILED_TO_CREATE_QUIZ);
         }
-        return makeQuizResponse.getBody();
+        return createQuizResponse.getBody();
     }
 }

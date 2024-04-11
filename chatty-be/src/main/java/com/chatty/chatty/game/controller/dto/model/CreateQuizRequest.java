@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record MakeQuizRequest(
+public record CreateQuizRequest(
 
         Long roomId,
 

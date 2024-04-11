@@ -2,7 +2,7 @@ package com.chatty.chatty.quizroom.controller.dto;
 
 import java.util.List;
 
-public record MakeRoomRequest(
+public record CreateRoomRequest(
 
         String name,
 
