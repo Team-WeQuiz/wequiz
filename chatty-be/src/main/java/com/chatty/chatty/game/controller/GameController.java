@@ -2,9 +2,9 @@ package com.chatty.chatty.game.controller;
 
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
-import com.chatty.chatty.game.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
+import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +67,10 @@ public class GameController {
     public ResponseEntity<Void> endGame(@PathVariable Long roomId) {
         gameService.endGame(roomId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    public void sendDescription(@PathVariable Long roomId) {
+        template.convertAndSend("/sub/rooms/" + roomId + "/data", gameService.getDescription(roomId));
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

@@ -31,7 +31,7 @@ public class DynamoDBService {
         this.dynamoDB = new DynamoDB(amazonDynamoDB);
     }
 
-    public String getDescriptionFromDB(Integer itemId, String timestamp) {
+    public String getDescriptionFromDB(Long itemId, String timestamp) {
         Table table = dynamoDB.getTable(TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
                 .withPrimaryKey(HASH_KEY, itemId, RANGE_KEY, timestamp)
@@ -44,7 +44,7 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<Question> getQuizFromDB(Integer itemId, String timestamp) {
+    public List<Question> getQuizFromDB(Long itemId, String timestamp) {
         Table table = dynamoDB.getTable(TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
                 .withPrimaryKey(HASH_KEY, itemId, RANGE_KEY, timestamp)
