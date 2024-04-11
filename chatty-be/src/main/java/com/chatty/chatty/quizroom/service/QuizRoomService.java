@@ -4,17 +4,17 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_FI
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
-import com.chatty.chatty.model.controller.dto.MakeQuizRequest;
-import com.chatty.chatty.model.service.ModelService;
+import com.chatty.chatty.game.controller.dto.model.MakeQuizRequest;
+import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
-import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
-import com.chatty.chatty.quizroom.domain.entity.Status;
+import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import com.chatty.chatty.quizroom.repository.PlayersStatusRepository;
+import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
