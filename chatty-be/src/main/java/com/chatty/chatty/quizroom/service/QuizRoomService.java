@@ -4,17 +4,17 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_FI
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
-import com.chatty.chatty.game.controller.dto.model.MakeQuizRequest;
+import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
 import com.chatty.chatty.game.service.model.ModelService;
-import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
+import com.chatty.chatty.player.repository.PlayersStatusRepository;
+import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
+import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -74,7 +74,7 @@ public class QuizRoomService {
     }
 
     @Transactional
-    public MakeRoomResponse makeRoom(MakeRoomRequest request, Long userId) {
+    public CreateRoomResponse createRoom(CreateRoomRequest request, Long userId) {
         QuizRoom newQuizRoom = QuizRoom.builder()
                 .name(request.name())
                 .numOfQuiz(request.numOfQuiz())
@@ -84,7 +84,7 @@ public class QuizRoomService {
                 .build();
         QuizRoom savedQuizRoom = quizRoomRepository.save(newQuizRoom);
 
-        MakeQuizRequest makeQuizRequest = MakeQuizRequest.builder()
+        CreateQuizRequest createQuizRequest = CreateQuizRequest.builder()
                 .roomId(savedQuizRoom.getId())
                 .numOfQuiz(request.numOfQuiz())
                 .type(request.type())
@@ -94,7 +94,7 @@ public class QuizRoomService {
 //        MakeQuizResponse makeQuizResponse = modelService.makeQuiz(makeQuizRequest);
 //        savedQuizRoom.setQuizDocId(makeQuizResponse.quizDocId());
 
-        return MakeRoomResponse.builder()
+        return CreateRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())
                 .build();
     }

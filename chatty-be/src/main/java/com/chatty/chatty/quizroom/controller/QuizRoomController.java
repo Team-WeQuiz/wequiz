@@ -1,8 +1,8 @@
 package com.chatty.chatty.quizroom.controller;
 
 import com.chatty.chatty.auth.support.AuthUser;
-import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
+import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
+import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -44,7 +44,7 @@ public class QuizRoomController {
     }
 
     @PostMapping
-    public ResponseEntity<MakeRoomResponse> makeRoom(@RequestBody MakeRoomRequest request, @AuthUser Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.makeRoom(request, userId));
+    public ResponseEntity<CreateRoomResponse> createRoom(@RequestBody CreateRoomRequest request, @AuthUser Long userId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.createRoom(request, userId));
     }
 }
