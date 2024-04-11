@@ -5,5 +5,5 @@ __pycache__
 gradio_chached_examples
 faiss_index
 index.*
-logs
+log
 *_security.py
