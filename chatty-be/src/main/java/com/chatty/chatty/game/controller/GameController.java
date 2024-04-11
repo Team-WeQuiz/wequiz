@@ -2,6 +2,7 @@ package com.chatty.chatty.game.controller;
 
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
+import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
@@ -69,8 +70,15 @@ public class GameController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    public void sendDescription(@PathVariable Long roomId) {
-        template.convertAndSend("/sub/rooms/" + roomId + "/data", gameService.getDescription(roomId));
+    public void sendDescription(Long roomId, String description) {
+        template.convertAndSend("/sub/rooms/" + roomId + "/data",
+                DescriptionResponse.builder()
+                        .description(description)
+                        .build());
+    }
+
+    public void sendQuiz(Long roomId) {
+        template.convertAndSend("/sub/rooms/" + roomId + "/data", gameService.getQuiz(roomId));
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

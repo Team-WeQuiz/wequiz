@@ -1,11 +1,14 @@
 package com.chatty.chatty.game.service;
 
+import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.controller.dto.dynamodb.Question;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,12 +44,15 @@ public class GameService {
         playersStatusRepository.clear(roomId);
     }
 
-    public String getDescription(Long roomId) {
+    public QuizResponse getQuiz(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId).orElseThrow();
-        // Long quizDocId = quizRoom.getQuizDocId();
+        Long quizDocId = quizRoom.getQuizDocId();
         String timestamp = quizRoom.getCreatedAt().toString();
-        String description = dynamoDBService.getFromDB(roomId, timestamp);
-        return description;
+
+        List<Question> quiz = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
+        return QuizResponse.builder()
+                .Quiz(quiz)
+                .build();
     }
 
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
