@@ -30,24 +30,14 @@ def ping():
 @app.post("/test")
 def test(generate_request: GenerateRequest):
     # Parsing and split file
-    splitter = Splitter(generate_request.files, AWS_ACCESS_KEY)
+    splitter = Splitter(generate_request.user_id)
     split_docs = splitter.split_docs()
 
-    # meta = {
-    #     "file": generate_request.files,
-    #     "length": split_docs[0]
-    # }
+    # Generate description
+    summarizer = Summarizer(OPENAI_API_KEY)
+    summary = summarizer.summarize(split_docs)
 
-    # print(meta)
-
-    # with open('../log/pdf_parser/s3loader.txt', 'w') as f:
-    #     f.write(json.dumps(meta))
-    #     f.write('\n')
-    #     f.write('*************************************')
-    #     f.write('\n')
-    #     f.write(split_docs[1])
-
-    return split_docs
+    return summary
 
 
 @app.post("/mark")
@@ -66,7 +56,7 @@ def mark(mark_request: MarkRequest):
             }
             answers.append(data)
     except Exception as e:
-        log('error', f'Failed to Mark answer: {str(e)}', AWS_ACCESS_KEY)
+        log('error', f'Failed to Mark answer: {str(e)}')
         raise e
 
     # DynamoDB에 채점 결과 업데이트
@@ -105,7 +95,7 @@ def mark(mark_request: MarkRequest):
                 ExpressionAttributeValues={":new_answer": {"L": [{"M": marked_item}]}}
             )
     except Exception as e:
-        log('error', f'Failed to push marked result to dynamodb: {str(e)}', AWS_ACCESS_KEY)
+        log('error', f'Failed to push marked result to dynamodb: {str(e)}')
         raise e
 
     # 응답 반환
@@ -120,7 +110,7 @@ def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     try:
         # Parsing and split file
-        splitter = Splitter(generate_request.files, AWS_ACCESS_KEY)
+        splitter = Splitter(generate_request.user_id)
         split_docs = splitter.split_docs()
 
         # Generate description
@@ -182,7 +172,7 @@ def generate(generate_request: GenerateRequest):
             )
 
     except Exception as e:
-        log('error', f'Failed to Generate Quiz: {str(e)}', AWS_ACCESS_KEY)
+        log('error', f'Failed to Generate Quiz: {str(e)}')
         raise e
 
 
