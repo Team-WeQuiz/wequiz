@@ -1,5 +1,7 @@
 # splitter
-BUCKET_NAME = 'kyuyeon-test'
+# BUCKET_NAME = 'kyuyeon-test'
+BUCKET_NAME = 'wequiz-files'
+PORT = 9010
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 0
 
