@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.chatty.chatty.quizroom.controller.dto.GenerateQuizMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.MakeQuizRequest;
 import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,17 @@ public class ModelService {
             QuizRoom quizRoom,
             List<String> fileNames
     ) {
-        return requestQuizGeneration(userId, quizRoom, fileNames)
+        String body = requestQuizGeneration(userId, quizRoom, fileNames)
                 .retrieve()
-                .toEntity(GenerateQuizMLResponse.class)
-                .getBody();
+                .body(String.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            GenerateQuizMLResponse[] responses = objectMapper.readValue(body, GenerateQuizMLResponse[].class);
+            return responses[0];
+            // TODO: 예외처리
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse response from ML server");
+        }
     }
 
     private RequestBodySpec requestQuizGeneration(Long userId, QuizRoom quizRoom, List<String> fileNames) {
