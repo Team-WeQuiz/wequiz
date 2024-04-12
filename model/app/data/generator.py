@@ -1,9 +1,9 @@
 from model.chain import Chain
-from data.vectorizer import Vectorizer
+from data.preprocessor import Vectorizer
 from data.settings import QUIZ_GENERATE_RETRY
 import uuid
 
-class ProbGenerator():
+class QuizGenerator():
     def __init__(self, split_docs, openai_api_key):
         self.openai_api_key = openai_api_key
         self.vectorizer = Vectorizer(openai_api_key)
@@ -43,6 +43,30 @@ class ProbGenerator():
             raise NotImplementedError("주관식에 대한 chain을 구성해야합니다.")
 
     
-       
+#######################################################################################
 
+from model.chain import MarkChain
+
+class Marker():
+    def __init__(self, openai_api_key):
+        self.openai_api_key = openai_api_key
+        self.marker_chain = MarkChain(self.openai_api_key)
     
+    def mark(self, answer, user):
+        response = self.marker_chain.mark(answer, user)
+        
+        return 'true' in response['text'].lower()
+
+
+########################################################################################
+
+from model.chain import SummaryChain
+
+class Summarizer():
+    def __init__(self, openai_api_key):
+        self.openai_api_key = openai_api_key
+        self.summary_chain = SummaryChain(self.openai_api_key)
+    
+    def summarize(self, split_docs):
+        response = self.summary_chain.summary(split_docs)
+        return response["output_text"]

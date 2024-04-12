@@ -1,5 +1,4 @@
-# splitter
-# BUCKET_NAME = 'kyuyeon-test'
+# parser
 BUCKET_NAME = 'wequiz-files'
 PORT = 9010
 CHUNK_SIZE = 1000
