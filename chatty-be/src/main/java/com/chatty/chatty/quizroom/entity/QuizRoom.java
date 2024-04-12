@@ -51,7 +51,7 @@ public class QuizRoom extends BaseEntity {
     private Status status;
 
     @Column
-    private Long quizDocId;
+    private String quizDocId;
 
     @PrePersist
     public void setDefaultColumns() {
@@ -59,7 +59,7 @@ public class QuizRoom extends BaseEntity {
         this.status = this.status == null ? Status.READY : this.status;
     }
 
-    public void setQuizDocId(Long id) {
+    public void setQuizDocId(String id) {
         this.quizDocId = id;
     }
 

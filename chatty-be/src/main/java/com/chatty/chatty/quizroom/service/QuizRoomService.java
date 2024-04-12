@@ -1,20 +1,23 @@
 package com.chatty.chatty.quizroom.service;
 
+import static com.chatty.chatty.quizroom.exception.FileExceptionType.FILE_INPUT_STREAM_FAILED;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_FINISHED;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
-import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
+import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.service.model.ModelService;
-import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
+import com.chatty.chatty.quizroom.controller.dto.GenerateQuizMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
+import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +32,7 @@ public class QuizRoomService {
 
     private final QuizRoomRepository quizRoomRepository;
     private final ModelService modelService;
-    private final PlayersStatusRepository playersStatusRepository;
+    private final MinioRepository minioRepository;
 
     public List<QuizRoom> getRooms() {
         return quizRoomRepository.findAll();
@@ -38,10 +41,8 @@ public class QuizRoomService {
     public RoomDetailResponse getRoomDetail(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
-        validateRoomStarted(quizRoom.getStatus());
-        validateRoomFinished(quizRoom.getStatus());
-
-        Long quizDocId = quizRoom.getQuizDocId();
+        validateRoomStatus(quizRoom.getStatus());
+//        Long quizDocId = quizRoom.getQuizDocId();
         // TODO: noSQL db에서 description 읽어오는 코드
         String description = "example_description";
 
@@ -59,7 +60,7 @@ public class QuizRoomService {
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         validateRoomFinished(quizRoom.getStatus());
 
-        Long quizDocId = quizRoom.getQuizDocId();
+//        Long quizDocId = quizRoom.getQuizDocId();
         // TODO: noSQL db에서 questions 읽어오는 코드
         List<?> questions = Arrays.asList("questionId:1, ...", "questionId:2, ...");
 
@@ -81,22 +82,30 @@ public class QuizRoomService {
                 .timeLimit(request.timeLimit())
                 .playerLimitNum(request.playerLimitNum())
                 .code(request.code())
+                .status(Status.READY)
                 .build();
         QuizRoom savedQuizRoom = quizRoomRepository.save(newQuizRoom);
 
-        CreateQuizRequest createQuizRequest = CreateQuizRequest.builder()
-                .roomId(savedQuizRoom.getId())
-                .numOfQuiz(request.numOfQuiz())
-                .type(request.type())
-                .files(request.files())
-                .build();
-        // 룸 생성 테스트를 위해 주석 처리
-//        MakeQuizResponse makeQuizResponse = modelService.makeQuiz(makeQuizRequest);
-//        savedQuizRoom.setQuizDocId(makeQuizResponse.quizDocId());
-
+        List<String> fileNames = request.files().stream()
+                .map(file -> {
+                    try {
+                        return minioRepository.saveFile(userId, file.getInputStream());
+                    } catch (IOException e) {
+                        throw new FileException(FILE_INPUT_STREAM_FAILED);
+                    }
+                })
+                .toList();
+        GenerateQuizMLResponse generateQuizMLResponse = modelService.createQuiz(userId, savedQuizRoom, fileNames);
+        savedQuizRoom.setQuizDocId(generateQuizMLResponse.id());
+        quizRoomRepository.save(savedQuizRoom);
         return CreateRoomResponse.builder()
-                .roomId(savedQuizRoom.getId())
+                .description(generateQuizMLResponse.description())
                 .build();
+    }
+
+    private void validateRoomStatus(Status status) {
+        validateRoomStarted(status);
+        validateRoomFinished(status);
     }
 
     private void validateRoomStarted(Status status) {

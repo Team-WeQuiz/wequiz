@@ -1,6 +1,7 @@
 package com.chatty.chatty.quizroom.controller.dto;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public record CreateRoomRequest(
 
@@ -16,7 +17,7 @@ public record CreateRoomRequest(
 
         String type,
 
-        List<String> files
+        List<MultipartFile> files
 ) {
 
 }
