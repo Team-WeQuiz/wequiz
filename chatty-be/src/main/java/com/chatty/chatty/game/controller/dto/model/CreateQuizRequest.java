@@ -6,7 +6,6 @@ import lombok.Builder;
 @Builder
 public record CreateQuizRequest(
         Long user_id,
-
         String timestamp,
 
         Integer numOfQuiz,

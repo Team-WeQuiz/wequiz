@@ -1,5 +1,5 @@
 # Use the official Python image as a base
-FROM python:3.9-slim-buster
+FROM python:3.9
 
 # Set the working directory in the container
 WORKDIR /
@@ -10,6 +10,8 @@ COPY . /app
 # Copy requirements.txt separately and install dependencies
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
 
 # Install AWS CLI
 RUN pip install awscli

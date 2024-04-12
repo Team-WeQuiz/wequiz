@@ -1,4 +1,4 @@
-package com.chatty.chatty.config;
+package com.chatty.chatty.game.config.model;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
