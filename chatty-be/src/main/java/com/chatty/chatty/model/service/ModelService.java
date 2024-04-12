@@ -1,42 +1,49 @@
 package com.chatty.chatty.model.service;
 
-import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.FAILED_TO_MAKE_QUIZ;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-import com.chatty.chatty.model.config.RestClientConfig;
-import com.chatty.chatty.model.controller.dto.MakeQuizRequest;
-import com.chatty.chatty.model.controller.dto.MakeQuizResponse;
-import com.chatty.chatty.quizroom.exception.QuizRoomException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import com.chatty.chatty.quizroom.controller.dto.GenerateQuizMLResponse;
+import com.chatty.chatty.quizroom.controller.dto.MakeQuizRequest;
+import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClient.RequestBodySpec;
 
 @Service
-@Slf4j
+@RequiredArgsConstructor
 public class ModelService {
 
-    private final RestClientConfig restClientConfig;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Value("${url.ml}")
+    private String ML_URL;
+
     private final RestClient restClient;
 
-    public ModelService(RestClientConfig restClientConfig) {
-        this.restClientConfig = restClientConfig;
-        this.restClient = restClientConfig.restClient();
+    public GenerateQuizMLResponse makeQuiz(
+            Long userId,
+            QuizRoom quizRoom,
+            List<String> fileNames
+    ) {
+        return requestQuizGeneration(userId, quizRoom, fileNames)
+                .retrieve()
+                .toEntity(GenerateQuizMLResponse.class)
+                .getBody();
     }
 
-    public MakeQuizResponse makeQuiz(MakeQuizRequest request) {
-        ResponseEntity<MakeQuizResponse> makeQuizResponse;
-        try {
-            makeQuizResponse = restClient.post()
-                    .uri("/generate")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(request)
-                    .retrieve()
-                    .toEntity(MakeQuizResponse.class);
-        } catch (RestClientException e) {
-            throw new QuizRoomException(FAILED_TO_MAKE_QUIZ);
-        }
-        return makeQuizResponse.getBody();
+    private RequestBodySpec requestQuizGeneration(Long userId, QuizRoom quizRoom, List<String> fileNames) {
+        return restClient.post()
+                .uri(ML_URL + "/generate")
+                .contentType(APPLICATION_JSON)
+                .body(MakeQuizRequest.builder()
+                        .user_id(userId)
+                        .timestamp(quizRoom.getCreatedAt().format(formatter))
+                        .numOfQuiz(quizRoom.getNumOfQuiz())
+                        .files(fileNames)
+                        .build());
     }
 }
