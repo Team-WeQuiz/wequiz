@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import AuthCheck from './_components/AuthCheck';
 import Header from '../_components/Header';

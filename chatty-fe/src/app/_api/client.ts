@@ -1,5 +1,5 @@
 import axios from 'axios';
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = 'https://api.wequiz.kr';
 const client = axios.create({
   baseURL: BASE_URL,
 });
