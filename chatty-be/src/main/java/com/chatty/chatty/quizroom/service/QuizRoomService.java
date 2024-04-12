@@ -99,6 +99,7 @@ public class QuizRoomService {
         savedQuizRoom.setQuizDocId(generateQuizMLResponse.id());
         quizRoomRepository.save(savedQuizRoom);
         return CreateRoomResponse.builder()
+                .roomId(Long.valueOf(generateQuizMLResponse.id()))
                 .description(generateQuizMLResponse.description())
                 .build();
     }
