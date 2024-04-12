@@ -97,11 +97,13 @@ def mark(mark_request: MarkRequest):
         raise e
 
     # 응답 반환
-    return {
+    res = {
         "id": mark_request.id,
         "quiz_id": mark_request.quiz_id,
         "answers": answers
     }
+    print(f'Marking is generated: {res}')
+    return res
 
 @app.post("/generate")
 def generate(generate_request: GenerateRequest):
@@ -128,7 +130,9 @@ def generate(generate_request: GenerateRequest):
         dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
 
         # Yield response
-        yield {"id": id, "description": summary}
+        res = {"id": id, "description": summary}
+        print(f'Description is generated: {res}')
+        yield res
 
         # Generate quiz
         quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
