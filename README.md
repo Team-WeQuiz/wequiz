@@ -76,6 +76,12 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
           <tr>
             <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/f884b0a7-e746-4131-82f3-4a67724190cb"></td>
           </tr>
+          <tr>
+            <td align='center'>CI / CD</td>
+          </tr>
+          <tr>
+            <td align='center'><img src="https://blog.kakaocdn.net/dn/bOfFLH/btsGwbtmsSn/jmzsqE2A37iZHtXBaphlfK/img.png"></td>
+          </tr>
     </tbody>
 </table>
 
