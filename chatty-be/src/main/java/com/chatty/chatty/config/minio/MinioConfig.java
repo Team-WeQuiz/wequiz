@@ -1,9 +1,15 @@
-package com.chatty.chatty.config;
+package com.chatty.chatty.config.minio;
 
+import static com.chatty.chatty.config.minio.exception.MinioExceptionType.IGNORE_CERT_CHECK_FAILED;
+
+import com.chatty.chatty.config.minio.exception.MinioException;
+import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
-import jakarta.annotation.PostConstruct;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -13,24 +19,23 @@ public class MinioConfig {
     @Value("${minio.access.key}")
     private String accessKey;
 
-    @Value("${minio.secret.key}")
+    @Value("${minio.access.secret}")
     private String secretKey;
-
-    @Value("${minio.bucket.name}")
-    private String bucketName;
 
     @Value("${minio.endpoint}")
     private String endpoint;
 
-    @PostConstruct
-    private void init() {
+    @Bean
+    public MinioClient init() {
         MinioClient minioClient = MinioClient.builder()
                 .endpoint(endpoint)
                 .credentials(accessKey, secretKey)
                 .build();
         try {
-            
+            minioClient.ignoreCertCheck();
+        } catch (KeyManagementException | NoSuchAlgorithmException e) {
+            throw new MinioException(IGNORE_CERT_CHECK_FAILED);
         }
+        return minioClient;
     }
-
 }
