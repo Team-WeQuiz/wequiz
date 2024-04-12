@@ -23,7 +23,7 @@ class ModelServiceTest {
     }
 
     @Test
-    void makeQuiz() {
+    void createQuiz() {
         String body = restClient.post().uri(ML_URL + "/generate")
                 .contentType(APPLICATION_JSON)
                 .body(MakeQuizRequest.builder()

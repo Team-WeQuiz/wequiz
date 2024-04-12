@@ -2,9 +2,9 @@ package com.chatty.chatty.game.service.model;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
 import com.chatty.chatty.quizroom.controller.dto.GenerateQuizMLResponse;
-import com.chatty.chatty.quizroom.controller.dto.MakeQuizRequest;
-import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
+import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,7 +25,7 @@ public class ModelService {
 
     private final RestClient restClient;
 
-    public GenerateQuizMLResponse makeQuiz(
+    public GenerateQuizMLResponse createQuiz(
             Long userId,
             QuizRoom quizRoom,
             List<String> fileNames
@@ -47,7 +47,7 @@ public class ModelService {
         return restClient.post()
                 .uri(ML_URL + "/generate")
                 .contentType(APPLICATION_JSON)
-                .body(MakeQuizRequest.builder()
+                .body(CreateQuizRequest.builder()
                         .user_id(userId)
                         .timestamp(quizRoom.getCreatedAt().format(formatter))
                         .numOfQuiz(quizRoom.getNumOfQuiz())

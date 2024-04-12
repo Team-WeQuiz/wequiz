@@ -6,14 +6,14 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
-import com.chatty.chatty.model.service.ModelService;
+import com.chatty.chatty.game.service.model.ModelService;
+import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
+import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.GenerateQuizMLResponse;
-import com.chatty.chatty.quizroom.controller.dto.MakeRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.MakeRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
-import com.chatty.chatty.quizroom.domain.entity.QuizRoom;
-import com.chatty.chatty.quizroom.domain.entity.Status;
+import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
@@ -75,7 +75,7 @@ public class QuizRoomService {
     }
 
     @Transactional
-    public MakeRoomResponse makeRoom(MakeRoomRequest request, Long userId) {
+    public CreateRoomResponse createRoom(CreateRoomRequest request, Long userId) {
         QuizRoom newQuizRoom = QuizRoom.builder()
                 .name(request.name())
                 .numOfQuiz(request.numOfQuiz())
@@ -95,10 +95,10 @@ public class QuizRoomService {
                     }
                 })
                 .toList();
-        GenerateQuizMLResponse generateQuizMLResponse = modelService.makeQuiz(userId, savedQuizRoom, fileNames);
+        GenerateQuizMLResponse generateQuizMLResponse = modelService.createQuiz(userId, savedQuizRoom, fileNames);
         savedQuizRoom.setQuizDocId(generateQuizMLResponse.id());
         quizRoomRepository.save(savedQuizRoom);
-        return MakeRoomResponse.builder()
+        return CreateRoomResponse.builder()
                 .description(generateQuizMLResponse.description())
                 .build();
     }
