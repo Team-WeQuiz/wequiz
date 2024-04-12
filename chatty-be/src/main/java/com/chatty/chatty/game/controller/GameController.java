@@ -5,7 +5,6 @@ import com.chatty.chatty.game.controller.dto.ChatResponse;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.service.GameService;
-import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -29,7 +28,6 @@ public class GameController {
 
     private final SimpMessagingTemplate template;
     private final GameService gameService;
-    private final DynamoDBService dynamoDBService;
 
     @MessageMapping("/rooms/{roomId}/chat")
     @SendTo("/sub/rooms/{roomId}/chat")

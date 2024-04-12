@@ -15,7 +15,7 @@ public class DynamoDBService {
 
     private final DynamoDBRepository dynamoDBRepository;
 
-    public List<Question> getQuizFromDB(Long itemId, String timestamp) {
+    public List<Question> getQuizFromDB(String itemId, String timestamp) {
         List<Map<String, Object>> questions = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
         return convertToList(questions);
     }
