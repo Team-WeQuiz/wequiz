@@ -1,14 +1,10 @@
 package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.game.controller.dto.QuizResponse;
-import com.chatty.chatty.game.controller.dto.dynamodb.Question;
-import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
+import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
-import com.chatty.chatty.quizroom.entity.QuizRoom;
-import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,8 +15,7 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
     private final PlayersStatusRepository playersStatusRepository;
-    private final QuizRoomRepository quizRoomRepository;
-    private final DynamoDBService dynamoDBService;
+    private final GameRepository gameRepository;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
         log.info("joinRoom: roomId: {}, userId: {}", roomId, userId);
@@ -44,14 +39,9 @@ public class GameService {
         playersStatusRepository.clear(roomId);
     }
 
-    public QuizResponse getQuiz(Long roomId) {
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId).orElseThrow();
-        Long quizDocId = quizRoom.getQuizDocId();
-        String timestamp = quizRoom.getCreatedAt().toString();
-
-        List<Question> quiz = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
+    public QuizResponse sendQuiz(Long roomId) {
         return QuizResponse.builder()
-                .Quiz(quiz)
+                .Quiz(gameRepository.sendQuiz(roomId))
                 .build();
     }
 

@@ -24,7 +24,7 @@ public class DynamoDBRepository {
         this.amazonDynamoDB = amazonDynamoDB;
         this.dynamoDB = new DynamoDB(amazonDynamoDB);
     }
-    
+
     public List<Map<String, Object>> getQuizFromDB(Long itemId, String timestamp) {
         Table table = dynamoDB.getTable(TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
