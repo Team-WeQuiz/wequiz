@@ -4,12 +4,10 @@ import boto3
 import uuid
 
 from schema import *
-from data.splitter import Splitter
-from data.prob_generator import ProbGenerator
-from data.summarizer import Summarizer
-from data.marker import Marker
-from utils.logger import log
+from data.preprocessor import Parser
+from data.generator import QuizGenerator, Marker, Summarizer
 from utils.security import get_openai_api_key, get_aws_access_key
+from utils.logger import log
 
 app = FastAPI()
 
@@ -30,8 +28,8 @@ def ping():
 @app.post("/test")
 def test(generate_request: GenerateRequest):
     # Parsing and split file
-    splitter = Splitter(generate_request.user_id)
-    split_docs = splitter.split_docs()
+    parser = Parser(generate_request.user_id)
+    split_docs = parser.parse()
 
     # Generate description
     summarizer = Summarizer(OPENAI_API_KEY)
@@ -110,8 +108,8 @@ def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     try:
         # Parsing and split file
-        splitter = Splitter(generate_request.user_id)
-        split_docs = splitter.split_docs()
+        parser = Parser(generate_request.user_id)
+        split_docs = parser.parse()
 
         # Generate description
         summarizer = Summarizer(OPENAI_API_KEY)
@@ -133,7 +131,7 @@ def generate(generate_request: GenerateRequest):
         yield {"id": id, "description": summary}
 
         # Generate quiz
-        prob_generator = ProbGenerator(split_docs, OPENAI_API_KEY)
+        quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
         keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
         if len(keywords) != generate_request.numOfQuiz:
             raise Exception('키워드가 충분히 생성되지 않았습니다.')
@@ -150,7 +148,7 @@ def generate(generate_request: GenerateRequest):
             type = random.randrange(0, 2)
 
             # Generate a new question
-            question = prob_generator.generate(type, keyword, idx + 1)
+            question = quiz_generator.generate(type, keyword, idx + 1)
             new_question = {
                 "M": {
                     "id": {"S": str(question["id"])},
