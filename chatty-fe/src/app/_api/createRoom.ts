@@ -9,26 +9,29 @@ export const postRoom = async (
   playerLimitNum: number,
   code: string,
   type: string,
-  files: Array<string>,
+  files: File[],
 ) => {
   try {
-    const response = await client.post(
-      '/rooms',
-      {
-        name,
-        numOfQuiz,
-        timeLimit,
-        playerLimitNum,
-        code,
-        type,
-        files,
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('numOfQuiz', String(numOfQuiz));
+    formData.append('timeLimit', String(timeLimit));
+    formData.append('playerLimitNum', String(playerLimitNum));
+    formData.append('code', code);
+    formData.append('type', type);
+
+    // files를 하나씩 FormData에 추가
+    files.forEach((file) => {
+      formData.append(`files`, file);
+    });
+
+    const response = await client.post('/rooms', formData, {
+      headers: {
+        Authorization: `Bearer ${useAuthStore.getState().accessToken}`,
+        'Content-Type': 'multipart/form-data',
       },
-      {
-        headers: {
-          Authorization: `Bearer ${useAuthStore.getState().accessToken}`,
-        },
-      },
-    );
+    });
+
     console.log(response.data);
     return response.data;
   } catch (error) {
