@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import json, random
 import boto3
 import uuid
+import time
 
 from schema import *
 from data.preprocessor import Parser
@@ -28,14 +29,35 @@ def ping():
 @app.post("/test")
 def test(generate_request: GenerateRequest):
     # Parsing and split file
+    start_time = time.time()
     parser = Parser(generate_request.user_id)
     split_docs = parser.parse()
+    end_time = time.time()
 
-    # Generate description
-    summarizer = Summarizer(OPENAI_API_KEY)
-    summary = summarizer.summarize(split_docs)
+    # # Generate description
+    # s_time = time.time()
+    # summarizer = Summarizer(OPENAI_API_KEY)
+    # summary = summarizer.summarize(split_docs)
+    # e_time = time.time()
 
-    return summary
+    meta = {
+        "file": generate_request.user_id,
+        "length": len(split_docs),
+        "execute_time": end_time - start_time,
+    }
+
+    print(meta)
+
+    with open('../log/3/pdfminer.txt', 'w') as f:
+        f.write(str(meta))
+        f.write('\n')
+        f.write('*************************************')
+        f.write('\n')
+        for doc in split_docs:
+            f.write('\n')
+            f.write(doc.page_content)
+
+    # return summary
 
 
 @app.post("/mark")
