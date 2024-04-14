@@ -4,13 +4,9 @@ from data.settings import BUCKET_NAME, CHUNK_SIZE, CHUNK_OVERLAP
 from utils.security import get_minio_access_key
 from data.loader import MinioLoader
 from langchain_community.document_loaders.parsers.pdf import (
-    # AmazonTextractPDFParser,
-    # DocumentIntelligenceParser,
     # PDFMinerParser,
-    # PDFPlumberParser,
     # PyMuPDFParser,
-    # PyPDFium2Parser,
-    PyPDFParser,
+    PyPDFium2Parser,
 )
 
 MINIO_ACCESS = json.loads(get_minio_access_key())
@@ -43,10 +39,10 @@ class Parser():
         minio_files = loader.get_list(self.user_id, 'pdf')
 
         # PyPDFParser 객체 초기화
-        parser = PyPDFParser(extract_images=True)
+        parser = PyPDFium2Parser(extract_images=True)
 
         docs_list = []
-        for file in minio_files[:2]:
+        for file in minio_files:
             file_obj = loader.load_file(file)
 
             # PDF 파싱
