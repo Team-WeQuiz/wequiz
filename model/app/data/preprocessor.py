@@ -35,8 +35,6 @@ class Parser():
 
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
         splitted_docs = text_splitter.split_documents(documents)
-        print(splitted_docs)
-        print(f"파일에 {len(splitted_docs)}개의 문서를 가지고 있습니다.")
         return splitted_docs
 
     # parse files
