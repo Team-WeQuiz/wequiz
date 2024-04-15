@@ -48,3 +48,8 @@ globalStyle('button', {
   border: 'none',
   background: 'none',
 });
+
+globalStyle('a', {
+  textDecoration: 'none',
+  color: 'inherit',
+});
