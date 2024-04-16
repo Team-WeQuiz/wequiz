@@ -77,9 +77,19 @@ export const buttonWrapper = style({
   width: 340,
   height: 100,
   top: 'calc(50% + 270px)',
-  textDecoration: 'none',
+  '@media': {
+    '(max-width: 600px)': {
+      width: 200,
+      top: 'calc(50% + 200px)',
+    },
+  },
 });
 
 export const buttonText = style({
   fontSize: 40,
+  '@media': {
+    '(max-width: 600px)': {
+      fontSize: 24,
+    },
+  },
 });
