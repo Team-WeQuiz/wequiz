@@ -48,7 +48,7 @@ def test(generate_request: GenerateRequest):
 
     print(meta)
 
-    with open('../log/3/pdfminer.txt', 'w') as f:
+    with open('../log/3/test.txt', 'w') as f:
         f.write(str(meta))
         f.write('\n')
         f.write('*************************************')
