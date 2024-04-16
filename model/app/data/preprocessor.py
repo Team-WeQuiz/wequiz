@@ -45,6 +45,7 @@ class Parser():
             docs_list += splitted_docs
 
         return docs_list
+      
     # parse files
     def parse(self):
         loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)

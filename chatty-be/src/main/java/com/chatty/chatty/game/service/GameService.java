@@ -19,11 +19,8 @@ public class GameService {
     private final DynamoDBService dynamoDBService;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
-        log.info("joinRoom: roomId: {}, userId: {}", roomId, userId);
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId);
-        PlayersStatusDTO playersStatusDTO = buildDTO(roomId, playersStatus);
-        log.info("joinRoom: {}", playersStatusDTO);
-        return playersStatusDTO;
+        return buildDTO(roomId, playersStatus);
     }
 
     public PlayersStatusDTO leaveRoom(Long roomId, Long userId) {

@@ -15,24 +15,32 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const [isConnected, setIsConnected] = useState(false);
   const accessToken = useAuthStore.getState().accessToken;
-  const { updateUsers, setMessage } = useWaitingStore();
+  const { userStatuses, updateUsers, setMessage } = useWaitingStore();
 
-  useEffect(() => {
-    const disconnect = () => {
-      console.log('Disconnecting from WebSocket');
+  const disconnect = () => {
+    console.log('Disconnecting from WebSocket');
+    if (userStatuses.length === 1) {
+      stompClient.publish({
+        destination: `/pub/rooms/${params.id}/end`,
+      });
+    } else {
       stompClient.publish({
         destination: `/pub/rooms/${params.id}/leave`,
       });
-      stompClient.deactivate();
-    };
+    }
+    stompClient.deactivate();
+  };
+
+  useEffect(() => {
+    window.addEventListener('popstate', disconnect);
     window.addEventListener('beforeunload', disconnect);
     return () => {
+      window.removeEventListener('popstate', disconnect);
       window.removeEventListener('beforeunload', disconnect);
     };
   }, []);
 
   useEffect(() => {
-    console.log('WaitingRoom mounted');
     const subscribeToStatus = (roomId: number) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);

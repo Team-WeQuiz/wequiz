@@ -3,7 +3,7 @@
 import * as StompJs from '@stomp/stompjs';
 
 const stompClient = new StompJs.Client({
-  brokerURL: 'ws://localhost:8080/api/ws',
+  brokerURL: 'ws://api.wequiz.kr/ws',
   debug: function (str) {
     console.log(str);
   },

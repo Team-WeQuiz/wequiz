@@ -13,6 +13,11 @@ springdoc:
 spring:
   config:
     import: 'aws-secretsmanager:wequiz/aws/back'
+  servlet:
+    #TODO: 파일 사이즈 상의 후 조정
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   profiles:
     active: local
 
@@ -26,3 +31,13 @@ jwt:
   access-token-expiration: 86400000
   refresh-token-expiration: 2592000000
 
+minio:
+  access:
+    key: ${MINIO_ACCESS_KEY}
+    secret: ${MINIO_SECRET_KEY}
+  bucket:
+    pdf: ${MINIO_BUCKET_PDF}
+  endpoint: ${MINIO_ENDPOINT}
+
+url:
+  ml: ${ML_URL}

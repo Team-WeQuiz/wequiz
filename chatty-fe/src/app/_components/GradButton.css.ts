@@ -23,7 +23,7 @@ export const gradButton = recipe({
   variants: {
     color: {
       primary: {
-        background: `linear-gradient(180deg, rgba(38, 146, 255, 0.10) 0%, #2692FF 77.5%)`,
+        background: `linear-gradient(180deg, rgba(38, 146, 255, 0.10) 0%, #2692FF 77.5%), #eaf4ff`,
         boxShadow: '0px 2px 8px 2px rgba(23, 96, 171, 0.30)',
         ':hover': {
           boxShadow: '0px 3px 8px 3px rgba(23, 96, 171, 0.30)',
@@ -35,7 +35,7 @@ export const gradButton = recipe({
       },
       secondary: {
         background:
-          'linear-gradient(180deg, rgba(255, 181, 38, 0.10) 0%, #FFB526 77.5%)',
+          'linear-gradient(180deg, rgba(255, 181, 38, 0.10) 0%, #FFB526 77.5%), #fff8ec',
         boxShadow: '0px 2px 8px 2px rgba(169, 121, 29, 0.30)',
         ':hover': {
           boxShadow: '0px 3px 8px 3px rgba(169, 121, 29, 0.30)',
@@ -59,7 +59,7 @@ export const gradButton = recipe({
     },
     disabled: {
       true: {
-        background: `linear-gradient(180deg, rgba(230, 230, 230, 0.10) 0%, #DEDEDE 77.5%)`,
+        background: `linear-gradient(180deg, rgba(230, 230, 230, 0.10) 0%, #DEDEDE 77.5%), white`,
         cursor: 'default',
         boxShadow: 'none',
         ':hover': {
