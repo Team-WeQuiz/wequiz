@@ -44,7 +44,7 @@ class SummaryChain():
         self.llm = OpenAI(openai_api_key=openai_api_key)
 
     # meta data generate, map reduce 방식으로 문서를 쪼개서 요약하고 합침.
-    def summary(self, split_docs):
+    async def summary(self, split_docs):
         parser = StrOutputParser()
         
         # map 
@@ -83,7 +83,7 @@ class SummaryChain():
             return_intermediate_steps=False,
         )
 
-        return map_reduce_chain.invoke(split_docs)
+        return await map_reduce_chain.ainvoke(split_docs)
 
 
 #######################################################################################################

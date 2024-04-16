@@ -27,35 +27,36 @@ def ping():
     return {"ping": "pong"}
 
 @app.post("/test")
-def test(generate_request: GenerateRequest):
+async def test(generate_request: GenerateRequest):
     # Parsing and split file
     start_time = time.time()
     parser = Parser(generate_request.user_id)
     split_docs = parser.parse()
     end_time = time.time()
 
-    # # Generate description
-    # s_time = time.time()
-    # summarizer = Summarizer(OPENAI_API_KEY)
-    # summary = summarizer.summarize(split_docs)
-    # e_time = time.time()
+    # Generate description
+    s_time = time.time()
+    summarizer = Summarizer(OPENAI_API_KEY)
+    summary = await summarizer.summarize(split_docs)
+    e_time = time.time()
 
     meta = {
         "file": generate_request.user_id,
+        "size": 0,
         "length": len(split_docs),
-        "execute_time": end_time - start_time,
+        "parsing_time": end_time - start_time,
+        "summary_time": e_time - s_time
     }
 
     print(meta)
 
-    with open('../log/3/test.txt', 'w') as f:
-        f.write(str(meta))
-        f.write('\n')
+    with open('../log/4/parsing_summary.txt', 'a') as f:
         f.write('*************************************')
         f.write('\n')
-        for doc in split_docs:
-            f.write('\n')
-            f.write(doc.page_content)
+        f.write(str(meta))
+        f.write('\n')
+        f.write(summary)
+        f.write('\n')
 
     # return summary
 
@@ -128,7 +129,7 @@ def mark(mark_request: MarkRequest):
     return res
 
 @app.post("/generate")
-def generate(generate_request: GenerateRequest):
+async def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     try:
         # Parsing and split file
@@ -137,7 +138,7 @@ def generate(generate_request: GenerateRequest):
 
         # Generate description
         summarizer = Summarizer(OPENAI_API_KEY)
-        summary = summarizer.summarize(split_docs)
+        summary = await summarizer.summarize(split_docs)
 
         # Prepare data for DynamoDB insertion
         data = {
