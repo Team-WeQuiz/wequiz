@@ -34,7 +34,7 @@ class QuizGenerator():
                     retry += 1
                     continue
                 except Exception as e:
-                    print(f"An unexpected error occurred: {e}")
+                    print(f"An unexpected quiz generate error occurred: {e}")
                     retry += 1
                     continue
             return data
