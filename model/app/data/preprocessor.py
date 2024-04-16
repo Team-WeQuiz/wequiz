@@ -1,11 +1,11 @@
 import tiktoken, json
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from data.settings import BUCKET_NAME, CHUNK_SIZE, CHUNK_OVERLAP
+from data.settings import BUCKET_NAME, CHUNK_SIZE, CHUNK_OVERLAP, PARSING_RETRY
 from utils.security import get_minio_access_key
 from data.loader import MinioLoader
 from langchain_community.document_loaders.parsers.pdf import (
-    # PDFMinerParser,
-    # PyMuPDFParser,
+    PDFMinerParser,
+    PyMuPDFParser,
     PyPDFium2Parser,
 )
 
@@ -33,16 +33,9 @@ class Parser():
         splitted_docs = text_splitter.split_documents(documents)
         return splitted_docs
 
-    # parse files
-    def parse(self):
-        loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
-        minio_files = loader.get_list(self.user_id, 'pdf')
-
-        # PyPDFParser 객체 초기화
-        parser = PyPDFium2Parser(extract_images=True)
-
+    def get_parsed_docs(self, parser, loader, files):
         docs_list = []
-        for file in minio_files:
+        for file in files:
             file_obj = loader.load_file(file)
 
             # PDF 파싱
@@ -50,6 +43,25 @@ class Parser():
 
             splitted_docs = self.split_docs(documents)
             docs_list += splitted_docs
+
+        return docs_list
+    # parse files
+    def parse(self):
+        loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
+        minio_files = loader.get_list(self.user_id, 'pdf')
+        parsers = [PyPDFium2Parser(extract_images=True), PyMuPDFParser(extract_images=True), PDFMinerParser(extract_images=True)]
+        retry = 0
+
+        while retry < PARSING_RETRY:
+            try:
+                # retry 횟수에 따라 파서 선정
+                parser = parsers[retry%3]
+                docs_list = self.get_parsed_docs(parser, loader, minio_files)
+                break
+            except Exception as e:
+                print(f"An unexpected parsing error occurred: {e}")
+                retry += 1
+                continue
         
         print(f"총 {len(docs_list)}개의 페이지가 준비되었습니다.")
         return docs_list
