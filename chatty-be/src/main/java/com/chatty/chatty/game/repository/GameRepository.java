@@ -1,13 +1,10 @@
 package com.chatty.chatty.game.repository;
 
 import com.chatty.chatty.game.controller.dto.dynamodb.Question;
-import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
-import com.chatty.chatty.quizroom.entity.QuizRoom;
-import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import com.chatty.chatty.game.domain.QuizQueue;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,34 +12,35 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class GameRepository {
 
-    private final QuizRoomRepository quizRoomRepository;
-    private final DynamoDBService dynamoDBService;
+    private static final Map<Long, QuizQueue> quizQueueMap = new ConcurrentHashMap<>();
 
-    private static final Queue<Question> quizQueue = new LinkedList<>();
+    private Optional<QuizQueue> findQueueByRoomId(Long roomId) {
+        return Optional.ofNullable(quizQueueMap.get(roomId));
+    }
 
-    private void getQuizFromDB(Long roomId) {
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId).orElseThrow();
-        Long quizDocId = quizRoom.getQuizDocId();
-        String timestamp = quizRoom.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        //List<Question> questions = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
-        List<Question> questions = dynamoDBService.getQuizFromDB(roomId.toString(), timestamp);
-        // TODO: 문제가 아직 업로드 되지 않았을 경우
-//        if (questions.isEmpty()) {
-//        }
-        // TODO: query로 필요한 5문제만 가져오기
-        quizQueue.addAll(questions);
+    public void initQuizQueue(Long roomId) {
+        QuizQueue quizQueue = QuizQueue.init();
+        quizQueue.fillQuiz(roomId);
+        updateQueue(roomId, quizQueue);
     }
 
     public Question sendQuiz(Long roomId) {
-        if (!quizQueue.isEmpty()) {
+        // TODO: isPresent
+        QuizQueue quizQueue = findQueueByRoomId(roomId).get();
+        return quizQueue.sendQuiz();
+    }
 
-            quizQueue.poll();
-        }
-        if (quizQueue.isEmpty()) {
-            getQuizFromDB(roomId);
-        }
+    private void removeQuiz(Long roomId) {
+        QuizQueue quizQueue = findQueueByRoomId(roomId).get();
+        quizQueue.removeAndFillQuiz(roomId);
+        updateQueue(roomId, quizQueue);
+    }
 
-        return quizQueue.peek();
+    public void clear(Long roomId) {
+        quizQueueMap.remove(roomId);
+    }
+
+    private void updateQueue(Long roomId, QuizQueue quizQueue) {
+        quizQueueMap.put(roomId, quizQueue);
     }
 }
