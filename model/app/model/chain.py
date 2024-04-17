@@ -1,6 +1,6 @@
 from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE
 from model.schema import ChoiceOutput, ShortOutput
-from langchain_openai import OpenAI
+from langchain_openai import OpenAI, ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.memory import VectorStoreRetrieverMemory
@@ -12,7 +12,7 @@ class Chain():
     def __init__(self, indices, openai_api_key):
         # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
         self.retriever = indices.as_retriever(search_kwargs=dict(k=3))
-        self.llm = OpenAI(openai_api_key=openai_api_key)
+        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-3.5-turbo-0125")
         self.types = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
         self.schems = [ChoiceOutput, ShortOutput]
     
@@ -41,7 +41,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 class SummaryChain():
     def __init__(self, openai_api_key):
-        self.llm = OpenAI(openai_api_key=openai_api_key)
+        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-3.5-turbo-0125")
 
     # meta data generate, map reduce 방식으로 문서를 쪼개서 요약하고 합침.
     def summary(self, split_docs):
@@ -93,7 +93,7 @@ from model.prompt import MARK_TEMPLATE
 
 class MarkChain():
     def __init__(self, openai_api_key):
-        self.llm = OpenAI(openai_api_key=openai_api_key)
+        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-3.5-turbo-0125")
     
     def mark(self, answer, user):
         prompt = PromptTemplate(
