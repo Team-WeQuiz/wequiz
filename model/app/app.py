@@ -34,29 +34,28 @@ async def test(generate_request: GenerateRequest):
     split_docs = parser.parse()
     end_time = time.time()
 
-    # Generate description
-    s_time = time.time()
-    summarizer = Summarizer(OPENAI_API_KEY)
-    summary = await summarizer.summarize(split_docs)
-    e_time = time.time()
+    # # Generate description
+    # s_time = time.time()
+    # summarizer = Summarizer(OPENAI_API_KEY)
+    # summary = await summarizer.summarize(split_docs)
+    # e_time = time.time()
 
     meta = {
         "file": generate_request.user_id,
         "size": 0,
         "length": len(split_docs),
         "parsing_time": end_time - start_time,
-        "summary_time": e_time - s_time
     }
 
     print(meta)
 
-    with open('../log/4/split.txt', 'a') as f:
-        f.write('*************************************')
-        f.write('\n')
-        f.write(str(meta))
-        f.write('\n')
-        f.write(summary)
-        f.write('\n')
+    # with open('../log/4/split.txt', 'a') as f:
+    #     f.write('*************************************')
+    #     f.write('\n')
+    #     f.write(str(meta))
+    #     f.write('\n')
+    #     f.write(summary)
+    #     f.write('\n')
 
     # return summary
 

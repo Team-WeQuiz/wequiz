@@ -28,7 +28,6 @@ class Parser():
         
             # print(f"페이지에 {len(document.page_content)}개의 단어를 가지고 있습니다.")
             # print(f'예상되는 토큰 수 {self.num_tokens_from_string(document.page_content, "cl100k_base")}')
-
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
         splitted_docs = text_splitter.split_documents(documents)
         return splitted_docs
