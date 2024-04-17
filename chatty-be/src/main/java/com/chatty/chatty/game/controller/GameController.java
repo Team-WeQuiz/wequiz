@@ -75,11 +75,10 @@ public class GameController {
         return gameService.sendQuiz(roomId);
     }
 
-    public void sendDescription(Long roomId, String description) {
-        template.convertAndSend("/sub/rooms/" + roomId + "/data",
-                DescriptionResponse.builder()
-                        .description(description)
-                        .build());
+    // TODO: 비동기
+    public void sendDescription(Long roomId) {
+        DescriptionResponse descriptionResponse = gameService.sendDescription(roomId);
+        template.convertAndSend("/sub/rooms/" + roomId + "/data", descriptionResponse);
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

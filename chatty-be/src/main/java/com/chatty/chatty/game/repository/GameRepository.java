@@ -39,6 +39,11 @@ public class GameRepository {
         updateQuizMap(roomId, quizData);
     }
 
+    public String sendDescription(Long roomId) {
+        QuizData quizData = findByRoomId(roomId).get();
+        return quizData.pollingDescription();
+    }
+
     public Quiz sendQuiz(Long roomId) {
         QuizData quizData = findByRoomId(roomId).get();
         return quizData.sendQuiz();

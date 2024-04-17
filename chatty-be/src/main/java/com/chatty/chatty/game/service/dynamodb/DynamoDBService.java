@@ -15,6 +15,10 @@ public class DynamoDBService {
 
     private final DynamoDBRepository dynamoDBRepository;
 
+    public String getDescriptionFromDB(String itemId, String timestamp) {
+        return dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
+    }
+
     public List<Map<String, Object>> getQuizFromDB(String itemId, String timestamp) {
         return dynamoDBRepository.getQuizFromDB(itemId, timestamp);
     }

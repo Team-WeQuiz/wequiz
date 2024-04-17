@@ -58,4 +58,13 @@ public class QuizData {
         }
         return quizzes;
     }
+
+    public String pollingDescription() {
+        String description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
+        while (description.equals("")) {
+            description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
+            // TODO: 5초마다 요청
+        }
+        return description;
+    }
 }

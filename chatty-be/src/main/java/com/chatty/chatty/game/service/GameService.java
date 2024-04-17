@@ -1,5 +1,6 @@
 package com.chatty.chatty.game.service;
 
+import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
@@ -39,16 +40,22 @@ public class GameService {
         playersStatusRepository.clear(roomId);
     }
 
-    public QuizResponse sendQuiz(Long roomId) {
-        return QuizResponse.builder()
-                .quiz(gameRepository.sendQuiz(roomId))
-                .build();
-    }
-
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()
                 .roomId(roomId)
                 .playerStatuses(playersStatus.playerStatusSet())
+                .build();
+    }
+
+    public DescriptionResponse sendDescription(Long roomId) {
+        return DescriptionResponse.builder()
+                .description(gameRepository.sendDescription(roomId))
+                .build();
+    }
+
+    public QuizResponse sendQuiz(Long roomId) {
+        return QuizResponse.builder()
+                .quiz(gameRepository.sendQuiz(roomId))
                 .build();
     }
 }
