@@ -50,7 +50,7 @@ async def test(generate_request: GenerateRequest):
 
     print(meta)
 
-    with open('../log/4/parsing_summary.txt', 'a') as f:
+    with open('../log/4/split.txt', 'a') as f:
         f.write('*************************************')
         f.write('\n')
         f.write(str(meta))
@@ -129,16 +129,16 @@ def mark(mark_request: MarkRequest):
     return res
 
 @app.post("/generate")
-async def generate(generate_request: GenerateRequest):
+def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     try:
         # Parsing and split file
         parser = Parser(generate_request.user_id)
         split_docs = parser.parse()
-
+        
         # Generate description
         summarizer = Summarizer(OPENAI_API_KEY)
-        summary = await summarizer.summarize(split_docs)
+        summary = summarizer.summarize(split_docs)
 
         # Prepare data for DynamoDB insertion
         data = {
