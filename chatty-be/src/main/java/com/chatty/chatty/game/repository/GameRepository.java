@@ -1,6 +1,6 @@
 package com.chatty.chatty.game.repository;
 
-import com.chatty.chatty.game.controller.dto.dynamodb.Question;
+import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -39,12 +39,11 @@ public class GameRepository {
         updateQuizMap(roomId, quizData);
     }
 
-    public Question sendQuiz(Long roomId) {
+    public Quiz sendQuiz(Long roomId) {
         QuizData quizData = findByRoomId(roomId).get();
         return quizData.sendQuiz();
     }
 
-    // 비동기
     private void removeQuiz(Long roomId) {
         QuizData quizData = findByRoomId(roomId).get();
         quizData.removeQuiz();

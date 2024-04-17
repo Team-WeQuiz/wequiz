@@ -1,6 +1,6 @@
 package com.chatty.chatty.game.service.dynamodb;
 
-import com.chatty.chatty.game.controller.dto.dynamodb.Question;
+import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -19,14 +19,14 @@ public class DynamoDBService {
         return dynamoDBRepository.getQuizFromDB(itemId, timestamp);
     }
 
-    private List<Question> convertToList(List<Map<String, Object>> listMap) {
+    private List<Quiz> convertToList(List<Map<String, Object>> listMap) {
         ObjectMapper mapper = new ObjectMapper();
-        List<Question> questions = new ArrayList<>();
+        List<Quiz> quizzes = new ArrayList<>();
 
         for (Map<String, Object> value : listMap) {
-            Question question = mapper.convertValue(value, Question.class);
-            questions.add(question);
+            Quiz quiz = mapper.convertValue(value, Quiz.class);
+            quizzes.add(quiz);
         }
-        return questions;
+        return quizzes;
     }
 }

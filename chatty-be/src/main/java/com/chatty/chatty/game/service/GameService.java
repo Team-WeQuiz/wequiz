@@ -41,7 +41,7 @@ public class GameService {
 
     public QuizResponse sendQuiz(Long roomId) {
         return QuizResponse.builder()
-                .Quiz(gameRepository.sendQuiz(roomId))
+                .quiz(gameRepository.sendQuiz(roomId))
                 .build();
     }
 

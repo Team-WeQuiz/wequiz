@@ -2,7 +2,7 @@ package com.chatty.chatty.game.controller.dto.dynamodb;
 
 import java.util.List;
 
-public record Question(
+public record Quiz(
 
         String id,
 

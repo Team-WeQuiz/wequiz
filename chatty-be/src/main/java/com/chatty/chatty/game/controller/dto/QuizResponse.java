@@ -1,10 +1,10 @@
 package com.chatty.chatty.game.controller.dto;
 
-import com.chatty.chatty.game.controller.dto.dynamodb.Question;
+import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import lombok.Builder;
 
 @Builder
 public record QuizResponse(
-        Question Quiz
+        Quiz quiz
 ) {
 }

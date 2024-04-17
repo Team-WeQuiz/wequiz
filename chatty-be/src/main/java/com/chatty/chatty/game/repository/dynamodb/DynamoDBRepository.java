@@ -15,7 +15,7 @@ public class DynamoDBRepository {
     private static final String TABLE_NAME = "wequiz-quiz";
     private static final String HASH_KEY = "id";
     private static final String RANGE_KEY = "timestamp";
-    private static final String QUESTIONS_ATTR_NAME = "questions";
+    private static final String QUIZ_ATTR_NAME = "questions";
 
     private final AmazonDynamoDB amazonDynamoDB;
     private final DynamoDB dynamoDB;
@@ -29,10 +29,10 @@ public class DynamoDBRepository {
         Table table = dynamoDB.getTable(TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
                 .withPrimaryKey(HASH_KEY, itemId, RANGE_KEY, timestamp)
-                .withProjectionExpression(QUESTIONS_ATTR_NAME);
+                .withProjectionExpression(QUIZ_ATTR_NAME);
 
         Item item = table.getItem(spec);
 
-        return item.getList(QUESTIONS_ATTR_NAME);
+        return item.getList(QUIZ_ATTR_NAME);
     }
 }
