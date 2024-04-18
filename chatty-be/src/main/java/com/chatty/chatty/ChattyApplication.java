@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
 
+@EnableAsync
 @EnableFeignClients
 @EnableJpaAuditing
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)

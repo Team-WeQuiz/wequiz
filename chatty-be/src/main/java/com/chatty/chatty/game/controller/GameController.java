@@ -18,6 +18,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,7 +77,7 @@ public class GameController {
         return gameService.sendQuiz(roomId);
     }
 
-    // TODO: 비동기
+    @Async
     public void sendDescription(Long roomId) {
         DescriptionResponse descriptionResponse = gameService.sendDescription(roomId);
         template.convertAndSend("/sub/rooms/" + roomId + "/data", descriptionResponse);
