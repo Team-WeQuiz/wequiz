@@ -56,8 +56,6 @@ async def test(generate_request: GenerateRequest):
         for doc in split_docs:
             f.write('\n')
             f.write(doc.page_content)
-            f.write('\n')
-            f.write('*************************************')
 
     # return summary
 

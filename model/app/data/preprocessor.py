@@ -19,27 +19,34 @@ def remove_urls(text):
     return text_without_urls
 
 def is_valid_doc(text):
-    unvalids = [
+    invalids = [
         'REFERENCES',
         'References',
         '참고문헌',
     ]
 
-    for unvalid in unvalids:
-        if unvalid in text:
-            return False
-    return True
+    for invalid in invalids:
+        invalid_position = text.find(invalid)
+        if invalid_position != -1:
+            # invalid 키워드가 등장한 위치부터 끝까지 텍스트 제거
+            text = text[:invalid_position]
+
+    return text
 
 def preprocess(docs):
     clean_docs = []
 
     for doc in docs:
-        if is_valid_doc(doc):
-            doc.page_content = remove_urls(doc.page_content)
+        text_without_urls = remove_urls(doc.page_content)
+        valid_checked_text = is_valid_doc(text_without_urls)
+        if valid_checked_text != text_without_urls:
+            doc.page_content = valid_checked_text
             clean_docs.append(doc)
-        else:
-            # invalid한 키워드 등장하면 이후 발생하는 문서를 드랍함
             break
+        else:
+            doc.page_content = text_without_urls
+            clean_docs.append(doc)
+
     return clean_docs
 
 
