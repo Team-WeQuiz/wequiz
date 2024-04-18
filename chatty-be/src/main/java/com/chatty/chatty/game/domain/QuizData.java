@@ -15,6 +15,7 @@ import lombok.Getter;
 @Getter
 public class QuizData {
     private static final Integer QUIZ_PER_ROUND = 5;
+    private static final Integer MAX_ATTEMPT = 120;
     private final Queue<Quiz> quizQueue = new LinkedList<>();
     private final String quizDocId;
     private final String timestamp;
@@ -25,6 +26,7 @@ public class QuizData {
         // TODO: send 요청 수 세서 인원수만큼 받으면 요청 하나로 처리해서 반환
         if (quizQueue.isEmpty()) {
             fillQuiz();
+            this.currQuizNum = currQuizNum + QUIZ_PER_ROUND;
         }
         return quizQueue.peek();
     }
@@ -41,10 +43,13 @@ public class QuizData {
     private List<Quiz> pollingQuiz() {
         List<Map<String, Object>> quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
         while (quizzes.size() < currQuizNum + QUIZ_PER_ROUND) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
-            // TODO: 5초마다 요청
         }
-        this.currQuizNum = currQuizNum + QUIZ_PER_ROUND;
         return convertToList(quizzes);
     }
 
@@ -61,9 +66,19 @@ public class QuizData {
 
     public String pollingDescription() {
         String description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
-        while (description.equals("")) {
+        int attempt = 0;
+        while (description.equals("") && attempt < MAX_ATTEMPT) {
+            // TODO: 폴링 방법...
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
-            // TODO: 5초마다 요청
+            attempt++;
+        }
+        if (description.equals("")) {
+            throw new RuntimeException("10분 동안 요약이 생성되지 않았으므로 데이터 가져오기를 중단합니다.");
         }
         return description;
     }
