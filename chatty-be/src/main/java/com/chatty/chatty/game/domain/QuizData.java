@@ -10,9 +10,12 @@ import java.util.Map;
 import java.util.Queue;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 
 @Builder
 @Getter
+@Slf4j
 public class QuizData {
     private static final Integer QUIZ_PER_ROUND = 5;
     private static final Integer MAX_ATTEMPT = 120;
@@ -23,31 +26,32 @@ public class QuizData {
     private final DynamoDBService dynamoDBService;
 
     public Quiz sendQuiz() {
-        // TODO: send 요청 수 세서 인원수만큼 받으면 요청 하나로 처리해서 반환
-        if (quizQueue.isEmpty()) {
-            fillQuiz();
-            this.currQuizNum = currQuizNum + QUIZ_PER_ROUND;
+        while (quizQueue.isEmpty()) {
+            wait5Sec();
         }
+        log.info("quiz: {}", quizQueue.peek());
         return quizQueue.peek();
     }
 
-    public void removeQuiz() {
+    public void removeAndFillQuiz() {
         quizQueue.poll();
+
+        if (quizQueue.isEmpty()) {
+            this.currQuizNum = currQuizNum + QUIZ_PER_ROUND;
+            fillQuiz();
+        }
     }
 
     public void fillQuiz() {
         List<Quiz> quizzes = pollingQuiz();
         quizQueue.addAll(quizzes.subList(currQuizNum, currQuizNum + QUIZ_PER_ROUND));
+        log.info("quizQueue: {}", quizQueue);
     }
 
     private List<Quiz> pollingQuiz() {
         List<Map<String, Object>> quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
         while (quizzes.size() < currQuizNum + QUIZ_PER_ROUND) {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            wait5Sec();
             quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
         }
         return convertToList(quizzes);
@@ -68,12 +72,7 @@ public class QuizData {
         String description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
         int attempt = 0;
         while (description.equals("") && attempt < MAX_ATTEMPT) {
-            // TODO: 폴링 방법...
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            wait5Sec();
             description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
             attempt++;
         }
@@ -81,5 +80,14 @@ public class QuizData {
             throw new RuntimeException("10분 동안 요약이 생성되지 않았으므로 데이터 가져오기를 중단합니다.");
         }
         return description;
+    }
+
+    private void wait5Sec() {
+        try {
+            Thread.sleep(5000);
+            log.info("wake: {}", DateTime.now());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

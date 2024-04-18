@@ -36,6 +36,7 @@ public class GameRepository {
                 .currQuizNum(FIRST_QUIZ_NUM)
                 .dynamoDBService(dynamoDBService)
                 .build();
+        quizData.fillQuiz();
         updateQuizMap(roomId, quizData);
     }
 
@@ -49,13 +50,13 @@ public class GameRepository {
         return quizData.sendQuiz();
     }
 
-    private void removeQuiz(Long roomId) {
+    public void removeQuiz(Long roomId) {
         QuizData quizData = findByRoomId(roomId).get();
-        quizData.removeQuiz();
+        quizData.removeAndFillQuiz();
         updateQuizMap(roomId, quizData);
     }
 
-    public void clear(Long roomId) {
+    private void clear(Long roomId) {
         quizDataMap.remove(roomId);
     }
 
