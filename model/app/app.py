@@ -27,35 +27,39 @@ def ping():
     return {"ping": "pong"}
 
 @app.post("/test")
-async def test(generate_request: GenerateRequest):
+def test(generate_request: GenerateRequest):
     # Parsing and split file
     start_time = time.time()
     parser = Parser(generate_request.user_id)
     split_docs = parser.parse()
     end_time = time.time()
 
-    # # Generate description
-    # s_time = time.time()
-    # summarizer = Summarizer(OPENAI_API_KEY)
-    # summary = await summarizer.summarize(split_docs)
-    # e_time = time.time()
+    # Generate description
+    s_time = time.time()
+    summarizer = Summarizer(OPENAI_API_KEY)
+    summary = summarizer.summarize(split_docs)
+    e_time = time.time()
 
     meta = {
         "file": generate_request.user_id,
         "size": 0,
         "length": len(split_docs),
         "parsing_time": end_time - start_time,
+        "summary_time": e_time - s_time,
     }
 
     print(meta)
 
-    # with open('../log/4/split.txt', 'a') as f:
-    #     f.write('*************************************')
-    #     f.write('\n')
-    #     f.write(str(meta))
-    #     f.write('\n')
-    #     f.write(summary)
-    #     f.write('\n')
+    with open('../log/4/split_and_summary.txt', 'a') as f:
+        f.write(str(meta))
+        f.write('\n')
+        f.write('*************************************')
+        for doc in split_docs:
+            f.write('\n')
+            f.write(doc.page_content)
+        f.write('\n')
+        f.write('*************************************')
+        f.write(summary)
 
     # return summary
 
