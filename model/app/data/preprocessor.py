@@ -1,4 +1,4 @@
-import tiktoken, json
+import tiktoken, json, re
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from data.settings import BUCKET_NAME, CHUNK_SIZE, CHUNK_OVERLAP, PARSING_RETRY
 from utils.security import get_minio_access_key
@@ -11,26 +11,69 @@ from langchain_community.document_loaders.parsers.pdf import (
 
 MINIO_ACCESS = json.loads(get_minio_access_key())
 
+def remove_urls(text):
+    # Define the regex pattern to match URLs
+    url_pattern = re.compile(r'https?://\S+|www\.\S+')
+    # Replace URLs with an empty string
+    text_without_urls = url_pattern.sub('', text)
+    return text_without_urls
+
+def is_valid_doc(text):
+    unvalids = [
+        'REFERENCES',
+        'References',
+        '참고문헌',
+    ]
+
+    for unvalid in unvalids:
+        if unvalid in text:
+            return False
+    return True
+
+def preprocess(docs):
+    clean_docs = []
+
+    for doc in docs:
+        if is_valid_doc(doc):
+            doc.page_content = remove_urls(doc.page_content)
+            clean_docs.append(doc)
+        else:
+            # invalid한 키워드 등장하면 이후 발생하는 문서를 드랍함
+            break
+    return clean_docs
+
 
 class Parser():
     def __init__(self, user_id):
         self.user_id = user_id
 
-    def num_tokens_from_string(self, string: str, encoding_name: str) -> int:
-        encoding = tiktoken.get_encoding(encoding_name)
-        num_tokens = len(encoding.encode(string))
-        return num_tokens
+    def num_tokens_from_string(self, documents) -> int:
+        encoding = tiktoken.get_encoding("cl100k_base")
+
+        total_tokens = 0
+        for document in documents:
+            num_tokens = len(encoding.encode(document.page_content))
+            total_tokens += num_tokens
+
+        print(f'예상되는 토큰 수: {total_tokens}')
+
+        return total_tokens
     
     def split_docs(self, documents):
-        # # 결과 출력
-        # for document in documents:
-        #     docs += document
         
-            # print(f"페이지에 {len(document.page_content)}개의 단어를 가지고 있습니다.")
-            # print(f'예상되는 토큰 수 {self.num_tokens_from_string(document.page_content, "cl100k_base")}')
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
-        splitted_docs = text_splitter.split_documents(documents)
-        return splitted_docs
+        doc_list = []
+        for document in documents:
+            doc_list.append(document)
+        
+        print(f'페이지 수: {len(doc_list)}')
+
+        total_tokens = self.num_tokens_from_string(doc_list)
+
+        # 결과 출력
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP, length_function=len)
+        splitted_docs = text_splitter.split_documents(doc_list)
+
+        return preprocess(splitted_docs)
 
 
     def get_parsed_docs(self, parser, loader, files):

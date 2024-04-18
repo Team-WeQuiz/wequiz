@@ -49,13 +49,15 @@ async def test(generate_request: GenerateRequest):
 
     print(meta)
 
-    # with open('../log/4/split.txt', 'a') as f:
-    #     f.write('*************************************')
-    #     f.write('\n')
-    #     f.write(str(meta))
-    #     f.write('\n')
-    #     f.write(summary)
-    #     f.write('\n')
+    with open('../log/4/split.txt', 'a') as f:
+        f.write(str(meta))
+        f.write('\n')
+        f.write('*************************************')
+        for doc in split_docs:
+            f.write('\n')
+            f.write(doc.page_content)
+            f.write('\n')
+            f.write('*************************************')
 
     # return summary
 
