@@ -68,7 +68,7 @@ class SummaryChain():
             # 문서가 `StuffDocumentsChain`의 컨텍스트를 초과하는 경우
             collapse_documents_chain=combine_documents_chain,
             # 문서를 그룹화할 때의 토큰 최대 개수입니다.
-            token_max=3000,
+            token_max=3800,
         )
 
         # 문서들에 체인을 매핑하여 결합하고, 그 다음 결과들을 결합합니다.
