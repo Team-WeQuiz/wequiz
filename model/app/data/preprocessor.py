@@ -115,7 +115,7 @@ class Parser():
                 retry += 1
                 continue
         
-        print(f"총 {len(docs_list)}개의 페이지가 준비되었습니다.")
+        print(f"총 {len(docs_list)}개의 문서 조각이 준비되었습니다.")
         return docs_list
 
 
