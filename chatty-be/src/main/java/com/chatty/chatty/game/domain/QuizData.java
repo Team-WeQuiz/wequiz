@@ -1,5 +1,6 @@
 package com.chatty.chatty.game.domain;
 
+import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,35 +23,38 @@ public class QuizData {
     private final Queue<Quiz> quizQueue = new LinkedList<>();
     private final String quizDocId;
     private final String timestamp;
-    private Integer currQuizNum;
+    private Integer currRound;
     private final DynamoDBService dynamoDBService;
 
-    public Quiz sendQuiz() {
+    public QuizResponse sendQuiz() {
         while (quizQueue.isEmpty()) {
             wait5Sec();
         }
         log.info("quiz: {}", quizQueue.peek());
-        return quizQueue.peek();
+        return QuizResponse.builder()
+                .round(currRound + 1)
+                .quiz(quizQueue.peek())
+                .build();
     }
 
     public void removeAndFillQuiz() {
         quizQueue.poll();
 
         if (quizQueue.isEmpty()) {
-            this.currQuizNum = currQuizNum + QUIZ_PER_ROUND;
+            this.currRound++;
             fillQuiz();
         }
     }
 
     public void fillQuiz() {
         List<Quiz> quizzes = pollingQuiz();
-        quizQueue.addAll(quizzes.subList(currQuizNum, currQuizNum + QUIZ_PER_ROUND));
+        quizQueue.addAll(quizzes.subList(currRound * QUIZ_PER_ROUND, (currRound + 1) * QUIZ_PER_ROUND));
         log.info("quizQueue: {}", quizQueue);
     }
 
     private List<Quiz> pollingQuiz() {
         List<Map<String, Object>> quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
-        while (quizzes.size() < currQuizNum + QUIZ_PER_ROUND) {
+        while (quizzes.size() < (currRound + 1) * QUIZ_PER_ROUND) {
             wait5Sec();
             quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
         }

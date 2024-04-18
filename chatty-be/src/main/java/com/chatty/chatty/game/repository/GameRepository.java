@@ -1,6 +1,6 @@
 package com.chatty.chatty.game.repository;
 
-import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class GameRepository {
     private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final Integer FIRST_QUIZ_NUM = 0;
+    private static final Integer DEFAULT_ROUND = 0;
     private static final Map<Long, QuizData> quizDataMap = new ConcurrentHashMap<>();
     private final QuizRoomRepository quizRoomRepository;
     private final DynamoDBService dynamoDBService;
@@ -33,7 +33,7 @@ public class GameRepository {
         QuizData quizData = QuizData.builder()
                 .quizDocId(quizDocId)
                 .timestamp(timestamp)
-                .currQuizNum(FIRST_QUIZ_NUM)
+                .currRound(DEFAULT_ROUND)
                 .dynamoDBService(dynamoDBService)
                 .build();
         quizData.fillQuiz();
@@ -45,7 +45,7 @@ public class GameRepository {
         return quizData.pollingDescription();
     }
 
-    public Quiz sendQuiz(Long roomId) {
+    public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = findByRoomId(roomId).get();
         return quizData.sendQuiz();
     }

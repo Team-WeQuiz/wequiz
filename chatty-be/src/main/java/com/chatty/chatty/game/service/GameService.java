@@ -54,8 +54,10 @@ public class GameService {
     }
 
     public QuizResponse sendQuiz(Long roomId) {
+        QuizResponse quizResponse = gameRepository.sendQuiz(roomId);
         return QuizResponse.builder()
-                .quiz(gameRepository.sendQuiz(roomId))
+                .round(quizResponse.round())
+                .quiz(quizResponse.quiz())
                 .build();
     }
 }

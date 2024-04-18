@@ -5,6 +5,8 @@ import lombok.Builder;
 
 @Builder
 public record QuizResponse(
+        Integer round,
+
         Quiz quiz
 ) {
 }
