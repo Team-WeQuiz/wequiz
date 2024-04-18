@@ -23,6 +23,7 @@ public class QuizData {
     private final Queue<Quiz> quizQueue = new LinkedList<>();
     private final String quizDocId;
     private final String timestamp;
+    private final Integer totalRound;
     private Integer currRound;
     private final DynamoDBService dynamoDBService;
 
@@ -32,7 +33,8 @@ public class QuizData {
         }
         log.info("quiz: {}", quizQueue.peek());
         return QuizResponse.builder()
-                .round(currRound + 1)
+                .totalRound(totalRound)
+                .currRound(currRound + 1)
                 .quiz(quizQueue.peek())
                 .build();
     }
@@ -40,7 +42,7 @@ public class QuizData {
     public void removeAndFillQuiz() {
         quizQueue.poll();
 
-        if (quizQueue.isEmpty()) {
+        if (quizQueue.isEmpty() && currRound < totalRound) {
             this.currRound++;
             fillQuiz();
         }
