@@ -25,6 +25,7 @@ public class GameRepository {
         return Optional.ofNullable(quizDataMap.get(roomId));
     }
 
+    // controller에서 비동기 처리
     public void initQuizData(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId).orElseThrow();
         String quizDocId = quizRoom.getQuizDocId();
@@ -50,10 +51,10 @@ public class GameRepository {
         return quizData.sendQuiz();
     }
 
+    // controller에서 비동기 처리
     public void removeQuiz(Long roomId) {
         QuizData quizData = findByRoomId(roomId).get();
         quizData.removeAndFillQuiz();
-        updateQuizMap(roomId, quizData);
     }
 
     private void clear(Long roomId) {
