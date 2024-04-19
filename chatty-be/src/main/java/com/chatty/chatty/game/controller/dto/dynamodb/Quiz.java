@@ -1,13 +1,13 @@
 package com.chatty.chatty.game.controller.dto.dynamodb;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.List;
 
 public record Quiz(
 
         String id,
 
-        @JsonProperty("question_number")
+        @JsonSetter("question_number")
         Integer questionNumber,
 
         String type,

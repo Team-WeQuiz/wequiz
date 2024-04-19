@@ -74,6 +74,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/quiz")
     @SendToUser("/queue/rooms/{roomId}/data")
     public QuizResponse sendQuiz(@DestinationVariable Long roomId) {
+        log.info("sendQuiz-controller time: {}", LocalDateTime.now());
         return gameService.sendQuiz(roomId);
     }
 

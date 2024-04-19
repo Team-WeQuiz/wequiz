@@ -51,6 +51,7 @@ public class GameRepository {
     }
 
     public QuizResponse sendQuiz(Long roomId) {
+        log.info("sendQuiz-repository roomId: {}", roomId);
         QuizData quizData = findByRoomId(roomId).get();
         return quizData.sendQuiz();
     }
