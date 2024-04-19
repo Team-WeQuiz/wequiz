@@ -2,6 +2,7 @@ package com.chatty.chatty.game.service.model;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import com.chatty.chatty.config.RestClientConfig;
 import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
 import com.chatty.chatty.quizroom.controller.dto.GenerateQuizMLResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;

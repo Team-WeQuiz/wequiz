@@ -2,9 +2,10 @@ package com.chatty.chatty.game.controller;
 
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
-import com.chatty.chatty.game.controller.dto.PlayersStatusDTO;
+import com.chatty.chatty.game.controller.dto.DescriptionResponse;
+import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.service.GameService;
-import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
+import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +30,6 @@ public class GameController {
 
     private final SimpMessagingTemplate template;
     private final GameService gameService;
-    private final DynamoDBService dynamoDBService;
 
     @MessageMapping("/rooms/{roomId}/chat")
     @SendTo("/sub/rooms/{roomId}/chat")
@@ -67,6 +69,18 @@ public class GameController {
     public ResponseEntity<Void> endGame(@PathVariable Long roomId) {
         gameService.endGame(roomId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @MessageMapping("/rooms/{roomId}/quiz")
+    @SendToUser("/queue/rooms/{roomId}/data")
+    public QuizResponse sendQuiz(@DestinationVariable Long roomId) {
+        return gameService.sendQuiz(roomId);
+    }
+
+    @Async
+    public void sendDescription(Long roomId) {
+        DescriptionResponse descriptionResponse = gameService.sendDescription(roomId);
+        template.convertAndSend("/sub/rooms/" + roomId + "/data", descriptionResponse);
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

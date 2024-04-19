@@ -1,10 +1,11 @@
 package com.chatty.chatty.game.service;
 
-import com.chatty.chatty.game.controller.dto.PlayersStatusDTO;
-import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
+import com.chatty.chatty.game.controller.dto.DescriptionResponse;
+import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
-import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,7 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
     private final PlayersStatusRepository playersStatusRepository;
-    private final QuizRoomRepository quizRoomRepository;
-    private final DynamoDBService dynamoDBService;
+    private final GameRepository gameRepository;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId);
@@ -42,5 +42,23 @@ public class GameService {
                 .roomId(roomId)
                 .playerStatuses(playersStatus.playerStatusSet())
                 .build();
+    }
+
+    public DescriptionResponse sendDescription(Long roomId) {
+        return DescriptionResponse.builder()
+                .description(gameRepository.sendDescription(roomId))
+                .build();
+    }
+
+    public QuizResponse sendQuiz(Long roomId) {
+        return gameRepository.sendQuiz(roomId);
+    }
+
+    public void removeQuiz(Long roomId) {
+        gameRepository.removeQuiz(roomId);
+    }
+
+    public void initQuiz(Long roomId) {
+        gameRepository.initQuizData(roomId);
     }
 }
