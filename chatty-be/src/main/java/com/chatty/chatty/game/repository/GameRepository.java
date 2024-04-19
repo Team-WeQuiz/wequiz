@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class GameRepository {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Integer DEFAULT_ROUND = 0;
@@ -28,6 +30,7 @@ public class GameRepository {
 
     // controller에서 비동기 처리
     public void initQuizData(Long roomId) {
+        log.info("InitQuizData");
         QuizRoom quizRoom = quizRoomRepository.findById(roomId).orElseThrow();
 
         QuizData quizData = QuizData.builder()
@@ -37,8 +40,9 @@ public class GameRepository {
                 .currentRound(DEFAULT_ROUND)
                 .dynamoDBService(dynamoDBService)
                 .build();
-        quizData.fillQuiz();
         updateQuizMap(roomId, quizData);
+        log.info("QuizMap: {}", quizDataMap);
+        quizData.fillQuiz();
     }
 
     public String sendDescription(Long roomId) {
