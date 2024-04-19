@@ -24,7 +24,7 @@ public class QuizData {
     private final String quizDocId;
     private final String timestamp;
     private final Integer totalRound;
-    private Integer currRound;
+    private Integer currentRound;
     private final DynamoDBService dynamoDBService;
 
     public QuizResponse sendQuiz() {
@@ -34,7 +34,7 @@ public class QuizData {
         log.info("quiz: {}", quizQueue.peek());
         return QuizResponse.builder()
                 .totalRound(totalRound)
-                .currRound(currRound + 1)
+                .currentRound(currentRound + 1)
                 .quiz(quizQueue.peek())
                 .build();
     }
@@ -42,21 +42,21 @@ public class QuizData {
     public void removeAndFillQuiz() {
         quizQueue.poll();
 
-        if (quizQueue.isEmpty() && currRound < totalRound) {
-            this.currRound++;
+        if (quizQueue.isEmpty() && currentRound < totalRound) {
+            this.currentRound++;
             fillQuiz();
         }
     }
 
     public void fillQuiz() {
         List<Quiz> quizzes = pollingQuiz();
-        quizQueue.addAll(quizzes.subList(currRound * QUIZ_PER_ROUND, (currRound + 1) * QUIZ_PER_ROUND));
+        quizQueue.addAll(quizzes.subList(currentRound * QUIZ_PER_ROUND, (currentRound + 1) * QUIZ_PER_ROUND));
         log.info("quizQueue: {}", quizQueue);
     }
 
     private List<Quiz> pollingQuiz() {
         List<Map<String, Object>> quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
-        while (quizzes.size() < (currRound + 1) * QUIZ_PER_ROUND) {
+        while (quizzes.size() < (currentRound + 1) * QUIZ_PER_ROUND) {
             wait5Sec();
             quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
         }

@@ -8,7 +8,7 @@ public record QuizResponse(
 
         Integer totalRound,
 
-        Integer currRound,
+        Integer currentRound,
 
         Quiz quiz
 ) {

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class GameRepository {
-    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Integer DEFAULT_ROUND = 0;
     private static final Integer QUIZ_PER_ROUND = 5;
     private static final Map<Long, QuizData> quizDataMap = new ConcurrentHashMap<>();
@@ -29,13 +29,12 @@ public class GameRepository {
     // controller에서 비동기 처리
     public void initQuizData(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId).orElseThrow();
-        String timestamp = quizRoom.getCreatedAt().format(DateTimeFormatter.ofPattern(DATETIME_FORMAT));
 
         QuizData quizData = QuizData.builder()
                 .quizDocId(quizRoom.getQuizDocId())
-                .timestamp(timestamp)
+                .timestamp(quizRoom.getCreatedAt().format(formatter))
                 .totalRound(quizRoom.getNumOfQuiz() / QUIZ_PER_ROUND)
-                .currRound(DEFAULT_ROUND)
+                .currentRound(DEFAULT_ROUND)
                 .dynamoDBService(dynamoDBService)
                 .build();
         quizData.fillQuiz();
