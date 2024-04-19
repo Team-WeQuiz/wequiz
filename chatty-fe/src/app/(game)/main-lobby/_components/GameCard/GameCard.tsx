@@ -5,11 +5,20 @@ type GameCardProps = {
   title: string;
   description: string;
   participants: number;
+  onClick?: () => void;
 };
 
-const GameCard = ({ title, description, participants }: GameCardProps) => {
+const GameCard = ({
+  title,
+  description,
+  participants,
+  onClick,
+}: GameCardProps) => {
   return (
-    <div className={`${styles.gameCard} ${styles.gameCardHover}`}>
+    <div
+      className={`${styles.gameCard} ${styles.gameCardHover}`}
+      onClick={onClick}
+    >
       <div className={styles.gameTitle}>{title}</div>
       <div className={styles.gameInfo}>
         <div className={styles.gameDescription}>{description}</div>

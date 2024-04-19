@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { globals } from '../../../globals.css';
+import { globals } from '../../../../globals.css';
 
 export const gameCard = style({
   display: 'flex',
