@@ -8,6 +8,7 @@ import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,6 +59,7 @@ public class GameService {
         gameRepository.removeQuiz(roomId);
     }
 
+    @Async
     public void initQuiz(Long roomId) {
         gameRepository.initQuizData(roomId);
     }

@@ -6,6 +6,7 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
+import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
@@ -33,6 +34,7 @@ public class QuizRoomService {
     private final QuizRoomRepository quizRoomRepository;
     private final ModelService modelService;
     private final MinioRepository minioRepository;
+    private final GameService gameService;
 
     public List<QuizRoom> getRooms() {
         return quizRoomRepository.findAll();
@@ -98,6 +100,7 @@ public class QuizRoomService {
         GenerateQuizMLResponse generateQuizMLResponse = modelService.createQuiz(userId, savedQuizRoom, fileNames);
         savedQuizRoom.setQuizDocId(generateQuizMLResponse.id());
         quizRoomRepository.save(savedQuizRoom);
+        gameService.initQuiz(savedQuizRoom.getId());
         return CreateRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())
                 .description(generateQuizMLResponse.description())
