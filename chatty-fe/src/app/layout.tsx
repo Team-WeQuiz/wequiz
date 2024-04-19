@@ -27,8 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${pretendard.variable} ${bagel.variable}`}>
-        {children}
-        <div id="modal-root" />
+        <div id="main-layout">
+          <div id="root">{children}</div>
+          <div id="modal-root" />
+        </div>
       </body>
     </html>
   );
