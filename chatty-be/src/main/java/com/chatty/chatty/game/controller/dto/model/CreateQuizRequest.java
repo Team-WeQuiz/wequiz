@@ -5,15 +5,13 @@ import lombok.Builder;
 
 @Builder
 public record CreateQuizRequest(
+        Long user_id,
 
-        Long roomId,
+        String timestamp,
 
         Integer numOfQuiz,
 
-        String type,
-
         List<String> files
-
 ) {
 
 }

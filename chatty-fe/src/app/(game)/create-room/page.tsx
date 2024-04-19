@@ -16,7 +16,8 @@ export default function CreateRoom() {
     { id: '객관식', value: '단답형', label: '단답형' },
   ];
 
-  const [fileNames, setFileNames] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [numberOfParticipants, setNumberOfParticipants] = useState(0);
@@ -32,6 +33,7 @@ export default function CreateRoom() {
   };
 
   const onSubmit = async () => {
+    setIsLoading(true);
     try {
       const response = await postRoom(
         title,
@@ -40,7 +42,7 @@ export default function CreateRoom() {
         numberOfParticipants,
         password,
         problemType,
-        fileNames,
+        files,
       );
       console.log(response);
       if (response) {
@@ -49,6 +51,7 @@ export default function CreateRoom() {
     } catch (error) {
       console.error(error);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -128,7 +131,8 @@ export default function CreateRoom() {
           <div className={styles.contentsWrapper}>
             <ContentsBox imgSrc="/images/paper_clip.svg" title="파일" />
             <div className={styles.titleWrapper}>
-              <FileUploadBox setFileNames={setFileNames} />
+              {/* <input type="file" onChange={handleFileChange} /> */}
+              <FileUploadBox setFiles={setFiles} />
             </div>
           </div>
 
@@ -159,7 +163,13 @@ export default function CreateRoom() {
         </div>
         <div className={styles.buttonContainer}>
           <div className={styles.buttonWrapper}>
-            <GradButton rounded onClick={onSubmit} fullWidth>
+            <GradButton
+              rounded
+              onClick={onSubmit}
+              fullWidth
+              isLoading={isLoading}
+              disabled={isLoading}
+            >
               생성하기
             </GradButton>
           </div>

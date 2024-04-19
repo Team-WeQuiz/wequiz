@@ -38,6 +38,13 @@ export const container = recipe({
   },
 });
 
+export const uploadedFiles = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 10,
+  alignItems: 'center',
+});
+
 export const wrapper = style({
   display: 'flex',
   flexDirection: 'column',

@@ -1,13 +1,17 @@
 import type { Metadata } from 'next';
-//import { Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 import './layout.css';
 
-//const inter = Inter({ subsets: ['latin'] });
 const pretendard = localFont({
   src: '../../public/fonts/PretendardVariable.ttf',
   variable: '--main-font',
+});
+
+const bagel = localFont({
+  src: '../../public/fonts/BagelFatOne-Regular.ttf',
+  variable: '--bagel-font',
+  weight: '400',
 });
 
 export const metadata: Metadata = {
@@ -22,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={pretendard.variable}>
+      <body className={`${pretendard.variable} ${bagel.variable}`}>
         {children}
         <div id="modal-root" />
       </body>

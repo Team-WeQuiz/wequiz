@@ -2,8 +2,6 @@
 config.yaml
 dummyData
 __pycache__
-gradio_chached_examples
 faiss_index
 index.*
-logs
-*_security.py
+log
