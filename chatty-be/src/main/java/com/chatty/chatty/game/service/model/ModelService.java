@@ -2,7 +2,7 @@ package com.chatty.chatty.game.service.model;
 
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.FAILED_TO_CREATE_QUIZ;
 
-import com.chatty.chatty.game.config.model.RestClientConfig;
+import com.chatty.chatty.config.RestClientConfig;
 import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
 import com.chatty.chatty.game.controller.dto.model.CreateQuizResponse;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
