@@ -57,28 +57,27 @@ class Parser():
     def num_tokens_from_string(self, documents) -> int:
         encoding = tiktoken.get_encoding("cl100k_base")
 
-        total_tokens = 0
-        for document in documents:
-            num_tokens = len(encoding.encode(document.page_content))
-            total_tokens += num_tokens
-
+        total_tokens = len(encoding.encode(documents))
         print(f'예상되는 토큰 수: {total_tokens}')
 
         return total_tokens
     
     def split_docs(self, documents):
         
-        doc_list = []
+        total_text = ''
+        page_num = 0
         for document in documents:
-            doc_list.append(document)
+            total_text += document.page_content
+            page_num += 1
         
-        print(f'페이지 수: {len(doc_list)}')
+        print(f'페이지 수: {page_num}')
 
-        total_tokens = self.num_tokens_from_string(doc_list)
+        total_tokens = self.num_tokens_from_string(total_text)
 
         # 결과 출력
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP, length_function=len)
-        splitted_docs = text_splitter.split_documents(doc_list)
+        splitted_text = text_splitter.split_text(total_text)
+        splitted_docs = text_splitter.create_documents(splitted_text)
 
         return preprocess(splitted_docs)
 
