@@ -50,7 +50,7 @@ def test(generate_request: GenerateRequest):
 
     print(meta)
 
-    with open('../log/4/split_and_summary.txt', 'a') as f:
+    with open('../log/5/3_original_prompt.txt', 'a') as f:
         f.write(str(meta))
         f.write('\n')
         f.write('*************************************')

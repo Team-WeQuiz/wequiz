@@ -36,8 +36,8 @@ REDUCE_TEMPLATE = """
 Here is a set of summaries:
 {doc_summaries}
 
-Please make an integrated summary based on these.
-Be sure to answer in Korean.
+Please summarize these into 3 lines or less by integrating them.
+Please answer in Korean.
 
 YOUR ANSWER:"""
 
