@@ -101,7 +101,7 @@ class Parser():
     def parse(self):
         loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
         minio_files = loader.get_list(self.user_id, 'pdf')
-        parsers = [PyPDFium2Parser(extract_images=True), PyMuPDFParser(extract_images=True), PDFMinerParser(extract_images=True)]
+        parsers = [PyPDFium2Parser(extract_images=False), PyMuPDFParser(extract_images=False), PDFMinerParser(extract_images=False)]
         retry = 0
 
         while retry < PARSING_RETRY:
