@@ -1,7 +1,5 @@
 CHOICE_PROB_TEMPLATE = """
-You are the best kindly AI model creating questions for learning.
-
-Please create a multiple choice question about keyword based on the document.
+Please create a multiple choice question based on the document.
 Be sure to answer in Korean.
 keyword: {message}
 
@@ -11,10 +9,7 @@ YOUR ANSWER:"""
 
 ######################################################################
 SHORT_PROB_TEMPLATE = """
-You are the best kindly AI model creating questions for learning.
-
-Please create a short answer question that people can answer as a word about keyword based on the document.
-The correct answer is only a word.
+Please create a short answer question that people can answer as a word based on the document.
 Be sure to answer in Korean.
 keyword: {message}
 
@@ -34,7 +29,7 @@ YOUR ANSWER:"""
 
 REDUCE_TEMPLATE = """
 Here is a set of summaries:
-{doc_summaries}
+{docs}
 
 Please summarize these into 3 lines or less by integrating them.
 Please answer in Korean.

@@ -29,39 +29,26 @@ def ping():
 @app.post("/test")
 def test(generate_request: GenerateRequest):
     # Parsing and split file
-    start_time = time.time()
     parser = Parser(generate_request.user_id)
     split_docs = parser.parse()
-    end_time = time.time()
 
-    # Generate description
-    s_time = time.time()
-    summarizer = Summarizer(OPENAI_API_KEY)
-    summary = summarizer.summarize(split_docs)
-    e_time = time.time()
+    # Generate quiz
+    quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
+    keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
+    if len(keywords) != generate_request.numOfQuiz:
+        raise Exception('키워드가 충분히 생성되지 않았습니다.')
+    
+    questions = []
 
-    meta = {
-        "file": generate_request.user_id,
-        "size": 0,
-        "length": len(split_docs),
-        "parsing_time": end_time - start_time,
-        "summary_time": e_time - s_time,
-    }
+    for idx, keyword in enumerate(keywords):
+        # Randomly select type (0: multiple choice, 1: short answer)
+        type = random.randrange(0, 2)
 
-    print(meta)
+        # Generate a new question
+        question = quiz_generator.generate(type, keyword, idx + 1)
+        questions.append(question)
 
-    with open('../log/5/3_original_prompt.txt', 'a') as f:
-        f.write(str(meta))
-        f.write('\n')
-        f.write('*************************************')
-        for doc in split_docs:
-            f.write('\n')
-            f.write(doc.page_content)
-        f.write('\n')
-        f.write('*************************************')
-        f.write(summary)
-
-    # return summary
+    return questions
 
 
 @app.post("/mark")

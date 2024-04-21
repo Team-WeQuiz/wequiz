@@ -58,7 +58,7 @@ class SummaryChain():
         # 문서의 목록을 받아들여, 이를 단일 문자열로 결합하고, 이를 LLMChain에 전달합니다.
         combine_documents_chain = StuffDocumentsChain(
             llm_chain=reduce_chain,                
-            document_variable_name="doc_summaries" # Reduce 프롬프트에 대입되는 변수
+            document_variable_name="docs" # Reduce 프롬프트에 대입되는 변수
         )
 
         # Map 문서를 통합하고 순차적으로 Reduce합니다.
@@ -68,7 +68,7 @@ class SummaryChain():
             # 문서가 `StuffDocumentsChain`의 컨텍스트를 초과하는 경우
             collapse_documents_chain=combine_documents_chain,
             # 문서를 그룹화할 때의 토큰 최대 개수입니다.
-            token_max=3800,
+            token_max=4000,
         )
 
         # 문서들에 체인을 매핑하여 결합하고, 그 다음 결과들을 결합합니다.
@@ -83,7 +83,9 @@ class SummaryChain():
             return_intermediate_steps=False,
         )
 
-        return map_reduce_chain.invoke(split_docs)
+        output = map_reduce_chain.invoke(split_docs)
+
+        return output
 
 
 #######################################################################################################
