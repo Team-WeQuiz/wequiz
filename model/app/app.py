@@ -3,6 +3,7 @@ import json, random
 import boto3
 import uuid
 import time
+import asyncio
 
 from schema import *
 from data.preprocessor import Parser
@@ -132,79 +133,6 @@ def mark(mark_request: MarkRequest):
     print(f'Marking is generated: {res}')
     return res
 
-# @app.post("/generate")
-# async def generate(generate_request: GenerateRequest):
-#     id = f'quizset-{uuid.uuid4()}'
-#     try:
-#         # Parsing and split file
-#         parser = Parser(generate_request.user_id)
-#         split_docs = parser.parse()
-        
-#         # Generate description
-#         summarizer = Summarizer(OPENAI_API_KEY)
-#         summary = await summarizer.summarize(split_docs)
-
-#         # Prepare data for DynamoDB insertion
-#         data = {
-#             "id": {"S": id},
-#             "timestamp": {"S": generate_request.timestamp},
-#             "user_id": {"N": str(generate_request.user_id)},
-#             "questions": {"L": []},
-#             "description": {"S": summary}
-#         }
-
-#         # Insert data into DynamoDB
-#         dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
-
-#         # Yield response
-#         res = {"id": id, "description": summary}
-#         print(f'Description is generated: {res}')
-#         yield res
-
-#         # Generate quiz
-#         quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
-#         keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
-#         if len(keywords) != generate_request.numOfQuiz:
-#             raise Exception('키워드가 충분히 생성되지 않았습니다.')
-
-#         for idx, keyword in enumerate(keywords):
-#             response = dynamodb.get_item(
-#                 TableName=QUIZ_TABLE,
-#                 Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
-#             )
-#             item = response.get('Item', {})
-#             questions = item.get('questions', {'L': []})['L']
-
-#             # Randomly select type (0: multiple choice, 1: short answer)
-#             type = random.randrange(0, 2)
-
-#             # Generate a new question
-#             question = quiz_generator.generate(type, keyword, idx + 1)
-#             new_question = {
-#                 "M": {
-#                     "id": {"S": str(question["id"])},
-#                     "question_number": {"N": str(question["question_number"])},
-#                     "type": {"S": question["type"]},
-#                     "question": {"S": question["question"]},
-#                     "options": {"L": [{"S": option} for option in question["options"]]},
-#                     "answer": {"S": question["answer"]}
-#                 }
-#             }
-#             questions.append(new_question)
-
-#             # Update item in DynamoDB
-#             dynamodb.update_item(
-#                 TableName=QUIZ_TABLE,
-#                 Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-#                 UpdateExpression='SET questions = :val',
-#                 ExpressionAttributeValues={':val': {'L': questions}}
-#             )
-
-#     except Exception as e:
-#         log('error', f'Failed to Generate Quiz: {str(e)}')
-#         raise e
-
-import asyncio
 
 def create_id(generate_request, id):
     try: 
