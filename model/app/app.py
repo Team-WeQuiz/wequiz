@@ -27,28 +27,42 @@ def ping():
     return {"ping": "pong"}
 
 @app.post("/test")
-def test(generate_request: GenerateRequest):
+async def test(generate_request: GenerateRequest):
     # Parsing and split file
+    start_time = time.time()
     parser = Parser(generate_request.user_id)
     split_docs = parser.parse()
+    end_time = time.time()
 
-    # Generate quiz
-    quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
-    keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
-    if len(keywords) != generate_request.numOfQuiz:
-        raise Exception('키워드가 충분히 생성되지 않았습니다.')
-    
-    questions = []
+    # Generate description
+    s_time = time.time()
+    summarizer = Summarizer(OPENAI_API_KEY)
+    summary, inters = await summarizer.summarize(split_docs)
+    e_time = time.time()
 
-    for idx, keyword in enumerate(keywords):
-        # Randomly select type (0: multiple choice, 1: short answer)
-        type = random.randrange(0, 2)
+    meta = {
+        "file": generate_request.user_id,
+        "size": '3000, 500',
+        "length": len(split_docs),
+        "parsing_time": end_time - start_time,
+        "summary_time": e_time - s_time,
+    }
 
-        # Generate a new question
-        question = quiz_generator.generate(type, keyword, idx + 1)
-        questions.append(question)
+    print(meta)
 
-    return questions
+    with open('../log/batch2/async_3000_500.txt', 'a') as f:
+        f.write('\n')
+        f.write(str(meta))
+        f.write('\n')
+        f.write('*************************************')
+        for inter in inters:
+            f.write('\n')
+            f.write(inter)
+        f.write('\n')
+        f.write('*************************************')
+        f.write(summary)
+
+    # return summary
 
 
 @app.post("/mark")
@@ -118,78 +132,182 @@ def mark(mark_request: MarkRequest):
     print(f'Marking is generated: {res}')
     return res
 
-@app.post("/generate")
-def generate(generate_request: GenerateRequest):
-    id = f'quizset-{uuid.uuid4()}'
-    try:
-        # Parsing and split file
-        parser = Parser(generate_request.user_id)
-        split_docs = parser.parse()
+# @app.post("/generate")
+# async def generate(generate_request: GenerateRequest):
+#     id = f'quizset-{uuid.uuid4()}'
+#     try:
+#         # Parsing and split file
+#         parser = Parser(generate_request.user_id)
+#         split_docs = parser.parse()
         
-        # Generate description
-        summarizer = Summarizer(OPENAI_API_KEY)
-        summary = summarizer.summarize(split_docs)
+#         # Generate description
+#         summarizer = Summarizer(OPENAI_API_KEY)
+#         summary = await summarizer.summarize(split_docs)
 
+#         # Prepare data for DynamoDB insertion
+#         data = {
+#             "id": {"S": id},
+#             "timestamp": {"S": generate_request.timestamp},
+#             "user_id": {"N": str(generate_request.user_id)},
+#             "questions": {"L": []},
+#             "description": {"S": summary}
+#         }
+
+#         # Insert data into DynamoDB
+#         dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
+
+#         # Yield response
+#         res = {"id": id, "description": summary}
+#         print(f'Description is generated: {res}')
+#         yield res
+
+#         # Generate quiz
+#         quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
+#         keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
+#         if len(keywords) != generate_request.numOfQuiz:
+#             raise Exception('키워드가 충분히 생성되지 않았습니다.')
+
+#         for idx, keyword in enumerate(keywords):
+#             response = dynamodb.get_item(
+#                 TableName=QUIZ_TABLE,
+#                 Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
+#             )
+#             item = response.get('Item', {})
+#             questions = item.get('questions', {'L': []})['L']
+
+#             # Randomly select type (0: multiple choice, 1: short answer)
+#             type = random.randrange(0, 2)
+
+#             # Generate a new question
+#             question = quiz_generator.generate(type, keyword, idx + 1)
+#             new_question = {
+#                 "M": {
+#                     "id": {"S": str(question["id"])},
+#                     "question_number": {"N": str(question["question_number"])},
+#                     "type": {"S": question["type"]},
+#                     "question": {"S": question["question"]},
+#                     "options": {"L": [{"S": option} for option in question["options"]]},
+#                     "answer": {"S": question["answer"]}
+#                 }
+#             }
+#             questions.append(new_question)
+
+#             # Update item in DynamoDB
+#             dynamodb.update_item(
+#                 TableName=QUIZ_TABLE,
+#                 Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+#                 UpdateExpression='SET questions = :val',
+#                 ExpressionAttributeValues={':val': {'L': questions}}
+#             )
+
+#     except Exception as e:
+#         log('error', f'Failed to Generate Quiz: {str(e)}')
+#         raise e
+
+import asyncio
+
+def create_id(generate_request, id):
+    try: 
         # Prepare data for DynamoDB insertion
         data = {
             "id": {"S": id},
             "timestamp": {"S": generate_request.timestamp},
             "user_id": {"N": str(generate_request.user_id)},
             "questions": {"L": []},
-            "description": {"S": summary}
+            "description": {"S": ''}
         }
 
         # Insert data into DynamoDB
         dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
 
-        # Yield response
-        res = {"id": id, "description": summary}
-        print(f'Description is generated: {res}')
-        yield res
-
-        # Generate quiz
-        quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
-        keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
-        if len(keywords) != generate_request.numOfQuiz:
-            raise Exception('키워드가 충분히 생성되지 않았습니다.')
-
-        for idx, keyword in enumerate(keywords):
-            response = dynamodb.get_item(
-                TableName=QUIZ_TABLE,
-                Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
-            )
-            item = response.get('Item', {})
-            questions = item.get('questions', {'L': []})['L']
-
-            # Randomly select type (0: multiple choice, 1: short answer)
-            type = random.randrange(0, 2)
-
-            # Generate a new question
-            question = quiz_generator.generate(type, keyword, idx + 1)
-            new_question = {
-                "M": {
-                    "id": {"S": str(question["id"])},
-                    "question_number": {"N": str(question["question_number"])},
-                    "type": {"S": question["type"]},
-                    "question": {"S": question["question"]},
-                    "options": {"L": [{"S": option} for option in question["options"]]},
-                    "answer": {"S": question["answer"]}
-                }
-            }
-            questions.append(new_question)
-
-            # Update item in DynamoDB
-            dynamodb.update_item(
-                TableName=QUIZ_TABLE,
-                Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-                UpdateExpression='SET questions = :val',
-                ExpressionAttributeValues={':val': {'L': questions}}
-            )
+        res = {"id": id}
+        print(f'Create Empty Quiz Object: {res}')
+        return res
 
     except Exception as e:
         log('error', f'Failed to Generate Quiz: {str(e)}')
         raise e
 
+
+async def generate_description_async(generate_request, id, split_docs):
+    try:
+        # Generate description
+        summarizer = Summarizer(OPENAI_API_KEY)
+        summary = await summarizer.summarize(split_docs)
+
+        dynamodb.update_item(
+            TableName=QUIZ_TABLE,
+            Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+            UpdateExpression='SET description = :val',
+            ExpressionAttributeValues={':val': {'S': summary}}
+        )
+
+    except Exception as e:
+        log('error', f'Failed to Generate Description: {str(e)}')
+        raise e
+
+
+async def generate_quiz_async(generate_request, id, split_docs):
+    # Generate quiz
+    quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
+    keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
+    if len(keywords) != generate_request.numOfQuiz:
+        raise Exception('키워드가 충분히 생성되지 않았습니다.')
+
+    for idx, keyword in enumerate(keywords):
+        response = dynamodb.get_item(
+            TableName=QUIZ_TABLE,
+            Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
+        )
+        item = response.get('Item', {})
+        questions = item.get('questions', {'L': []})['L']
+
+        # Randomly select type (0: multiple choice, 1: short answer)
+        type = random.randrange(0, 2)
+
+        # Generate a new question
+        question = quiz_generator.generate(type, keyword, idx + 1)
+        new_question = {
+            "M": {
+                "id": {"S": str(question["id"])},
+                "question_number": {"N": str(question["question_number"])},
+                "type": {"S": question["type"]},
+                "question": {"S": question["question"]},
+                "options": {"L": [{"S": option} for option in question["options"]]},
+                "answer": {"S": question["answer"]}
+            }
+        }
+        questions.append(new_question)
+
+        # Update item in DynamoDB
+        dynamodb.update_item(
+            TableName=QUIZ_TABLE,
+            Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+            UpdateExpression='SET questions = :val',
+            ExpressionAttributeValues={':val': {'L': questions}}
+        )
+
+@app.post("/generate")
+async def generate(generate_request: GenerateRequest):
+    id = f'quizset-{uuid.uuid4()}'
+    # Parsing and split file
+    parser = Parser(generate_request.user_id)
+    split_docs = parser.parse()
+
+    try:
+        # Call create_id to obtain the ID
+        res = create_id(generate_request, id)
+
+        # Create tasks for generating description and quiz asynchronously
+        description_task = asyncio.create_task(generate_description_async(generate_request, id, split_docs))
+        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, split_docs))
+        
+        # Return the ID as the response
+        return res
+
+    except Exception as e:
+        log('error', f'Failed to Generate Quiz: {str(e)}')
+        raise e
 
 
 
