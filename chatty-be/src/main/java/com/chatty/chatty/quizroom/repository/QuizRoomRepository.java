@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface QuizRoomRepository extends JpaRepository<QuizRoom, Long> {
 
     Page<QuizRoom> findByStatusOrderByCreatedAt(Status status, Pageable pageable);
+
+    Long countByStatus(Status status);
 }

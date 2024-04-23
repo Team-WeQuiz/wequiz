@@ -7,8 +7,10 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_ST
 
 import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.service.model.ModelService;
+import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomAbstractResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -22,7 +24,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +36,24 @@ public class QuizRoomService {
     private final QuizRoomRepository quizRoomRepository;
     private final ModelService modelService;
     private final MinioRepository minioRepository;
+    private final SimpMessagingTemplate template;
+    private final PlayersStatusRepository playersStatusRepository;
 
     private static final Integer DEFAULT_PAGE_SIZE = 5;
 
-    public List<QuizRoom> getRooms(int page) {
-        PageRequest pageRequest = PageRequest.of(page, DEFAULT_PAGE_SIZE);
-        return quizRoomRepository.findByStatusOrderByCreatedAt(Status.READY, pageRequest).getContent();
+    public List<RoomAbstractResponse> getRooms(Integer page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
+        return quizRoomRepository.findByStatusOrderByCreatedAt(Status.READY, pageRequest)
+                .getContent()
+                .stream()
+                .map(quizRoom -> RoomAbstractResponse.builder()
+                        .roomId(quizRoom.getId())
+                        .name(quizRoom.getName())
+                        .description(quizRoom.getDescription())
+                        .currentPlayers(playersStatusRepository.countPlayers(quizRoom.getId()))
+                        .maxPlayers(quizRoom.getPlayerLimitNum())
+                        .build())
+                .toList();
     }
 
     public RoomDetailResponse getRoomDetail(Long roomId) {
@@ -100,9 +114,23 @@ public class QuizRoomService {
         savedQuizRoom.setQuizDocId(modelService.requestQuizDocId(userId, savedQuizRoom));
         quizRoomRepository.save(savedQuizRoom);
 
+        // 방 목록 업데이트 소켓 메세지 전송
+        broadcastUpdatedRoomList();
+
         return CreateRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())
                 .build();
+    }
+
+    private void broadcastUpdatedRoomList() {
+        long totalPages = quizRoomRepository.countByStatus(Status.READY) / 5 + 1;
+        for (int page = 1; page <= totalPages; page++) {
+            template.convertAndSend(buildRoomListTopic(page), getRooms(page));
+        }
+    }
+
+    private String buildRoomListTopic(int page) {
+        return String.format("/sub/rooms?page=%d", page);
     }
 
     private void uploadFilesToStorage(CreateRoomRequest request, Long userId) {
