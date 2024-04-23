@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +35,11 @@ public class QuizRoomService {
     private final ModelService modelService;
     private final MinioRepository minioRepository;
 
-    public List<QuizRoom> getRooms() {
-        return quizRoomRepository.findAll();
+    private static final Integer DEFAULT_PAGE_SIZE = 5;
+
+    public List<QuizRoom> getRooms(int page) {
+        PageRequest pageRequest = PageRequest.of(page, DEFAULT_PAGE_SIZE);
+        return quizRoomRepository.findByStatusOrderByCreatedAt(Status.READY, pageRequest).getContent();
     }
 
     public RoomDetailResponse getRoomDetail(Long roomId) {
@@ -79,6 +84,7 @@ public class QuizRoomService {
         QuizRoom savedQuizRoom = quizRoomRepository.save(
                 QuizRoom.builder()
                         .name(request.name())
+                        .description(request.description())
                         .numOfQuiz(request.numOfQuiz())
                         .timeLimit(request.timeLimit())
                         .playerLimitNum(request.playerLimitNum())
