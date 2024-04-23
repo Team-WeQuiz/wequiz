@@ -4,8 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record CreateRoomResponse(
-        Long roomId,
-        String description
+        Long roomId
 ) {
 
 }
