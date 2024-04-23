@@ -15,8 +15,6 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class ModelService {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     @Value("${url.ml}")
     private String ML_URL;
 
@@ -31,7 +29,7 @@ public class ModelService {
                 .contentType(APPLICATION_JSON)
                 .body(CreateQuizRequest.builder()
                         .user_id(userId)
-                        .timestamp(quizRoom.getCreatedAt().format(formatter))
+                        .timestamp(quizRoom.getCreatedAt().toString())
                         .numOfQuiz(quizRoom.getNumOfQuiz())
                         .build()
                 )
