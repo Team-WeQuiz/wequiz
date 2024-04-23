@@ -21,7 +21,7 @@ public class ModelService {
 
     private final RestClient restClient;
 
-    public String createQuiz(
+    public String requestQuizDocId(
             Long userId,
             QuizRoom quizRoom
     ) {

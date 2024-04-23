@@ -91,7 +91,7 @@ public class QuizRoomService {
         uploadFilesToStorage(request, userId);
 
         // QuizDocId 저장
-        savedQuizRoom.setQuizDocId(modelService.createQuiz(userId, savedQuizRoom));
+        savedQuizRoom.setQuizDocId(modelService.requestQuizDocId(userId, savedQuizRoom));
         quizRoomRepository.save(savedQuizRoom);
 
         return CreateRoomResponse.builder()
