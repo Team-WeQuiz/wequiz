@@ -43,6 +43,12 @@ public class PlayersStatusRepository {
         playersStatusMap.remove(roomId);
     }
 
+    public Integer countPlayers(Long roomId) {
+        return findByRoomId(roomId)
+                .map(status -> status.playerStatusSet().size())
+                .orElse(0);
+    }
+
     private void updateStatus(Long roomId, PlayersStatus playersStatus) {
         playersStatusMap.put(roomId, playersStatus);
     }

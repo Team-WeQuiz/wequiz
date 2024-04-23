@@ -6,8 +6,12 @@ import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
+import com.chatty.chatty.quizroom.entity.Status;
+import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import com.chatty.chatty.quizroom.service.QuizRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,14 +21,19 @@ public class GameService {
 
     private final PlayersStatusRepository playersStatusRepository;
     private final GameRepository gameRepository;
+    private final QuizRoomRepository quizRoomRepository;
+    private final SimpMessagingTemplate template;
+    private final QuizRoomService quizRoomService;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId);
+        broadcastUpdatedRoomList();
         return buildDTO(roomId, playersStatus);
     }
 
     public PlayersStatusDTO leaveRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.leaveRoom(roomId, userId);
+        broadcastUpdatedRoomList();
         return buildDTO(roomId, playersStatus);
     }
 
@@ -60,5 +69,16 @@ public class GameService {
 
     public void initQuiz(Long roomId) {
         gameRepository.initQuizData(roomId);
+    }
+
+    private void broadcastUpdatedRoomList() {
+        long totalPages = quizRoomRepository.countByStatus(Status.READY) / 5 + 1;
+        for (int page = 1; page <= totalPages; page++) {
+            template.convertAndSend(buildRoomListTopic(page), quizRoomService.getRooms(page));
+        }
+    }
+
+    private String buildRoomListTopic(int page) {
+        return String.format("/sub/rooms?page=%d", page);
     }
 }
