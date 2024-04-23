@@ -9,6 +9,7 @@ import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
+import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -91,7 +92,8 @@ public class QuizRoomService {
         uploadFilesToStorage(request, userId);
 
         // QuizDocId 저장
-        savedQuizRoom.setQuizDocId(modelService.requestQuizDocId(userId, savedQuizRoom));
+        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom);
+        savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
 
         return CreateRoomResponse.builder()
