@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class GameService {
 
+    private static final Integer DEFAULT_PAGE_SIZE = 10;
+
     private final PlayersStatusRepository playersStatusRepository;
     private final GameRepository gameRepository;
     private final QuizRoomRepository quizRoomRepository;
@@ -72,7 +74,7 @@ public class GameService {
     }
 
     private void broadcastUpdatedRoomList() {
-        long totalPages = quizRoomRepository.countByStatus(Status.READY) / 5 + 1;
+        long totalPages = quizRoomRepository.countByStatus(Status.READY) / DEFAULT_PAGE_SIZE + 1;
         for (int page = 1; page <= totalPages; page++) {
             template.convertAndSend(buildRoomListTopic(page), quizRoomService.getRooms(page));
         }

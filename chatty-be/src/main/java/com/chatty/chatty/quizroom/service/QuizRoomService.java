@@ -5,15 +5,13 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_FI
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
-import com.chatty.chatty.common.util.Sha256Encrypt;
 import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
-import com.chatty.chatty.quizroom.controller.dto.RoomAbstractDTO;
-import com.chatty.chatty.quizroom.controller.dto.RoomAbstractResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomAbstractDTO;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;

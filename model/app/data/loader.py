@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 from minio import Minio
 from langchain_community.document_loaders.blob_loaders import Blob
 from data.settings import PORT
+from utils.hash import string_to_hash
 
 
 class S3Loader:
@@ -41,11 +42,15 @@ class MinioLoader:
             print(f"Bucket {self.bucket_name} does not exist")
     
     # bucket내 유저 폴더 안에 존재하는 파일 리스트 리턴
-    def get_list(self, user_id, type):
+    def get_list(self, user_id, timestamp, type):
         try:
-            objects = self.client.list_objects(self.bucket_name, prefix=f'{user_id}/{type}', recursive=True)
+            prefix = string_to_hash(str(user_id) + str(timestamp))
+            objects = self.client.list_objects(self.bucket_name, prefix=f'{prefix}/{type}', recursive=True)
             file_list = [obj.object_name for obj in objects if obj.object_name != user_id]
-            return file_list
+            if len(file_list) == 0:
+                raise Exception(f'There is no file in Minio: {prefix}/{type}')
+            else:
+                return file_list
         except Exception as e:
             print(f"Error getting file list from Minio: {e}")
             return None

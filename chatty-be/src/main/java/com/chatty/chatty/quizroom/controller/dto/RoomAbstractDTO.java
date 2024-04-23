@@ -3,7 +3,7 @@ package com.chatty.chatty.quizroom.controller.dto;
 import lombok.Builder;
 
 @Builder
-public record RoomAbstractResponse(
+public record RoomAbstractDTO(
         Long roomId,
         String name,
         String description,

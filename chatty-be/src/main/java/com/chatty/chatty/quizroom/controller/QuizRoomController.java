@@ -3,12 +3,10 @@ package com.chatty.chatty.quizroom.controller;
 import com.chatty.chatty.auth.support.AuthUser;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
-import com.chatty.chatty.quizroom.controller.dto.RoomAbstractResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
-import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,7 +36,7 @@ public class QuizRoomController {
 
     @MessageMapping("/rooms?page={page}")
     @SendTo("/sub/rooms?page={page}")
-    public List<RoomAbstractResponse> getRooms(@DestinationVariable Integer page) {
+    public RoomListResponse getRooms(@DestinationVariable Integer page) {
         return quizRoomService.getRooms(page);
     }
 
