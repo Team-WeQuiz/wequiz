@@ -25,7 +25,7 @@ public class MinioRepository {
     @Value("${minio.bucket.pdf}")
     private String bucketName;
 
-    public String saveFile(Long userId, InputStream stream) {
+    public void saveFile(Long userId, InputStream stream) {
         String pdfFileName = filePathBuilder(userId);
         try {
             minioClient.putObject(PutObjectArgs.builder()
@@ -37,7 +37,6 @@ public class MinioRepository {
         } catch (Exception e) {
             throw new MinioException(FAILED_TO_SAVE_FILE);
         }
-        return pdfFileName;
     }
 
     private String filePathBuilder(Long userId) {

@@ -6,11 +6,9 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
-import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
-import com.chatty.chatty.quizroom.controller.dto.GenerateQuizMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -34,7 +32,6 @@ public class QuizRoomService {
     private final QuizRoomRepository quizRoomRepository;
     private final ModelService modelService;
     private final MinioRepository minioRepository;
-    private final GameService gameService;
 
     public List<QuizRoom> getRooms() {
         return quizRoomRepository.findAll();
@@ -78,33 +75,39 @@ public class QuizRoomService {
 
     @Transactional
     public CreateRoomResponse createRoom(CreateRoomRequest request, Long userId) {
-        QuizRoom newQuizRoom = QuizRoom.builder()
-                .name(request.name())
-                .numOfQuiz(request.numOfQuiz())
-                .timeLimit(request.timeLimit())
-                .playerLimitNum(request.playerLimitNum())
-                .code(request.code())
-                .status(Status.READY)
-                .build();
-        QuizRoom savedQuizRoom = quizRoomRepository.save(newQuizRoom);
+        // 퀴즈룸 DB에 저장
+        QuizRoom savedQuizRoom = quizRoomRepository.save(
+                QuizRoom.builder()
+                        .name(request.name())
+                        .numOfQuiz(request.numOfQuiz())
+                        .timeLimit(request.timeLimit())
+                        .playerLimitNum(request.playerLimitNum())
+                        .code(request.code())
+                        .status(Status.READY)
+                        .build()
+        );
 
-        List<String> fileNames = request.files().stream()
-                .map(file -> {
+        // minio에 파일(들) 업로드
+        uploadFilesToStorage(request, userId);
+
+        // QuizDocId 저장
+        savedQuizRoom.setQuizDocId(modelService.createQuiz(userId, savedQuizRoom));
+        quizRoomRepository.save(savedQuizRoom);
+
+        return CreateRoomResponse.builder()
+                .roomId(savedQuizRoom.getId())
+                .build();
+    }
+
+    private void uploadFilesToStorage(CreateRoomRequest request, Long userId) {
+        request.files()
+                .forEach(file -> {
                     try {
-                        return minioRepository.saveFile(userId, file.getInputStream());
+                        minioRepository.saveFile(userId, file.getInputStream());
                     } catch (IOException e) {
                         throw new FileException(FILE_INPUT_STREAM_FAILED);
                     }
-                })
-                .toList();
-        GenerateQuizMLResponse generateQuizMLResponse = modelService.createQuiz(userId, savedQuizRoom, fileNames);
-        savedQuizRoom.setQuizDocId(generateQuizMLResponse.id());
-        quizRoomRepository.save(savedQuizRoom);
-        gameService.initQuiz(savedQuizRoom.getId());
-        return CreateRoomResponse.builder()
-                .roomId(savedQuizRoom.getId())
-                .description(generateQuizMLResponse.description())
-                .build();
+                });
     }
 
     private void validateRoomStatus(Status status) {
