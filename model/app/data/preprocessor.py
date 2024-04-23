@@ -51,8 +51,9 @@ def preprocess(docs):
 
 
 class Parser():
-    def __init__(self, user_id):
+    def __init__(self, user_id, timestamp):
         self.user_id = user_id
+        self.timestamp = timestamp
 
     def num_tokens_from_string(self, documents) -> int:
         encoding = tiktoken.get_encoding("cl100k_base")
@@ -99,7 +100,7 @@ class Parser():
     # parse files
     def parse(self):
         loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
-        minio_files = loader.get_list(self.user_id, 'pdf')
+        minio_files = loader.get_list(self.user_id, self.timestamp, 'pdf')
         parsers = [PyPDFium2Parser(extract_images=False), PyMuPDFParser(extract_images=False), PDFMinerParser(extract_images=False)]
         retry = 0
 
