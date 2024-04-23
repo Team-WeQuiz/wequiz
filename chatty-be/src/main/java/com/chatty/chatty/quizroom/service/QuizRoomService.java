@@ -5,12 +5,14 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_FI
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
+import com.chatty.chatty.common.util.Sha256Encrypt;
 import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomAbstractResponse;
+import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -19,6 +21,7 @@ import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -108,10 +111,11 @@ public class QuizRoomService {
         );
 
         // minio에 파일(들) 업로드
-        uploadFilesToStorage(request, userId);
+        uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
 
         // QuizDocId 저장
-        savedQuizRoom.setQuizDocId(modelService.requestQuizDocId(userId, savedQuizRoom));
+        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom);
+        savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
 
         // 방 목록 업데이트 소켓 메세지 전송
@@ -133,11 +137,11 @@ public class QuizRoomService {
         return String.format("/sub/rooms?page=%d", page);
     }
 
-    private void uploadFilesToStorage(CreateRoomRequest request, Long userId) {
+    private void uploadFilesToStorage(CreateRoomRequest request, LocalDateTime time, Long userId) {
         request.files()
                 .forEach(file -> {
                     try {
-                        minioRepository.saveFile(userId, file.getInputStream());
+                        minioRepository.saveFile(userId, time, file.getInputStream());
                     } catch (IOException e) {
                         throw new FileException(FILE_INPUT_STREAM_FAILED);
                     }
