@@ -219,7 +219,7 @@ async def generate_quiz_async(generate_request, id, split_docs):
 async def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     # Parsing and split file
-    parser = Parser(generate_request.user_id)
+    parser = Parser(generate_request.user_id, generate_request.timestamp)
     split_docs = parser.parse()
 
     try:
