@@ -1,18 +1,18 @@
-package com.chatty.chatty.quizroom.exception;
+package com.chatty.chatty.game.exception;
 
 import com.chatty.chatty.common.exception.ExceptionType;
 import com.chatty.chatty.common.exception.Status;
 
-public enum FileExceptionType implements ExceptionType {
+public enum GameExceptionType implements ExceptionType {
 
-    FILE_INPUT_STREAM_FAILED(Status.BAD_REQUEST, 7001, "파일 입력 스트림 생성에 실패했습니다"),
-    FAILED_TO_ENCRYPT(Status.SERVER_ERROR, 7002, "암호화에 실패했습니다");
+    THREAD_INTERRUPTED(Status.SERVER_ERROR, 8001, "폴링 중 스레드가 중단되었습니다"),
+    FAILED_TO_FETCH_DESCRIPTION(Status.SERVER_ERROR, 8002, "10분간의 대기 후 Description을 가져오지 못했습니다");
 
     private final Status status;
     private final int exceptionCode;
     private final String message;
 
-    FileExceptionType(Status status, int exceptionCode, String message) {
+    GameExceptionType(Status status, int exceptionCode, String message) {
         this.status = status;
         this.exceptionCode = exceptionCode;
         this.message = message;
