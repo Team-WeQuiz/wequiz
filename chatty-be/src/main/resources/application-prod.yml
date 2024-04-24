@@ -6,7 +6,7 @@ spring:
         show_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   datasource:
     url: jdbc:mysql://mysql:3306/wequiz
     driver-class-name: com.mysql.cj.jdbc.Driver
