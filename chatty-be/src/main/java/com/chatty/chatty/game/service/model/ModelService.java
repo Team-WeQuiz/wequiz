@@ -35,4 +35,8 @@ public class ModelService {
                 .retrieve()
                 .body(QuizDocIdMLResponse.class);
     }
+
+    public void requestMark() {
+        return;
+    }
 }

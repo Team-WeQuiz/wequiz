@@ -4,8 +4,11 @@ import static com.chatty.chatty.common.util.ThreadSleep.sleep;
 
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
+import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.domain.QuizData;
+import com.chatty.chatty.game.domain.SubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
@@ -13,6 +16,7 @@ import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,5 +120,24 @@ public class GameService {
                 .totalRound(quizData.getTotalRound())
                 .currentRound(quizData.getCurrentRound() + 1)
                 .build();
+    }
+
+    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
+        SubmitStatus status = answerRepository.addPlayerAnswer(roomId, request);
+
+        if (status == SubmitStatus.ALL_SUBMITTED) {
+            removeQuiz(roomId);
+            modelService.requestMark();
+            calculateScore();
+            answerRepository.clearAnswer(roomId);
+        }
+        return SubmitAnswerResponse.builder()
+                .status(status)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    private void calculateScore() {
+        // TODO: 점수 계산
     }
 }

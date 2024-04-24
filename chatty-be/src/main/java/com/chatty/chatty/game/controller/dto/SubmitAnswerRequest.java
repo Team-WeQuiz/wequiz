@@ -1,12 +1,10 @@
 package com.chatty.chatty.game.controller.dto;
 
-public record PlayerAnswerRequest(
+public record SubmitAnswerRequest(
         Integer quizNum,
-
-        Object quizAnswer,
 
         Long playerId,
 
-        Object playerAnswer
+        String playerAnswer
 ) {
 }

@@ -17,6 +17,7 @@ public class DynamoDBRepository {
     private static final String RANGE_KEY = "timestamp";
     private static final String QUIZ = "questions";
     private static final String DESCRIPTION = "description";
+    private static final String ANSWER = "answer";
 
     private final AmazonDynamoDB amazonDynamoDB;
     private final DynamoDB dynamoDB;
@@ -46,5 +47,10 @@ public class DynamoDBRepository {
         Item item = table.getItem(spec);
 
         return item.getList(QUIZ);
+    }
+
+    public String getAnswerFromDB(String itemId, String timestamp) {
+        return item.getString(ANSWER);
+
     }
 }
