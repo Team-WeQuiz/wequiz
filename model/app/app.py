@@ -176,13 +176,32 @@ async def generate_description_async(generate_request, id, split_docs):
 
 
 async def generate_quiz_async(generate_request, id, split_docs):
+    try:
+        # Generate description
+        summarizer = Summarizer(OPENAI_API_KEY)
+        summary, inters = await summarizer.summarize(split_docs)
+
+        dynamodb.update_item(
+            TableName=QUIZ_TABLE,
+            Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+            UpdateExpression='SET description = :val',
+            ExpressionAttributeValues={':val': {'S': summary}}
+        )
+
+    except Exception as e:
+        log('error', f'Failed to Generate Description: {str(e)}')
+        raise e
+
     # Generate quiz
     quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
-    keywords = ["원핫인코딩", "의미기반 언어모델", "사전학습", "전처리", "미세조정"]
-    if len(keywords) != generate_request.numOfQuiz:
+    if len(inters) <= generate_request.numOfQuiz:
+        inters = inters * ((generate_request.numOfQuiz // len(inters)) + 1)
+    contents = inters[:generate_request.numOfQuiz]
+
+    if len(contents) != generate_request.numOfQuiz:
         raise Exception('키워드가 충분히 생성되지 않았습니다.')
 
-    for idx, keyword in enumerate(keywords):
+    for idx, keyword in enumerate(contents):
         response = dynamodb.get_item(
             TableName=QUIZ_TABLE,
             Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
@@ -190,7 +209,7 @@ async def generate_quiz_async(generate_request, id, split_docs):
         item = response.get('Item', {})
         questions = item.get('questions', {'L': []})['L']
 
-        # Randomly select type (0: multiple choice, 1: short answer)
+        # Randomly select type (0: multiple choice, 1: short answer, 2: OX quiz)
         type = random.randrange(0, 2)
 
         # Generate a new question
@@ -226,8 +245,8 @@ async def generate(generate_request: GenerateRequest):
         # Call create_id to obtain the ID
         res = create_id(generate_request, id)
 
-        # Create tasks for generating description and quiz asynchronously
-        description_task = asyncio.create_task(generate_description_async(generate_request, id, split_docs))
+        # # Create tasks for generating description and quiz asynchronously
+        # description_task = asyncio.create_task(generate_description_async(generate_request, id, split_docs))
         quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, split_docs))
         
         # Return the ID as the response

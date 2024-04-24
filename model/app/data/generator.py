@@ -69,4 +69,4 @@ class Summarizer():
     
     async def summarize(self, split_docs):
         response = await self.summary_chain.summary(split_docs)
-        return response["output_text"]
+        return response["output_text"], response["intermediate_steps"]
