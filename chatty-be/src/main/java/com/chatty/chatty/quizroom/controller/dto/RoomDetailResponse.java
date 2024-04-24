@@ -9,10 +9,11 @@ public record RoomDetailResponse(
 
         String name,
 
-        Integer timeLimit,
+        Integer maxPlayers,
 
-        Integer playerLimitNum,
+        String description,
 
-        String description
+        Integer numOfQuiz
 ) {
+
 }

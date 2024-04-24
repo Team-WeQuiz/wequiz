@@ -36,13 +36,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class QuizRoomService {
 
+    private static final Integer DEFAULT_PAGE_SIZE = 10;
+    private static final String BROADCAST_URL = "/sub/rooms?page=%d";
+
     private final QuizRoomRepository quizRoomRepository;
     private final ModelService modelService;
     private final MinioRepository minioRepository;
     private final SimpMessagingTemplate template;
     private final PlayersStatusRepository playersStatusRepository;
 
-    private static final Integer DEFAULT_PAGE_SIZE = 10;
 
     public RoomListResponse getRooms(Integer page) {
         PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
@@ -68,16 +70,13 @@ public class QuizRoomService {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         validateRoomStatus(quizRoom.getStatus());
-//        Long quizDocId = quizRoom.getQuizDocId();
-        // TODO: noSQL db에서 description 읽어오는 코드
-        String description = "example_description";
 
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
                 .name(quizRoom.getName())
-                .timeLimit(quizRoom.getTimeLimit())
-                .playerLimitNum(quizRoom.getPlayerLimitNum())
-                .description(description)
+                .maxPlayers(quizRoom.getPlayerLimitNum())
+                .description(quizRoom.getDescription())
+                .numOfQuiz(quizRoom.getNumOfQuiz())
                 .build();
     }
 
@@ -94,7 +93,6 @@ public class QuizRoomService {
                 .roomId(quizRoom.getId())
                 .name(quizRoom.getName())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
-                .timeLimit(quizRoom.getTimeLimit())
                 .playerNum(quizRoom.getPlayerNum())
                 .questions(questions)
                 .build();
@@ -108,7 +106,6 @@ public class QuizRoomService {
                         .name(request.name())
                         .description(request.description())
                         .numOfQuiz(request.numOfQuiz())
-                        .timeLimit(request.timeLimit())
                         .playerLimitNum(request.playerLimitNum())
                         .code(request.code())
                         .status(Status.READY)
@@ -139,7 +136,7 @@ public class QuizRoomService {
     }
 
     private String buildRoomListTopic(int page) {
-        return String.format("/sub/rooms?page=%d", page);
+        return String.format(BROADCAST_URL, page);
     }
 
     private void uploadFilesToStorage(CreateRoomRequest request, LocalDateTime time, Long userId) {

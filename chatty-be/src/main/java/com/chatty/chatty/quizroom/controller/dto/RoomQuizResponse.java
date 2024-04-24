@@ -12,10 +12,9 @@ public record RoomQuizResponse(
 
         Integer numOfQuiz,
 
-        Integer timeLimit,
-
         Integer playerNum,
 
         List<?> questions
 ) {
+
 }

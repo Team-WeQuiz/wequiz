@@ -39,9 +39,6 @@ public class QuizRoom extends BaseEntity {
     private Integer numOfQuiz;
 
     @Column(nullable = false)
-    private Integer timeLimit;
-
-    @Column(nullable = false)
     private Integer playerNum;
 
     @Column(nullable = false)
