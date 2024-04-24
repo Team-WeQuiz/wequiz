@@ -5,7 +5,6 @@ import static com.chatty.chatty.game.exception.GameExceptionType.THREAD_INTERRUP
 
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.exception.GameException;
-import com.chatty.chatty.game.exception.GameExceptionType;
 import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -27,19 +26,12 @@ public class DynamoDBService {
     private final ObjectMapper mapper = new ObjectMapper();
 
     public String pollDescription(String itemId, String timestamp) {
-        String description = "";
         int attempts = 0;
+        String description = dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
         while (description.isEmpty() && attempts < POLLING_MAX_ATTEMPTS) {
+            sleep(DESCRIPTION_POLLING_SLEEP_TIME);
+            attempts++;
             description = dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
-            if (description.isEmpty()) {
-                try {
-                    Thread.sleep(DESCRIPTION_POLLING_SLEEP_TIME);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new GameException(THREAD_INTERRUPTED);
-                }
-                attempts++;
-            }
         }
         if (description.isEmpty()) {
             throw new GameException(FAILED_TO_FETCH_DESCRIPTION);
@@ -48,17 +40,10 @@ public class DynamoDBService {
     }
 
     public List<Quiz> pollQuizzes(String itemId, String timestamp) {
-        List<Map<String, Object>> rawQuizzes = new ArrayList<>();
+        List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
         while (rawQuizzes.size() < QUIZ_SIZE) {
+            sleep(QUIZ_POLLING_SLEEP_TIME);
             rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
-            if (rawQuizzes.size() < QUIZ_SIZE) {
-                try {
-                    Thread.sleep(QUIZ_POLLING_SLEEP_TIME);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new GameException(THREAD_INTERRUPTED);
-                }
-            }
         }
         return convertToList(rawQuizzes);
     }
@@ -70,5 +55,14 @@ public class DynamoDBService {
             quizzes.add(quiz);
         }
         return quizzes;
+    }
+
+    private void sleep(Long sleepTime) {
+        try {
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new GameException(THREAD_INTERRUPTED);
+        }
     }
 }
