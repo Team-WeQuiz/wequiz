@@ -1,13 +1,19 @@
 package com.chatty.chatty.game.service;
 
+import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
-import com.chatty.chatty.quizroom.service.QuizRoomService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,17 +23,16 @@ public class GameService {
 
     private final PlayersStatusRepository playersStatusRepository;
     private final GameRepository gameRepository;
-    private final QuizRoomService quizRoomService;
+    private final DynamoDBService dynamoDBService;
+    private final SimpMessagingTemplate template;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId);
-        quizRoomService.broadcastUpdatedRoomList();
         return buildDTO(roomId, playersStatus);
     }
 
     public PlayersStatusDTO leaveRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.leaveRoom(roomId, userId);
-        quizRoomService.broadcastUpdatedRoomList();
         return buildDTO(roomId, playersStatus);
     }
 
@@ -48,14 +53,41 @@ public class GameService {
     }
 
     public QuizResponse sendQuiz(Long roomId) {
-        return gameRepository.sendQuiz(roomId);
+        QuizData quizData = gameRepository.getQuizData(roomId);
+        if (quizData.getQuizQueue().isEmpty()) {
+            fillQuiz(quizData);
+        }
+        return buildQuizResponse(quizData);
     }
 
-    public void removeQuiz(Long roomId) {
-        gameRepository.removeQuiz(roomId);
+    private void fillQuiz(QuizData quizData) {
+        List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp());
+        quizData.getQuizQueue().addAll(quizzes);
     }
 
-    public void initQuiz(Long roomId) {
-        gameRepository.initQuizData(roomId);
+    /*
+        subscription URL : /user/{userId}/queue/rooms/{roodId}/description
+     */
+    @Async
+    public void sendDescription(Long roomId, Long userId) {
+        QuizData quizData = gameRepository.getQuizData(roomId);
+        String description = dynamoDBService.pollDescription(quizData.getQuizDocId(), quizData.getTimestamp());
+        DescriptionResponse descriptionResponse = DescriptionResponse.builder()
+                .description(description)
+                .build();
+        template.convertAndSendToUser(
+                userId.toString(),
+                "/queue/rooms/" + roomId + "/description",
+                descriptionResponse
+        );
+    }
+
+    private QuizResponse buildQuizResponse(QuizData quizData) {
+        Quiz quiz = quizData.getQuizQueue().peek();
+        return QuizResponse.builder()
+                .quiz(quiz)
+                .totalRound(quizData.getTotalRound())
+                .currentRound(quizData.getCurrentRound() + 1)
+                .build();
     }
 }

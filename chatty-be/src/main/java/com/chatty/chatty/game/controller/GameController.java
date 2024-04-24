@@ -2,10 +2,10 @@ package com.chatty.chatty.game.controller;
 
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
-import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
+import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +17,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameController {
 
     private final GameService gameService;
+    private final QuizRoomService quizRoomService;
+    private final SimpMessagingTemplate template;
 
     @MessageMapping("/rooms/{roomId}/chat")
     @SendTo("/sub/rooms/{roomId}/chat")
@@ -50,12 +49,14 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        quizRoomService.broadcastUpdatedRoomList();
         return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor));
     }
 
     @MessageMapping("/rooms/{roomId}/leave")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO leaveRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        quizRoomService.broadcastUpdatedRoomList();
         return gameService.leaveRoom(roomId, getUserIdFromHeader(headerAccessor));
     }
 
@@ -71,11 +72,18 @@ public class GameController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /*
+    publication URL : /pub/rooms/{roomId}/quiz
+    subscription URL : /user/{userId}/queue/rooms/{roodId}/quiz
+     */
     @MessageMapping("/rooms/{roomId}/quiz")
-    @SendToUser("/queue/rooms/{roomId}/data")
-    public QuizResponse sendQuiz(@DestinationVariable Long roomId) {
-        log.info("sendQuiz-controller time: {}", LocalDateTime.now());
-        return gameService.sendQuiz(roomId);
+    public void sendQuiz(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        QuizResponse quizResponse = gameService.sendQuiz(roomId);
+        template.convertAndSendToUser(
+                getUserIdFromHeader(headerAccessor).toString(),
+                "/queue/rooms/" + roomId + "/quiz",
+                quizResponse
+        );
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
