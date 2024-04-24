@@ -7,7 +7,19 @@
 
 ## Architecture
 
-<img src="./assets/ML_architecture.png">
+### Generate Summary
+
+```mermaid
+graph LR;
+    pdf-->|parsing|documents;
+    documents-->|split|chunk_0-->|summarize|chunk_summary_0-->|combine|combined_chunk_summary;
+    documents-->|split|chunk_1-->|summarize|chunk_summary_1-->|combine|combined_chunk_summary;
+    documents-->|split|chunk_2-->|summarize|chunk_summary_2-->|combine|combined_chunk_summary;
+    combined_chunk_summary-->|summarize|summary;
+```
+
+### Generate Quiz
+to be continued...
 
 ## Skills
 - Langchain
