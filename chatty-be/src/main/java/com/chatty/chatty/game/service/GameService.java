@@ -19,23 +19,19 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class GameService {
 
-    private static final Integer DEFAULT_PAGE_SIZE = 10;
-
     private final PlayersStatusRepository playersStatusRepository;
     private final GameRepository gameRepository;
-    private final QuizRoomRepository quizRoomRepository;
-    private final SimpMessagingTemplate template;
     private final QuizRoomService quizRoomService;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId);
-        broadcastUpdatedRoomList();
+        quizRoomService.broadcastUpdatedRoomList();
         return buildDTO(roomId, playersStatus);
     }
 
     public PlayersStatusDTO leaveRoom(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.leaveRoom(roomId, userId);
-        broadcastUpdatedRoomList();
+        quizRoomService.broadcastUpdatedRoomList();
         return buildDTO(roomId, playersStatus);
     }
 
@@ -71,16 +67,5 @@ public class GameService {
 
     public void initQuiz(Long roomId) {
         gameRepository.initQuizData(roomId);
-    }
-
-    private void broadcastUpdatedRoomList() {
-        long totalPages = quizRoomRepository.countByStatus(Status.READY) / DEFAULT_PAGE_SIZE + 1;
-        for (int page = 1; page <= totalPages; page++) {
-            template.convertAndSend(buildRoomListTopic(page), quizRoomService.getRooms(page));
-        }
-    }
-
-    private String buildRoomListTopic(int page) {
-        return String.format("/sub/rooms?page=%d", page);
     }
 }

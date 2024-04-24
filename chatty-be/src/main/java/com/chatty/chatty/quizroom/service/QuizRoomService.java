@@ -131,7 +131,7 @@ public class QuizRoomService {
                 .build();
     }
 
-    private void broadcastUpdatedRoomList() {
+    public void broadcastUpdatedRoomList() {
         long totalPages = quizRoomRepository.countByStatus(Status.READY) / DEFAULT_PAGE_SIZE + 1;
         for (int page = 1; page <= totalPages; page++) {
             template.convertAndSend(buildRoomListTopic(page), getRooms(page));
