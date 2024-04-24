@@ -33,6 +33,9 @@ public class QuizRoom extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
     private Integer numOfQuiz;
 
     @Column(nullable = false)

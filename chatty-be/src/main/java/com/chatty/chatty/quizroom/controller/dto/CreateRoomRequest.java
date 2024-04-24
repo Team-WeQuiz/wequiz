@@ -7,6 +7,8 @@ public record CreateRoomRequest(
 
         String name,
 
+        String description,
+
         Integer numOfQuiz,
 
         Integer timeLimit,
