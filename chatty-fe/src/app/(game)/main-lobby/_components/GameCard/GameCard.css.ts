@@ -53,6 +53,7 @@ export const partNum = style({
   fontWeight: '400',
   height: 24,
   alignItems: 'center',
+  fontFamily: 'var(--bagel-font)',
 });
 
 export const overlay = style({

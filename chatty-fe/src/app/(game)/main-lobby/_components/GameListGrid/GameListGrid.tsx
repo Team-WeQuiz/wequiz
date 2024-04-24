@@ -1,155 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GameCard from '../GameCard/GameCard';
 import Paginator from '../Paginator/Paginator';
 import * as styles from './GameListGrid.css';
+import stompClient from '@/app/(game)/_utils/stomp';
+import useAuthStore from '@/app/_store/useAuthStore';
+import { StompSubscription } from '@stomp/stompjs';
 
-const GameList = [
-  {
-    title: 'Game 1',
-    description: 'This is game 1',
-    participants: 3,
-  },
-  {
-    title: 'Game 2',
-    description: 'This is game 2',
-    participants: 5,
-  },
-  {
-    title: 'Game 3',
-    description: 'This is game 3',
-    participants: 2,
-  },
-  {
-    title: 'Game 4',
-    description: 'This is game 4',
-    participants: 4,
-  },
-  {
-    title: 'Game 5',
-    description: 'This is game 5',
-    participants: 1,
-  },
-  {
-    title: 'Game 6',
-    description: 'This is game 6',
-    participants: 6,
-  },
-  {
-    title: 'Game 7',
-    description: 'This is game 7',
-    participants: 3,
-  },
-  {
-    title: 'Game 8',
-    description: 'This is game 8',
-    participants: 5,
-  },
-  {
-    title: 'Game 9',
-    description: 'This is game 9',
-    participants: 2,
-  },
-  {
-    title: 'Game 10',
-    description: 'This is game 10',
-    participants: 4,
-  },
-  {
-    title: 'Game 11',
-    description: 'This is game 11',
-    participants: 1,
-  },
-  {
-    title: 'Game 12',
-    description: 'This is game 12',
-    participants: 6,
-  },
-  {
-    title: 'Game 13',
-    description: 'This is game 13',
-    participants: 3,
-  },
-  {
-    title: 'Game 14',
-    description: 'This is game 14',
-    participants: 5,
-  },
-  {
-    title: 'Game 15',
-    description: 'This is game 15',
-    participants: 2,
-  },
-  {
-    title: 'Game 1',
-    description: 'This is game 1',
-    participants: 3,
-  },
-  {
-    title: 'Game 2',
-    description: 'This is game 2',
-    participants: 5,
-  },
-  {
-    title: 'Game 3',
-    description: 'This is game 3',
-    participants: 2,
-  },
-  {
-    title: 'Game 4',
-    description: 'This is game 4',
-    participants: 4,
-  },
-  {
-    title: 'Game 5',
-    description: 'This is game 5',
-    participants: 1,
-  },
-  {
-    title: 'Game 6',
-    description: 'This is game 6',
-    participants: 6,
-  },
-  {
-    title: 'Game 7',
-    description: 'This is game 7',
-    participants: 3,
-  },
-  {
-    title: 'Game 8',
-    description: 'This is game 8',
-    participants: 5,
-  },
-  {
-    title: 'Game 9',
-    description: 'This is game 9',
-    participants: 2,
-  },
-  {
-    title: 'Game 10',
-    description: 'This is game 10',
-    participants: 4,
-  },
-  {
-    title: 'Game 11',
-    description: 'This is game 11',
-    participants: 1,
-  },
-  {
-    title: 'Game 12',
-    description: 'This is game 12',
-    participants: 6,
-  },
-  {
-    title: 'Game 13',
-    description: 'This is game 13',
-    participants: 3,
-  },
-];
+export type RoomInfo = {
+  roomId: number;
+  name: string;
+  description: string;
+  currentPlayers: number;
+  maxPlayers: number;
+};
+
+const DATA_LENGTH = 10;
 
 const GameListGrid = () => {
   const [pageNum, setPageNum] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageData, setPageData] = useState<RoomInfo[]>([]);
+  const accessToken = useAuthStore.getState().accessToken;
+  const [subscription, setSubscription] = useState<StompSubscription | null>(
+    null,
+  );
 
   const handlePagePrev = () => {
     if (pageNum > 1) {
@@ -161,23 +37,87 @@ const GameListGrid = () => {
     setPageNum(pageNum + 1);
   };
 
+  const subscribePage = (pageNumber: number) => {
+    if (!stompClient.connected) return;
+    const sub = stompClient.subscribe(
+      `/sub/rooms?page=${pageNumber}`,
+      (message) => {
+        const pageData = JSON.parse(message.body);
+        if (pageNumber !== pageData.currentPage) {
+          console.error('Page number mismatch');
+          return;
+        }
+        setTotalPages(pageData.totalPages);
+        setPageData(pageData.rooms);
+      },
+    );
+    setSubscription(sub);
+  };
+
+  const getPage = (pageNumber: number) => {
+    if (!stompClient.connected) return;
+    stompClient.publish({
+      destination: `/pub/rooms?page=${pageNumber}`,
+    });
+  };
+
+  useEffect(() => {
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+    subscribePage(pageNum);
+    getPage(pageNum);
+  }, [pageNum]);
+
+  useEffect(() => {
+    stompClient.beforeConnect = () => {
+      console.log('Connecting to WebSocket token: ', accessToken);
+      stompClient.configure({
+        connectHeaders: { Authorization: `Bearer ${accessToken}` },
+      });
+    };
+
+    stompClient.onConnect = () => {
+      console.log('Connected to WebSocket');
+      subscribePage(pageNum);
+      getPage(pageNum);
+    };
+
+    stompClient.activate();
+
+    return () => {
+      stompClient.deactivate();
+    };
+  }, [accessToken]);
+
   return (
     <>
       <div className={styles.gameListContainer}>
         <div className={styles.gameListGrid}>
-          {GameList.map((game, index) => (
-            <GameCard
-              key={index}
-              title={game.title}
-              description={game.description}
-              participants={game.participants}
-            />
-          ))}
+          {pageData &&
+            pageData
+              .map((room, index) => (
+                <GameCard
+                  key={index}
+                  roomId={room.roomId}
+                  name={room.name}
+                  description={room.description}
+                  currentPlayers={room.currentPlayers}
+                  maxPlayers={room.maxPlayers}
+                />
+              ))
+              .concat(
+                Array.from({ length: DATA_LENGTH - pageData.length }).map(
+                  (_, index) => (
+                    <div key={index} className={styles.emptyCard} />
+                  ),
+                ),
+              )}
         </div>
         <div className={styles.paginatorWrapper}>
           <Paginator
             currentPage={pageNum}
-            totalPages={3}
+            totalPages={totalPages}
             handlePagePrev={handlePagePrev}
             handlePageNext={handlePageNext}
           />

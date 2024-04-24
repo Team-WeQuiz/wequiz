@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import stompClient from './_utils/stomp';
+import stompClient from '../../_utils/stomp';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import * as styles from './page.css';
 import UserList from './_components/UserList/UserList';
