@@ -71,6 +71,7 @@ public class QuizRoomService {
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         validateRoomStatus(quizRoom.getStatus());
         gameService.sendDescription(quizRoom.getId(), userId);
+        gameService.initQuiz(quizRoom.getId());
 
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
