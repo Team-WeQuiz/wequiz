@@ -5,7 +5,6 @@ import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
-import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +35,8 @@ public class QuizRoomController {
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomDetail(roomId));
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId, @AuthUser Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomDetail(roomId, userId));
     }
 
     @MessageMapping("/rooms?page={page}")
@@ -45,10 +44,4 @@ public class QuizRoomController {
     public RoomListResponse getRooms(@DestinationVariable Integer page) {
         return quizRoomService.getRooms(page);
     }
-
-    @GetMapping("/{roomId}/quiz")
-    public ResponseEntity<RoomQuizResponse> getRoomQuiz(@PathVariable Long roomId) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomQuiz(roomId));
-    }
-
 }

@@ -6,6 +6,7 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
+import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
@@ -14,7 +15,6 @@ import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomAbstractDTO;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
-import com.chatty.chatty.quizroom.controller.dto.RoomQuizResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.FileException;
@@ -22,7 +22,6 @@ import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +39,7 @@ public class QuizRoomService {
     private static final String BROADCAST_URL = "/sub/rooms?page=%d";
 
     private final QuizRoomRepository quizRoomRepository;
+    private final GameService gameService;
     private final ModelService modelService;
     private final MinioRepository minioRepository;
     private final SimpMessagingTemplate template;
@@ -66,10 +66,11 @@ public class QuizRoomService {
                 .build();
     }
 
-    public RoomDetailResponse getRoomDetail(Long roomId) {
+    public RoomDetailResponse getRoomDetail(Long roomId, Long userId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         validateRoomStatus(quizRoom.getStatus());
+        gameService.sendDescription(quizRoom.getId(), userId);
 
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
@@ -77,24 +78,6 @@ public class QuizRoomService {
                 .maxPlayers(quizRoom.getPlayerLimitNum())
                 .description(quizRoom.getDescription())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
-                .build();
-    }
-
-    public RoomQuizResponse getRoomQuiz(Long roomId) {
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId)
-                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
-        validateRoomFinished(quizRoom.getStatus());
-
-//        Long quizDocId = quizRoom.getQuizDocId();
-        // TODO: noSQL db에서 questions 읽어오는 코드
-        List<?> questions = Arrays.asList("questionId:1, ...", "questionId:2, ...");
-
-        return RoomQuizResponse.builder()
-                .roomId(quizRoom.getId())
-                .name(quizRoom.getName())
-                .numOfQuiz(quizRoom.getNumOfQuiz())
-                .playerNum(quizRoom.getPlayerNum())
-                .questions(questions)
                 .build();
     }
 
