@@ -10,12 +10,15 @@ import * as styles from './ReadyButton.css';
 const ReadyButton = ({
   roomId,
   userId,
+  isQuizReady,
 }: {
   roomId: number;
   userId: number | undefined;
+  isQuizReady: boolean;
 }) => {
-  const { userStatuses } = useWaitingStore();
+  const { userStatuses, allUsersReady } = useWaitingStore();
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<number>(3);
 
   useEffect(() => {
     setIsReady(
@@ -30,13 +33,38 @@ const ReadyButton = ({
     });
   };
 
+  useEffect(() => {
+    setCountdown(3);
+    let timer: NodeJS.Timeout | null = null;
+    if (isQuizReady && allUsersReady) {
+      timer = setInterval(() => {
+        setCountdown((prevCount) => {
+          const nextCount = prevCount - 1;
+          if (nextCount === -1) {
+            clearInterval(timer!)
+            // 페이지 이동 시키기
+          }
+          return nextCount;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isQuizReady, allUsersReady]);
+
   return (
     <div className={styles.readyContainer}>
-      {isReady && (
-        <span className={`${styles.readyStatus} ${styles.blinking}`}>
-          waiting
-        </span>
-      )}
+      {isReady &&
+        (isQuizReady && allUsersReady ? (
+          <span className={styles.readyStatus}>
+            {countdown > 0 ? countdown : '퀴즈 시작 !'}
+          </span>
+        ) : (
+          <span className={`${styles.readyStatus} ${styles.blinking}`}>
+            waiting
+          </span>
+        ))}
       <GradButton color="secondary" fullWidth rounded onClick={toggleReady}>
         <span className={`${styles.buttonText} ${!isReady && styles.blinking}`}>
           {isReady ? '준비취소' : '준비하기'}
