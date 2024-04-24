@@ -14,7 +14,7 @@ export const header = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginTop: 63,
+  marginTop: 44,
 });
 
 export const decoIcon = style({
@@ -28,7 +28,7 @@ export const name = style({
   textAlign: 'center',
   backgroundColor: globals.color.blue_main,
   borderRadius: 16,
-  padding: '12px 8px',
+  padding: '12px 8px 12px 24px',
   fontSize: 20,
   fontWeight: 600,
   color: 'white',
@@ -46,7 +46,6 @@ export const description = style({
 
 export const detail = style({
   width: '100%',
-  padding: '14px',
   display: 'flex',
   flexWrap: 'wrap',
   justifyContent: 'space-around',
@@ -56,22 +55,26 @@ export const detail = style({
 export const detailBlock = style({
   display: 'flex',
   width: '100%',
-  maxWidth: 188,
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   gap: 4,
   padding: '12px 0',
   color: globals.color.black,
+  fontSize: 20,
   fontWeight: 400,
   backgroundColor: globals.color.blue_7,
   borderRadius: 16,
 });
 
-export const detailLabel = style({
-  fontSize: 20,
+export const detailText = style({
+  display: 'flex',
+  alignItems: 'center',
+  lineHeight: 2,
 });
 
-export const detailValue = style({
+export const numText = style({
   fontSize: 26,
+  fontFamily: 'var(--bagel-font)',
+  lineHeight: 0.8,
 });
