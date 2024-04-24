@@ -6,7 +6,7 @@ export const gameListContainer = style({
   flexDirection: 'column',
   width: '100%',
   height: 'calc(100% - 90px)',
-  padding: 24,
+  padding: '24px 24px 60px 24px',
   alignItems: 'center',
   backgroundColor: globals.color.blue_main,
   borderRadius: 26,
@@ -52,4 +52,14 @@ export const gameListGrid = style({
     boxShadow: '0px 0px 4px 2px rgba(23, 96, 171, 0.25)',
     zIndex: 2,
   },
+});
+
+export const paginatorWrapper = style({
+  position: 'absolute',
+  bottom: 0,
+  width: '100%',
+  height: 60,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 });
