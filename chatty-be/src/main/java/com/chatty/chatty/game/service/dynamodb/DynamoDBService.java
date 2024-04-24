@@ -29,11 +29,11 @@ public class DynamoDBService {
     public String pollDescription(String itemId, String timestamp) {
         String description = "";
         int attempts = 0;
-        while (description.isEmpty() && attempts < POLLING_MAX_ATTEMPTS) {  // 최대 10분간 대기
+        while (description.isEmpty() && attempts < POLLING_MAX_ATTEMPTS) {
             description = dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
             if (description.isEmpty()) {
                 try {
-                    Thread.sleep(DESCRIPTION_POLLING_SLEEP_TIME);  // 5초 대기
+                    Thread.sleep(DESCRIPTION_POLLING_SLEEP_TIME);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new GameException(THREAD_INTERRUPTED);
