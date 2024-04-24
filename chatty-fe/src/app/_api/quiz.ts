@@ -2,7 +2,7 @@ import client from './client';
 
 export const getQuizInfo = async (id: number) => {
   try {
-    const response = await client.get(`rooms/${id}/lobby`);
+    const response = await client.get(`rooms/${id}`);
     return response.data;
   } catch (error) {
     console.error('error: ', error);
