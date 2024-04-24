@@ -13,6 +13,7 @@ const MainLobby = () => {
   const router = useRouter();
   const [search, setSearch] = useState('');
 
+
   return (
     <>
       <div className={styles.lobbyContainer}>

@@ -1,4 +1,8 @@
+'use client';
+
+import { useState } from 'react';
 import GameCard from '../GameCard/GameCard';
+import Paginator from '../Paginator/Paginator';
 import * as styles from './GameListGrid.css';
 
 const GameList = [
@@ -145,6 +149,18 @@ const GameList = [
 ];
 
 const GameListGrid = () => {
+  const [pageNum, setPageNum] = useState(1);
+
+  const handlePagePrev = () => {
+    if (pageNum > 1) {
+      setPageNum(pageNum - 1);
+    }
+  };
+
+  const handlePageNext = () => {
+    setPageNum(pageNum + 1);
+  };
+
   return (
     <>
       <div className={styles.gameListContainer}>
@@ -157,6 +173,14 @@ const GameListGrid = () => {
               participants={game.participants}
             />
           ))}
+        </div>
+        <div className={styles.paginatorWrapper}>
+          <Paginator
+            currentPage={pageNum}
+            totalPages={3}
+            handlePagePrev={handlePagePrev}
+            handlePageNext={handlePageNext}
+          />
         </div>
       </div>
     </>
