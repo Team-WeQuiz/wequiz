@@ -3,12 +3,14 @@ import { UserStatus } from '@/app/_types/WaitingStatus';
 
 type WaitingStore = {
   userStatuses: UserStatus[];
+  allUsersReady: boolean;
   updateUsers: (userStatuses: UserStatus[]) => void; // 접속 유저 업데이트 함수
   setMessage: (userId: number, message: string) => void; // 메시지 설정 함수
 };
 
 const useWaitingStore = create<WaitingStore>((set) => ({
   userStatuses: [],
+  allUsersReady: false,
   updateUsers: (userStatuses) => {
     set((state) => {
       const existingUserIds = state.userStatuses.map((user) => user.userId);
@@ -33,7 +35,9 @@ const useWaitingStore = create<WaitingStore>((set) => ({
         })
         .filter(Boolean) as UserStatus[];
 
-      return { userStatuses: updatedUserStatuses };
+      const allUsersReady = updatedUserStatuses.every((user) => user.isReady);
+
+      return { userStatuses: updatedUserStatuses, allUsersReady };
     });
   },
   setMessage: (userId, message) => {

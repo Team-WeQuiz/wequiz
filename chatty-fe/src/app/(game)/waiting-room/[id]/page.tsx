@@ -115,7 +115,11 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
           <QuizInfoCard roomId={params.id} />
         </div>
         <div className={styles.buttonWrapper}>
-          <ReadyButton roomId={params.id} userId={userId} />
+          <ReadyButton
+            roomId={params.id}
+            userId={userId}
+            isQuizReady={isQuizReady}
+          />
         </div>
       </div>
     </div>
