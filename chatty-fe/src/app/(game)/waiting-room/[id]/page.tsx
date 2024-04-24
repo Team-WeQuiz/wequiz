@@ -16,6 +16,8 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const [isConnected, setIsConnected] = useState(false);
   const accessToken = useAuthStore.getState().accessToken;
   const { userStatuses, updateUsers, setMessage } = useWaitingStore();
+  // 퀴즈 생성 완료 체크
+  const [isQuizReady] = useState(false);
 
   const disconnect = () => {
     console.log('Disconnecting from WebSocket');
@@ -98,7 +100,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     <div className={styles.roomContainer}>
       <div className={styles.wideArea}>
         <div className={styles.userList}>
-          <UserList />
+          <UserList isQuizReady={isQuizReady} />
         </div>
         <div className={styles.chattingArea}>
           <ChatInput

@@ -10,11 +10,14 @@ const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
   useEffect(() => {
     if (userStatus.message) {
       setShowMessage(true);
-      const timer = setTimeout(() => {
-        setShowMessage(false);
-      }, 5000); // 5초 후 메시지 숨김
+      // 봇 메시지는 숨기지 않음
+      if (userStatus.userId > 0) {
+        const timer = setTimeout(() => {
+          setShowMessage(false);
+        }, 5000); // 5초 후 메시지 숨김
 
-      return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
+      }
     }
   }, [userStatus.message]);
 
