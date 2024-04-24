@@ -18,8 +18,10 @@ import org.joda.time.DateTime;
 @Getter
 @Slf4j
 public class QuizData {
+
     private static final Integer QUIZ_PER_ROUND = 5;
     private static final Integer MAX_ATTEMPT = 120;
+
     private final Queue<Quiz> quizQueue = new LinkedList<>();
     private final String quizDocId;
     private final String timestamp;
@@ -29,7 +31,7 @@ public class QuizData {
 
     public QuizResponse sendQuiz() {
         while (quizQueue.isEmpty()) {
-            wait5Sec();
+            waitFiveSec();
         }
         log.info("quiz: {}", quizQueue.peek());
         return QuizResponse.builder()
@@ -57,7 +59,7 @@ public class QuizData {
     private List<Quiz> pollingQuiz() {
         List<Map<String, Object>> quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
         while (quizzes.size() < (currentRound + 1) * QUIZ_PER_ROUND) {
-            wait5Sec();
+            waitFiveSec();
             quizzes = dynamoDBService.getQuizFromDB(quizDocId, timestamp);
         }
         return convertToList(quizzes);
@@ -77,18 +79,18 @@ public class QuizData {
     public String pollingDescription() {
         String description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
         int attempt = 0;
-        while (description.equals("") && attempt < MAX_ATTEMPT) {
-            wait5Sec();
+        while (description.isEmpty() && attempt < MAX_ATTEMPT) {
+            waitFiveSec();
             description = dynamoDBService.getDescriptionFromDB(quizDocId, timestamp);
             attempt++;
         }
-        if (description.equals("")) {
+        if (description.isEmpty()) {
             throw new RuntimeException("10분 동안 요약이 생성되지 않았으므로 데이터 가져오기를 중단합니다.");
         }
         return description;
     }
 
-    private void wait5Sec() {
+    private void waitFiveSec() {
         try {
             Thread.sleep(5000);
             log.info("wake: {}", DateTime.now());

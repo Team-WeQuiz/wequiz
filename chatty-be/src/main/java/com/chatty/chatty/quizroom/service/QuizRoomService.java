@@ -6,6 +6,8 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
+import com.chatty.chatty.game.controller.dto.DescriptionResponse;
+import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,7 @@ public class QuizRoomService {
     private static final String BROADCAST_URL = "/sub/rooms?page=%d";
 
     private final QuizRoomRepository quizRoomRepository;
+    private final GameRepository gameRepository;
     private final ModelService modelService;
     private final MinioRepository minioRepository;
     private final SimpMessagingTemplate template;
@@ -70,6 +74,7 @@ public class QuizRoomService {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         validateRoomStatus(quizRoom.getStatus());
+        sendDescriptionAsync(roomId);
 
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
@@ -148,6 +153,14 @@ public class QuizRoomService {
                         throw new FileException(FILE_INPUT_STREAM_FAILED);
                     }
                 });
+    }
+
+    @Async
+    public void sendDescriptionAsync(Long roomId) {
+        DescriptionResponse descriptionResponse = DescriptionResponse.builder()
+                .description(gameRepository.sendDescription(roomId))
+                .build();
+        template.convertAndSend("/sub/rooms/" + roomId + "/data", descriptionResponse);
     }
 
     private void validateRoomStatus(Status status) {

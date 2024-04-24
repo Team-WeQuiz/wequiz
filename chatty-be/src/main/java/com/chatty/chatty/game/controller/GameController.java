@@ -20,6 +20,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class GameController {
 
-    private final SimpMessagingTemplate template;
     private final GameService gameService;
 
     @MessageMapping("/rooms/{roomId}/chat")
@@ -76,12 +76,6 @@ public class GameController {
     public QuizResponse sendQuiz(@DestinationVariable Long roomId) {
         log.info("sendQuiz-controller time: {}", LocalDateTime.now());
         return gameService.sendQuiz(roomId);
-    }
-
-    @Async
-    public void sendDescription(Long roomId) {
-        DescriptionResponse descriptionResponse = gameService.sendDescription(roomId);
-        template.convertAndSend("/sub/rooms/" + roomId + "/data", descriptionResponse);
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

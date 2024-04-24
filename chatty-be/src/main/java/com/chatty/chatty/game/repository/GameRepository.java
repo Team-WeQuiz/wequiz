@@ -17,10 +17,12 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 @Slf4j
 public class GameRepository {
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Integer DEFAULT_ROUND = 0;
     private static final Integer QUIZ_PER_ROUND = 5;
     private static final Map<Long, QuizData> quizDataMap = new ConcurrentHashMap<>();
+
     private final QuizRoomRepository quizRoomRepository;
     private final DynamoDBService dynamoDBService;
 

@@ -1,17 +1,13 @@
 package com.chatty.chatty.game.service;
 
-import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
-import com.chatty.chatty.quizroom.entity.Status;
-import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -48,12 +44,6 @@ public class GameService {
         return PlayersStatusDTO.builder()
                 .roomId(roomId)
                 .playerStatuses(playersStatus.playerStatusSet())
-                .build();
-    }
-
-    public DescriptionResponse sendDescription(Long roomId) {
-        return DescriptionResponse.builder()
-                .description(gameRepository.sendDescription(roomId))
                 .build();
     }
 
