@@ -4,7 +4,7 @@ import GradButton from '@/app/_components/GradButton';
 import { useEffect, useState } from 'react';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import { UserStatus } from '@/app/_types/WaitingStatus';
-import stompClient from '../../_utils/stomp';
+import stompClient from '../../../../_utils/stomp';
 import * as styles from './ReadyButton.css';
 
 const ReadyButton = ({
@@ -41,7 +41,7 @@ const ReadyButton = ({
         setCountdown((prevCount) => {
           const nextCount = prevCount - 1;
           if (nextCount === -1) {
-            clearInterval(timer!)
+            clearInterval(timer!);
             // 페이지 이동 시키기
           }
           return nextCount;

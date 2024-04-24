@@ -1,25 +1,22 @@
 import * as styles from './GameCard.css';
 import Image from 'next/image';
-
-type GameCardProps = {
-  title: string;
-  description: string;
-  participants: number;
-  onClick?: () => void;
-};
+import { RoomInfo } from '../GameListGrid/GameListGrid';
+import { useRouter } from 'next/navigation';
 
 const GameCard = ({
-  title,
+  roomId,
+  name,
   description,
-  participants,
-  onClick,
-}: GameCardProps) => {
+  currentPlayers,
+  maxPlayers,
+}: RoomInfo) => {
+  const router = useRouter();
   return (
     <div
       className={`${styles.gameCard} ${styles.gameCardHover}`}
-      onClick={onClick}
+      onClick={() => router.push(`/waiting-room/${roomId}`)}
     >
-      <div className={styles.gameTitle}>{title}</div>
+      <div className={styles.gameTitle}>{name}</div>
       <div className={styles.gameInfo}>
         <div className={styles.gameDescription}>{description}</div>
         <div className={styles.gameParticipants}>
@@ -29,7 +26,9 @@ const GameCard = ({
             height={24}
             alt="participant"
           />
-          <div className={styles.partNum}>{participants}/8</div>
+          <div className={styles.partNum}>
+            {currentPlayers} / {maxPlayers}
+          </div>
         </div>
       </div>
       <div className={styles.overlay}>join!</div>

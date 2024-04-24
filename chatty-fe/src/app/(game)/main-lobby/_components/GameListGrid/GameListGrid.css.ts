@@ -6,6 +6,7 @@ export const gameListContainer = style({
   flexDirection: 'column',
   width: '100%',
   height: 'calc(100% - 90px)',
+  maxHeight: 800,
   padding: '24px 24px 60px 24px',
   alignItems: 'center',
   backgroundColor: globals.color.blue_main,
@@ -62,4 +63,11 @@ export const paginatorWrapper = style({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+});
+
+export const emptyCard = style({
+  width: '100%',
+  height: 120,
+  borderRadius: 16,
+  backgroundColor: 'rgba(17, 41, 66, 0.05)',
 });

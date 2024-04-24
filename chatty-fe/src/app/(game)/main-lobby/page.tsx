@@ -13,7 +13,6 @@ const MainLobby = () => {
   const router = useRouter();
   const [search, setSearch] = useState('');
 
-
   return (
     <>
       <div className={styles.lobbyContainer}>
@@ -45,7 +44,7 @@ const MainLobby = () => {
                 fullWidth
                 onClick={() => router.push('/create-room')}
               >
-                방 만들기
+                <span className={styles.buttonText}>방 만들기</span>
               </GradButton>
             </div>
           </div>

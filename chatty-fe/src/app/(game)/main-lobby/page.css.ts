@@ -32,4 +32,14 @@ export const searchInput = style({
 
 export const createButton = style({
   width: 168,
+  maxHeight: 60,
+});
+
+export const buttonText = style({
+  fontSize: 20,
+  '@media': {
+    'screen and (max-width: 768px)': {
+      fontSize: 14,
+    },
+  },
 });

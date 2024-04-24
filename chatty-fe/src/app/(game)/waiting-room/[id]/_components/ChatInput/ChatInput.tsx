@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import TextInputField from '@/app/_components/TextInputField';
-import stompClient from '../../_utils/stomp';
+import stompClient from '../../../../_utils/stomp';
 import { ChatType, ChatMessage } from '@/app/_types/ChatType';
 import { submitButton } from './ChatInput.css';
 
@@ -48,7 +48,6 @@ const ChatInput = ({
     });
     setMessage('');
   };
-
 
   return (
     <form onSubmit={handleSubmit}>
