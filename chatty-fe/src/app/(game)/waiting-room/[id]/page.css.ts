@@ -5,11 +5,13 @@ export const roomContainer = style({
   width: '100%',
   maxWidth: 1830,
   gap: 30,
+  height: '100%',
 });
 
 export const wideArea = style({
   maxWidth: 1314,
   width: 'calc(73% - 15px)',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   gap: 30,
@@ -20,10 +22,12 @@ export const narrowArea = style({
   width: 'calc(28% - 15px)',
   display: 'flex',
   position: 'relative',
+  height: '100%',
 });
 
 export const userList = style({
   width: '100%',
+  height: 'calc(100% - 80px)',
 });
 
 export const chattingArea = style({
@@ -42,7 +46,6 @@ export const detailArea = style({
 export const buttonWrapper = style({
   position: 'absolute',
   display: 'flex',
-  height: 80,
   width: '100%',
   bottom: 0,
 });
