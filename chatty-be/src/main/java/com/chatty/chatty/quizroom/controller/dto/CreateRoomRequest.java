@@ -11,8 +11,6 @@ public record CreateRoomRequest(
 
         Integer numOfQuiz,
 
-        Integer timeLimit,
-
         Integer playerLimitNum,
 
         String code,

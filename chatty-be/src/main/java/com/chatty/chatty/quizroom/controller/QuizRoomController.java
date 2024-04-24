@@ -29,6 +29,12 @@ public class QuizRoomController {
 
     private final QuizRoomService quizRoomService;
 
+    @PostMapping
+    public ResponseEntity<CreateRoomResponse> createRoom(@ModelAttribute CreateRoomRequest request,
+            @AuthUser Long userId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.createRoom(request, userId));
+    }
+
     @GetMapping("/{roomId}")
     public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId) {
         return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomDetail(roomId));
@@ -45,9 +51,4 @@ public class QuizRoomController {
         return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomQuiz(roomId));
     }
 
-    @PostMapping
-    public ResponseEntity<CreateRoomResponse> createRoom(@ModelAttribute CreateRoomRequest request,
-            @AuthUser Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.createRoom(request, userId));
-    }
 }
