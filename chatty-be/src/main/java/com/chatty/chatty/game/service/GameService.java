@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class GameService {
 
+    private static final Integer QUIZ_SIZE = 5;
     private final PlayersStatusRepository playersStatusRepository;
     private final GameRepository gameRepository;
     private final DynamoDBService dynamoDBService;
@@ -61,8 +62,11 @@ public class GameService {
     }
 
     private void fillQuiz(QuizData quizData) {
-        List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp());
-        quizData.getQuizQueue().addAll(quizzes);
+        Integer currentRound = quizData.getCurrentRound();
+        List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
+                currentRound, QUIZ_SIZE);
+        List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
+        quizData.getQuizQueue().addAll(currentQuizzes);
     }
 
     /*

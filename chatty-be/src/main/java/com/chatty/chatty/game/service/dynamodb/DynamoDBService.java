@@ -20,8 +20,6 @@ public class DynamoDBService {
     private static final Long QUIZ_POLLING_SLEEP_TIME = 10000L;
     private static final Long DESCRIPTION_POLLING_SLEEP_TIME = 5000L;
     private static final Long POLLING_MAX_ATTEMPTS = 120L;
-    private static final Integer QUIZ_SIZE = 5;
-
     private final DynamoDBRepository dynamoDBRepository;
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -39,9 +37,9 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<Quiz> pollQuizzes(String itemId, String timestamp) {
+    public List<Quiz> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) {
         List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
-        while (rawQuizzes.size() < QUIZ_SIZE) {
+        while (rawQuizzes.size() < (currentRound + 1) * quizSize) {
             sleep(QUIZ_POLLING_SLEEP_TIME);
             rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
         }
