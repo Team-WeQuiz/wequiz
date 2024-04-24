@@ -6,7 +6,7 @@ export const mainContainer = style({
   flexWrap: 'wrap',
   gap: 24,
   width: '100%',
-  minHeight: 792,
+  height: '100%',
   padding: '24px',
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import { UserStatus } from '@/app/_types/WaitingStatus';
 import stompClient from '../../_utils/stomp';
+import * as styles from './ReadyButton.css';
 
 const ReadyButton = ({
   roomId,
@@ -30,9 +31,18 @@ const ReadyButton = ({
   };
 
   return (
-    <GradButton color="secondary" fullWidth rounded onClick={toggleReady}>
-      {isReady ? '시작대기' : '준비하기'}
-    </GradButton>
+    <div className={styles.readyContainer}>
+      {isReady && (
+        <span className={`${styles.readyStatus} ${styles.blinking}`}>
+          waiting
+        </span>
+      )}
+      <GradButton color="secondary" fullWidth rounded onClick={toggleReady}>
+        <span className={`${styles.buttonText} ${!isReady && styles.blinking}`}>
+          {isReady ? '준비취소' : '준비하기'}
+        </span>
+      </GradButton>
+    </div>
   );
 };
 
