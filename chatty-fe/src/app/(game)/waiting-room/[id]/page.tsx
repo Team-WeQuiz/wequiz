@@ -18,19 +18,19 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { accessToken } = useAuthStore();
   const { userStatuses, updateUsers, setMessage } = useWaitingStore();
   // 퀴즈 생성 완료 체크
-  const [isQuizReady] = useState(false);
+  const [isQuizReady] = useState(true);
 
   const disconnect = () => {
     console.log('Disconnecting from WebSocket');
+    stompClient.publish({
+      destination: `/pub/rooms/${params.id}/leave`,
+    });
     if (userStatuses.length === 1) {
       stompClient.publish({
         destination: `/pub/rooms/${params.id}/end`,
       });
-    } else {
-      stompClient.publish({
-        destination: `/pub/rooms/${params.id}/leave`,
-      });
     }
+
     stompClient.deactivate();
   };
 
@@ -74,6 +74,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
           console.log('Received description message:', description);
         },
       );
+      setIsSubscribed(true);
     };
 
     const joinRoom = (roomId: number) => {
@@ -101,16 +102,15 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       setIsConnected(true);
       subscribeToStatus(params.id);
       subscribeToChat(params.id);
-      subscribeToDescription(userId, params.id);
-      setIsSubscribed(true);
       joinRoom(params.id);
+      subscribeToDescription(userId, params.id);
     };
-    if (accessToken) stompClient.activate();
+    if (accessToken && userId) stompClient.activate();
 
     return () => {
       stompClient.deactivate();
     };
-  }, [accessToken]);
+  }, [accessToken, userId]);
 
   return (
     <div className={styles.roomContainer}>

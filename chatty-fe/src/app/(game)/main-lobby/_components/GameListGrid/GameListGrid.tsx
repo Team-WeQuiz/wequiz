@@ -70,9 +70,8 @@ const GameListGrid = () => {
   }, [pageNum]);
 
   useEffect(() => {
-    console.log('GameListGrid useEffect accessToken: ', accessToken);
     stompClient.beforeConnect = () => {
-      console.log('Connecting to WebSocket token: ', accessToken);
+      console.log('Connecting to WebSocket');
       stompClient.configure({
         connectHeaders: { Authorization: `Bearer ${accessToken}` },
       });
