@@ -3,6 +3,8 @@ package com.chatty.chatty.game.service.model;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
+import com.chatty.chatty.game.controller.dto.model.MarkRequest;
+import com.chatty.chatty.game.controller.dto.model.MarkResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,12 @@ public class ModelService {
                 .body(QuizDocIdMLResponse.class);
     }
 
-    public void requestMark() {
-        return;
+    public MarkResponse requestMark(MarkRequest request) {
+        return restClient.post()
+                .uri(ML_URL + "/mark")
+                .contentType(APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(MarkResponse.class);
     }
 }

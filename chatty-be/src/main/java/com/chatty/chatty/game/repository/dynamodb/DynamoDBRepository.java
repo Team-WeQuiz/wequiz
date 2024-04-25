@@ -48,9 +48,4 @@ public class DynamoDBRepository {
 
         return item.getList(QUIZ);
     }
-
-    public String getAnswerFromDB(String itemId, String timestamp) {
-        return item.getString(ANSWER);
-
-    }
 }

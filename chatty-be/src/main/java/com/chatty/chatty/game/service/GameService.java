@@ -7,6 +7,8 @@ import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.model.MarkRequest;
+import com.chatty.chatty.game.domain.AnswerData;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.SubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
@@ -89,10 +91,12 @@ public class GameService {
     public void removeQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         quizData.getQuizQueue().poll();
+        log.info("Remove: QuizData: {}", quizData);
 
         if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
             quizData.increaseCurrentRound();
             fillQuiz(quizData);
+            log.info("Fill: QuizData: {}", quizData);
         }
     }
 
@@ -124,10 +128,20 @@ public class GameService {
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
         SubmitStatus status = answerRepository.addPlayerAnswer(roomId, request);
+        log.info("Add: AnswerData: {}", answerRepository.getAnswerData(roomId, request));
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
             removeQuiz(roomId);
-            modelService.requestMark();
+
+            String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
+            AnswerData answerData = answerRepository.getAnswerData(roomId, request);
+            modelService.requestMark(MarkRequest.builder()
+                    .id(quizDocId)
+                    .quiz_id(answerData.getQuizId())
+                    .question_number(answerData.getQuizNum())
+                    .correct(answerData.getAnswer())
+                    .answers(answerData.getPlayerAnswers())
+                    .build());
             calculateScore();
             answerRepository.clearAnswer(roomId);
         }

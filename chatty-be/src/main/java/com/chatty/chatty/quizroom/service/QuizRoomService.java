@@ -71,7 +71,6 @@ public class QuizRoomService {
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         validateRoomStatus(quizRoom.getStatus());
         gameService.sendDescription(quizRoom.getId(), userId);
-        gameService.initQuiz(quizRoom.getId());
 
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
@@ -103,6 +102,8 @@ public class QuizRoomService {
         QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom);
         savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
+
+        gameService.initQuiz(savedQuizRoom.getId());
 
         // 방 목록 업데이트 소켓 메세지 전송
         broadcastUpdatedRoomList();
