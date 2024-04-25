@@ -10,6 +10,7 @@ import QuizInfoCard from './_components/QuizInfoCard/QuizInfoCard';
 import useAuthStore from '@/app/_store/useAuthStore';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
+import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
@@ -17,6 +18,9 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { accessToken } = useAuthStore();
   const { userStatuses, updateUsers, setMessage } = useWaitingStore();
+  // 퀴즈 요약
+  const [quizSummary, setQuizSummary] =
+    useState('퀴즈 요약을 불러오는 중 입니다.');
   // 퀴즈 생성 완료 체크
   const [isQuizReady] = useState(true);
 
@@ -44,7 +48,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   }, []);
 
   useEffect(() => {
-    console.log('WaitingRoom useEffect');
     const subscribeToStatus = (roomId: number) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);
@@ -70,8 +73,9 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       stompClient.subscribe(
         `/user/${userId}/queue/rooms/${roomId}/description`,
         (message) => {
-          const description = JSON.parse(message.body);
-          console.log('Received description message:', description);
+          const data = JSON.parse(message.body);
+          console.log('Received description message:', data);
+          setQuizSummary(data.description);
         },
       );
       setIsSubscribed(true);
@@ -129,6 +133,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       <div className={styles.narrowArea}>
         <div className={styles.detailArea}>
           <QuizInfoCard roomId={params.id} isSubscribed={isSubscribed} />
+          <QuizSummaryCard summary={quizSummary} />
         </div>
         <div className={styles.buttonWrapper}>
           <ReadyButton
