@@ -26,13 +26,13 @@ export const gameTitle = style({
 export const gameInfo = style({
   display: 'flex',
   width: '100%',
-  gap: 10,
-  justifyContent: 'space-between',
   minHeight: 50,
+  position: 'relative',
 });
 
 export const gameDescription = style({
   display: 'flex',
+  width: '100%',
   flexDirection: 'column',
   padding: '0 10px',
   color: globals.color.black_2,
@@ -41,6 +41,9 @@ export const gameDescription = style({
 });
 
 export const gameParticipants = style({
+  position: 'absolute',
+  right: 0,
+  bottom: 0,
   display: 'flex',
   alignItems: 'flex-end',
   gap: 4,
@@ -80,4 +83,10 @@ export const gameCardHover = style({
     backgroundColor: 'rgba(17, 41, 66, 0.30)',
     color: 'white',
   },
+});
+
+export const textEllipsis = style({
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 });

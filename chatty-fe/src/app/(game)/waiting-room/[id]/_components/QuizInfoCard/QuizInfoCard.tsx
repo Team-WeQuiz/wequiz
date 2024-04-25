@@ -47,6 +47,7 @@ const QuizInfoCard = ({
       }
     };
     if (accessToken && isSubscribed) {
+      console.log('sub?', isSubscribed);
       fetchData();
     }
   }, [isSubscribed, accessToken]);
@@ -62,14 +63,14 @@ const QuizInfoCard = ({
           className={styles.decoIcon}
         />
         <div className={styles.name}>
-          <h3>{data.name}</h3>
+          <h3 className={styles.textEllipsis}>{data.name}</h3>
         </div>
       </div>
       <div className={styles.description}>
-        <p>{data.description}</p>
+        <p className={styles.textEllipsis}>{data.description}</p>
       </div>
       <div className={styles.detail}>
-        <div className={styles.detailBlock}>
+        <div className={`${styles.detailBlock} ${styles.textEllipsis}`}>
           <p className={styles.detailText}>
             최대&nbsp;<span className={styles.numText}>{data.maxPlayers}</span>
             명의 참여자와&nbsp;
