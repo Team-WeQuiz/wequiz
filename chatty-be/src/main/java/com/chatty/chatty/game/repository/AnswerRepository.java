@@ -27,15 +27,13 @@ public class AnswerRepository {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
 
-        AnswerData answerData = AnswerData.builder()
+        return AnswerData.builder()
                 .playerNum(quizRoom.getPlayerNum())
                 .majorityNum((quizRoom.getPlayerNum() + 1) / 2)
                 .quizId(request.quizId())
                 .quizNum(request.quizNum())
                 .answer(request.answer())
                 .build();
-        answerDataMap.put(roomId, answerData);
-        return answerData;
     }
 
     public SubmitStatus addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
