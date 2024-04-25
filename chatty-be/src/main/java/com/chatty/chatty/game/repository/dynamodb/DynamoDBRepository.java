@@ -7,9 +7,11 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Slf4j
 public class DynamoDBRepository {
 
     private static final String TABLE_NAME = "wequiz-quiz";
@@ -44,6 +46,7 @@ public class DynamoDBRepository {
                 .withProjectionExpression(QUIZ);
 
         Item item = table.getItem(spec);
+        log.info("Item: {}", item);
 
         return item.getList(QUIZ);
     }

@@ -37,4 +37,8 @@ public class GameRepository {
                 .currentRound(DEFAULT_ROUND)
                 .build();
     }
+
+    public void clearQuizData(Long roomId) {
+        quizDataMap.remove(roomId);
+    }
 }

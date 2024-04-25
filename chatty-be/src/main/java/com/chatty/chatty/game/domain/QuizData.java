@@ -17,4 +17,8 @@ public class QuizData {
     private final String timestamp;
     private final Integer totalRound;
     private Integer currentRound;
+
+    public void increaseCurrentRound() {
+        this.currentRound++;
+    }
 }
