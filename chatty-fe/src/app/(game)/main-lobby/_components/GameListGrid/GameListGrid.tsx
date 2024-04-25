@@ -22,7 +22,7 @@ const GameListGrid = () => {
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageData, setPageData] = useState<RoomInfo[]>([]);
-  const accessToken = useAuthStore.getState().accessToken;
+  const { accessToken } = useAuthStore();
   const [subscription, setSubscription] = useState<StompSubscription | null>(
     null,
   );
@@ -70,6 +70,7 @@ const GameListGrid = () => {
   }, [pageNum]);
 
   useEffect(() => {
+    console.log('GameListGrid useEffect accessToken: ', accessToken);
     stompClient.beforeConnect = () => {
       console.log('Connecting to WebSocket token: ', accessToken);
       stompClient.configure({
@@ -83,7 +84,7 @@ const GameListGrid = () => {
       getPage(pageNum);
     };
 
-    stompClient.activate();
+    if (accessToken) stompClient.activate();
 
     return () => {
       stompClient.deactivate();
@@ -109,7 +110,10 @@ const GameListGrid = () => {
               .concat(
                 Array.from({ length: DATA_LENGTH - pageData.length }).map(
                   (_, index) => (
-                    <div key={index} className={styles.emptyCard} />
+                    <div
+                      key={index + pageData.length}
+                      className={styles.emptyCard}
+                    />
                   ),
                 ),
               )}
