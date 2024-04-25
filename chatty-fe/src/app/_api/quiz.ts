@@ -1,8 +1,12 @@
 import client from './client';
 
-export const getQuizInfo = async (id: number) => {
+export const getQuizInfo = async (id: number, accessToken: string) => {
   try {
-    const response = await client.get(`rooms/${id}`);
+    const response = await client.get(`rooms/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('error: ', error);

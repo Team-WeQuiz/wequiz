@@ -2,6 +2,7 @@ import Image from 'next/image';
 import * as styles from './QuizInfoCard.css';
 import { getQuizInfo } from '@/app/_api/quiz';
 import { useState, useEffect } from 'react';
+import useAuthStore from '@/app/_store/useAuthStore';
 
 type QuizInfo = {
   roomId: number;
@@ -19,13 +20,20 @@ const initialData: QuizInfo = {
   numOfQuiz: 0,
 };
 
-const QuizInfoCard = ({ roomId }: { roomId: number }) => {
+const QuizInfoCard = ({
+  roomId,
+  isSubscribed,
+}: {
+  roomId: number;
+  isSubscribed: boolean;
+}) => {
   const [data, setData] = useState<QuizInfo>(initialData);
+  const { accessToken } = useAuthStore();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getQuizInfo(roomId);
+        const response = await getQuizInfo(roomId, accessToken);
         setData(response);
       } catch (error) {
         console.error('error: ', error);
@@ -38,9 +46,10 @@ const QuizInfoCard = ({ roomId }: { roomId: number }) => {
         });
       }
     };
-
-    fetchData();
-  }, []);
+    if (accessToken && isSubscribed) {
+      fetchData();
+    }
+  }, [isSubscribed, accessToken]);
 
   return (
     <div className={styles.infoCard}>

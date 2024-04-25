@@ -14,7 +14,8 @@ import ReadyButton from './_components/ReadyButton/ReadyButton';
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const [isConnected, setIsConnected] = useState(false);
-  const accessToken = useAuthStore.getState().accessToken;
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const { accessToken } = useAuthStore();
   const { userStatuses, updateUsers, setMessage } = useWaitingStore();
   // 퀴즈 생성 완료 체크
   const [isQuizReady] = useState(false);
@@ -43,6 +44,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   }, []);
 
   useEffect(() => {
+    console.log('WaitingRoom useEffect');
     const subscribeToStatus = (roomId: number) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);
@@ -59,6 +61,19 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         if (chatMessage.chatType === 'TEXT')
           setMessage(chatMessage.userId, chatMessage.message);
       });
+    };
+
+    const subscribeToDescription = (
+      userId: number | undefined,
+      roomId: number,
+    ) => {
+      stompClient.subscribe(
+        `/user/${userId}/queue/rooms/${roomId}/description`,
+        (message) => {
+          const description = JSON.parse(message.body);
+          console.log('Received description message:', description);
+        },
+      );
     };
 
     const joinRoom = (roomId: number) => {
@@ -86,10 +101,11 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       setIsConnected(true);
       subscribeToStatus(params.id);
       subscribeToChat(params.id);
+      subscribeToDescription(userId, params.id);
+      setIsSubscribed(true);
       joinRoom(params.id);
     };
-
-    stompClient.activate();
+    if (accessToken) stompClient.activate();
 
     return () => {
       stompClient.deactivate();
@@ -112,7 +128,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       </div>
       <div className={styles.narrowArea}>
         <div className={styles.detailArea}>
-          <QuizInfoCard roomId={params.id} />
+          <QuizInfoCard roomId={params.id} isSubscribed={isSubscribed} />
         </div>
         <div className={styles.buttonWrapper}>
           <ReadyButton
