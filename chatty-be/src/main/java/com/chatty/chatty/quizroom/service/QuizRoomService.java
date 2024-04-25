@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +80,7 @@ public class QuizRoomService {
                 .build();
     }
 
-    @Transactional
+    // @Transactional
     public CreateRoomResponse createRoom(CreateRoomRequest request, Long userId) {
         // 퀴즈룸 DB에 저장
         QuizRoom savedQuizRoom = quizRoomRepository.save(
@@ -103,10 +102,10 @@ public class QuizRoomService {
         savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
 
-        gameService.initQuiz(savedQuizRoom.getId());
-
         // 방 목록 업데이트 소켓 메세지 전송
         broadcastUpdatedRoomList();
+
+        gameService.initQuiz(savedQuizRoom.getId());
 
         return CreateRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())

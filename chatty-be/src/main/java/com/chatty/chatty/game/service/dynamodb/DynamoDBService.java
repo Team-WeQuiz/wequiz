@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DynamoDBService {
 
     private static final Long QUIZ_POLLING_SLEEP_TIME = 5000L;
@@ -42,7 +44,9 @@ public class DynamoDBService {
         while (rawQuizzes.size() < (currentRound + 1) * quizSize) {
             sleep(QUIZ_POLLING_SLEEP_TIME);
             rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
+            log.info("polling...");
         }
+        log.info("polling done.");
         return convertToList(rawQuizzes);
     }
 

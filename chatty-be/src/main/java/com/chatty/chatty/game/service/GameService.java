@@ -66,6 +66,7 @@ public class GameService {
                 .build();
     }
 
+    @Async
     public void initQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         fillQuiz(quizData);
@@ -86,6 +87,7 @@ public class GameService {
                 currentRound, QUIZ_SIZE);
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.getQuizQueue().addAll(currentQuizzes);
+        log.info("filled queue: {}", quizData);
     }
 
     public void removeQuiz(Long roomId) {
@@ -110,6 +112,7 @@ public class GameService {
         DescriptionResponse descriptionResponse = DescriptionResponse.builder()
                 .description(description)
                 .build();
+        log.info("디스크립션: {}", descriptionResponse);
         template.convertAndSendToUser(
                 userId.toString(),
                 "/queue/rooms/" + roomId + "/description",
