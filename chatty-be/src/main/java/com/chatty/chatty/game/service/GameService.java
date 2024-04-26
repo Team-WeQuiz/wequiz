@@ -81,7 +81,7 @@ public class GameService {
         return buildQuizResponse(quizData);
     }
 
-    // @Async
+    @Async
     private void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
         List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
@@ -100,7 +100,7 @@ public class GameService {
     /*
         subscription URL : /user/{userId}/queue/rooms/{roodId}/description
      */
-    // @Async
+    @Async
     public void sendDescription(Long roomId, Long userId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         String description = dynamoDBService.pollDescription(quizData.getQuizDocId(), quizData.getTimestamp());
