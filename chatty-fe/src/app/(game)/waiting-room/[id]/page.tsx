@@ -20,7 +20,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { userStatuses, updateUsers, setMessage } = useWaitingStore();
   // 퀴즈 요약
   const [quizSummary, setQuizSummary] =
-    useState('퀴즈 요약을 불러오는 중 입니다.');
+    useState<string>('');
   // 퀴즈 생성 완료 체크
   const [isQuizReady] = useState(true);
 
@@ -78,7 +78,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
           setQuizSummary(data.description);
         },
       );
-      setIsSubscribed(true);
     };
 
     const joinRoom = (roomId: number) => {
@@ -108,7 +107,9 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       subscribeToChat(params.id);
       joinRoom(params.id);
       subscribeToDescription(userId, params.id);
+      setIsSubscribed(true);
     };
+
     if (accessToken && userId) stompClient.activate();
 
     return () => {
