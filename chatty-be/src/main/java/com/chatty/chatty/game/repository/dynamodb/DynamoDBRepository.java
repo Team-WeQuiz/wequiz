@@ -29,12 +29,17 @@ public class DynamoDBRepository {
     }
 
     public String getDescriptionFromDB(String itemId, String timestamp) {
+        log.info("Getting description from DB for itemId: {} and timestamp: {}", itemId, timestamp);
         Table table = dynamoDB.getTable(TABLE_NAME);
+        log.info("Table: {}", table);
         GetItemSpec spec = new GetItemSpec()
                 .withPrimaryKey(HASH_KEY, itemId, RANGE_KEY, timestamp)
                 .withProjectionExpression(DESCRIPTION);
+        log.info("Spec: {}", spec);
 
         Item item = table.getItem(spec);
+
+        log.info("Item: {}", item);
 
         return item.getString(DESCRIPTION);
     }
