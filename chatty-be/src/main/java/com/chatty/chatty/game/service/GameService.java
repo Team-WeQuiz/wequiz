@@ -72,9 +72,8 @@ public class GameService {
 
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        if (quizData.getQuizQueue().isEmpty()) {
+        if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
             fillQuiz(quizData);
-            quizData.increaseCurrentRound();
             log.info("Fill: QuizData: {}", quizData);
         }
         log.info("Send: QuizData: {}", quizData);
@@ -88,13 +87,15 @@ public class GameService {
                 currentRound, QUIZ_SIZE);
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.getQuizQueue().addAll(currentQuizzes);
+        quizData.increaseCurrentRound();
         log.info("filled queue: {}", quizData);
     }
 
-    public void removeQuiz(Long roomId) {
+    public void removeAndSendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         quizData.getQuizQueue().poll();
         log.info("Remove: QuizData: {}", quizData);
+        sendQuiz(roomId);
     }
 
     /*
@@ -129,7 +130,7 @@ public class GameService {
         log.info("Add: AnswerData: {}", answerRepository.getAnswerData(roomId, request));
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
-            removeQuiz(roomId);
+            removeAndSendQuiz(roomId);
 
             String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
             AnswerData answerData = answerRepository.getAnswerData(roomId, request);
