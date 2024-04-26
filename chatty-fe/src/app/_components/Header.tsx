@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 export default function Header() {
   const navigate = useRouter();
   const handleLogoClick = () => {
-    navigate.push('/main');
+    navigate.push('/main-lobby');
   };
   const handleProfileClick = () => {
     navigate.push('/mypage');

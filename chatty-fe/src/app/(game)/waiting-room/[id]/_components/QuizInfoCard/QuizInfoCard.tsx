@@ -14,7 +14,7 @@ type QuizInfo = {
 
 const initialData: QuizInfo = {
   roomId: 0,
-  name: '',
+  name: '정보를 불러오는 중 입니다.',
   maxPlayers: 0,
   description: '',
   numOfQuiz: 0,
@@ -66,17 +66,20 @@ const QuizInfoCard = ({
           <h3 className={styles.textEllipsis}>{data.name}</h3>
         </div>
       </div>
-      <div className={styles.description}>
+      <div
+        className={styles.description}
+      >
         <p className={styles.textEllipsis}>{data.description}</p>
       </div>
       <div className={styles.detail}>
         <div className={`${styles.detailBlock} ${styles.textEllipsis}`}>
-          <p className={styles.detailText}>
-            최대&nbsp;<span className={styles.numText}>{data.maxPlayers}</span>
-            명의 참여자와&nbsp;
+          <div className={styles.detailText}>
+            <span>최대&nbsp;</span>
+            <span className={styles.numText}>{data.maxPlayers}</span>
+            <span>명의 참여자와&nbsp;</span>
             <span className={styles.numText}> {data.numOfQuiz}</span>
-            문제를 풉니다
-          </p>
+            <span>문제를 풉니다</span>
+          </div>
         </div>
       </div>
     </div>

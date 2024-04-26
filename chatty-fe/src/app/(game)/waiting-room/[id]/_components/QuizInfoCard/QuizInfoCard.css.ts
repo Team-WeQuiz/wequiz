@@ -55,8 +55,6 @@ export const detail = style({
   width: '100%',
   display: 'flex',
   flexWrap: 'wrap',
-  justifyContent: 'space-around',
-  gridGap: 16,
 });
 
 export const detailBlock = style({
@@ -82,6 +80,9 @@ export const detailText = style({
 });
 
 export const numText = style({
+  display: 'flex',
+  alignItems: 'center',
   fontSize: 24,
   fontFamily: 'var(--bagel-font)',
+  lineHeight: 1.2,
 });
