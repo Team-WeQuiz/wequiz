@@ -32,9 +32,6 @@ public class DynamoDBRepository {
     }
 
     public String getDescriptionFromDB(String itemId, String timestamp) {
-        log.info("aws Key {}:", awsKey.getAccessKey());
-        log.info("aws Secret Key {}:", awsKey.getSecretKey());
-        log.info("aws Region {}:", awsKey.getRegion());
         log.info("Getting description from DB for itemId: {} and timestamp: {}", itemId, timestamp);
         Table table = dynamoDB.getTable(TABLE_NAME);
         log.info("Table: {}", table);
