@@ -6,7 +6,13 @@ COPY ./src $WORK/src
 
 WORKDIR $WORK
 
-RUN apt-get update && apt-get install -y dos2unix && dos2unix gradlew
+RUN apt-get update && apt-get install -y dos2unix unzip curl
+
+RUN dos2unix gradlew && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
+
 RUN chmod +x gradlew
 RUN ./gradlew clean bootJar --parallel --no-daemon
 
