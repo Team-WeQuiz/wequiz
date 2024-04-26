@@ -1,7 +1,5 @@
 package com.chatty.chatty.game.service;
 
-import static com.chatty.chatty.common.util.ThreadSleep.sleep;
-
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
@@ -74,9 +72,12 @@ public class GameService {
 
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        while (quizData.getQuizQueue().isEmpty()) {
-            sleep(QUIZ_POLLING_SLEEP_TIME);
+        if (quizData.getQuizQueue().isEmpty()) {
+            fillQuiz(quizData);
+            quizData.increaseCurrentRound();
+            log.info("Fill: QuizData: {}", quizData);
         }
+        log.info("Send: QuizData: {}", quizData);
         return buildQuizResponse(quizData);
     }
 
@@ -94,12 +95,6 @@ public class GameService {
         QuizData quizData = gameRepository.getQuizData(roomId);
         quizData.getQuizQueue().poll();
         log.info("Remove: QuizData: {}", quizData);
-
-        if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
-            quizData.increaseCurrentRound();
-            fillQuiz(quizData);
-            log.info("Fill: QuizData: {}", quizData);
-        }
     }
 
     /*
