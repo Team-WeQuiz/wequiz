@@ -89,7 +89,7 @@ public class GameController {
     }
 
     @MessageMapping("/rooms/{roomId}/submit")
-    @SendTo("/sub/rooms/{roomId}/submitStatus")
+    @SendTo("/sub/rooms/{roomId}/submit")
     public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request) {
         return gameService.addPlayerAnswer(roomId, request);
     }
