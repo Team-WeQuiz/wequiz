@@ -5,20 +5,18 @@ import useAuthStore from '@/app/_store/useAuthStore';
 export const postRoom = async (
   name: string,
   numOfQuiz: number,
-  timeLimit: number,
   playerLimitNum: number,
   code: string,
-  type: string,
   files: File[],
+  description: string,
 ) => {
   try {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('numOfQuiz', String(numOfQuiz));
-    formData.append('timeLimit', String(timeLimit));
     formData.append('playerLimitNum', String(playerLimitNum));
     formData.append('code', code);
-    formData.append('type', type);
+    formData.append('description', description);
 
     // files를 하나씩 FormData에 추가
     files.forEach((file) => {
