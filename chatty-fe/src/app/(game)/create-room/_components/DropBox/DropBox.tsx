@@ -3,14 +3,14 @@ import * as styles from './DropBox.css';
 import Image from 'next/image';
 
 const List = [
-  { id: 1, name: 'asd' },
-  { id: 2, name: 'asd' },
-  { id: 3, name: 'asd' },
-  { id: 4, name: 'asd' },
-  { id: 5, name: 'asd' },
-  { id: 6, name: 'asd' },
-  { id: 7, name: 'asd' },
-  { id: 8, name: 'asd' },
+  { id: 1, name: '1번 문제 리스트' },
+  { id: 2, name: '2번 문제 리스트' },
+  { id: 3, name: '3번 문제 리스트' },
+  { id: 4, name: '4번 문제 리스트' },
+  { id: 5, name: '5번 문제 리스트' },
+  { id: 6, name: '6번 문제 리스트' },
+  { id: 7, name: '7번 문제 리스트' },
+  { id: 8, name: '8번 문제 리스트' },
 ];
 
 export default function DropBox() {
