@@ -24,7 +24,6 @@ function GoogleLoginComponent() {
 
   useEffect(() => {
     if (authCode) handleLogin(authCode);
-    if (authCode) handleLogin(authCode);
   });
 
   return <div>로그인 중입니다..</div>;
