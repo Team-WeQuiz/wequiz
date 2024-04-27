@@ -20,7 +20,9 @@ export default function DropBox() {
   return (
     <div className={styles.MainContainer}>
       <div className={styles.Container} onClick={() => setIsOpen(!isOpen)}>
-        <span>{selected || '문제를 선택해주세요.'}</span>
+        <span className={selected === '' ? styles.NoneSelected : ''}>
+          {selected || '문제를 선택해주세요.'}
+        </span>
         <button className={styles.ButtonWrapper}>
           <Image
             src="/images/expand_more.svg"

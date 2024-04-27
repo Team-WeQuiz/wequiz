@@ -38,10 +38,14 @@ export const ListItem = style({
   padding: '8px 12px',
   border: 'none',
   ':hover': {
-    background: '#fcfcfc',
+    background: '#f7f7f7',
   },
 });
 
 export const ButtonWrapper = style({
   cursor: 'pointer',
+});
+
+export const NoneSelected = style({
+  color: '#666',
 });
