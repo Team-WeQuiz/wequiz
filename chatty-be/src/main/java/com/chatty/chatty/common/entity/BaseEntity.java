@@ -3,7 +3,9 @@ package com.chatty.chatty.common.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,4 +27,12 @@ public abstract class BaseEntity {
     @Column(nullable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void onPrePersist() {
+        String customLocalDateTimeFormat = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime parsedCreateDate = LocalDateTime.parse(customLocalDateTimeFormat,
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.createdAt = parsedCreateDate;
+    }
 }

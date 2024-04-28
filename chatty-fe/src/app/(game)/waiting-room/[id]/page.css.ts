@@ -39,7 +39,10 @@ export const chattingArea = style({
 export const detailArea = style({
   position: 'absolute',
   display: 'flex',
+  flexDirection: 'column',
+  gap: 20,
   width: '100%',
+  height: '100%',
   top: 0,
 });
 

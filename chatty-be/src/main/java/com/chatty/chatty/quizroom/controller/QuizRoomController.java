@@ -30,7 +30,7 @@ public class QuizRoomController {
 
     @PostMapping
     public ResponseEntity<CreateRoomResponse> createRoom(@ModelAttribute CreateRoomRequest request,
-            @AuthUser Long userId) {
+                                                         @AuthUser Long userId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.createRoom(request, userId));
     }
 

@@ -4,6 +4,7 @@ import useAuthStore from '@/app/_store/useAuthStore';
 
 export const postRoom = async (
   name: string,
+  description: string,
   numOfQuiz: number,
   playerLimitNum: number,
   code: string,
@@ -13,6 +14,7 @@ export const postRoom = async (
   try {
     const formData = new FormData();
     formData.append('name', name);
+    formData.append('description', description);
     formData.append('numOfQuiz', String(numOfQuiz));
     formData.append('playerLimitNum', String(playerLimitNum));
     formData.append('code', code);

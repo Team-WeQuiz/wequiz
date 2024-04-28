@@ -3,6 +3,8 @@ package com.chatty.chatty.game.controller;
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
+import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
@@ -84,6 +86,12 @@ public class GameController {
                 "/queue/rooms/" + roomId + "/quiz",
                 quizResponse
         );
+    }
+
+    @MessageMapping("/rooms/{roomId}/submit")
+    @SendTo("/sub/rooms/{roomId}/submit")
+    public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request) {
+        return gameService.addPlayerAnswer(roomId, request);
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

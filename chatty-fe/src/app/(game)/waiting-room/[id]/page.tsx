@@ -10,26 +10,31 @@ import QuizInfoCard from './_components/QuizInfoCard/QuizInfoCard';
 import useAuthStore from '@/app/_store/useAuthStore';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
+import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const [isConnected, setIsConnected] = useState(false);
-  const accessToken = useAuthStore.getState().accessToken;
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const { accessToken } = useAuthStore();
   const { userStatuses, updateUsers, setMessage } = useWaitingStore();
+  // 퀴즈 요약
+  const [quizSummary, setQuizSummary] =
+    useState<string>('');
   // 퀴즈 생성 완료 체크
-  const [isQuizReady] = useState(false);
+  const [isQuizReady] = useState(true);
 
   const disconnect = () => {
     console.log('Disconnecting from WebSocket');
+    stompClient.publish({
+      destination: `/pub/rooms/${params.id}/leave`,
+    });
     if (userStatuses.length === 1) {
       stompClient.publish({
         destination: `/pub/rooms/${params.id}/end`,
       });
-    } else {
-      stompClient.publish({
-        destination: `/pub/rooms/${params.id}/leave`,
-      });
     }
+
     stompClient.deactivate();
   };
 
@@ -61,6 +66,20 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       });
     };
 
+    const subscribeToDescription = (
+      userId: number | undefined,
+      roomId: number,
+    ) => {
+      stompClient.subscribe(
+        `/user/${userId}/queue/rooms/${roomId}/description`,
+        (message) => {
+          const data = JSON.parse(message.body);
+          console.log('Received description message:', data);
+          setQuizSummary(data.description);
+        },
+      );
+    };
+
     const joinRoom = (roomId: number) => {
       stompClient.publish({
         destination: `/pub/rooms/${roomId}/join`,
@@ -87,14 +106,16 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       subscribeToStatus(params.id);
       subscribeToChat(params.id);
       joinRoom(params.id);
+      subscribeToDescription(userId, params.id);
+      setIsSubscribed(true);
     };
 
-    stompClient.activate();
+    if (accessToken && userId) stompClient.activate();
 
     return () => {
       stompClient.deactivate();
     };
-  }, [accessToken]);
+  }, [accessToken, userId]);
 
   return (
     <div className={styles.roomContainer}>
@@ -112,7 +133,8 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       </div>
       <div className={styles.narrowArea}>
         <div className={styles.detailArea}>
-          <QuizInfoCard roomId={params.id} />
+          <QuizInfoCard roomId={params.id} isSubscribed={isSubscribed} />
+          <QuizSummaryCard summary={quizSummary} />
         </div>
         <div className={styles.buttonWrapper}>
           <ReadyButton

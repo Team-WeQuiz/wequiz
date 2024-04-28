@@ -1,7 +1,7 @@
 import * as styles from './GameCard.css';
 import Image from 'next/image';
 import { RoomInfo } from '../GameListGrid/GameListGrid';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const GameCard = ({
   roomId,
@@ -10,15 +10,16 @@ const GameCard = ({
   currentPlayers,
   maxPlayers,
 }: RoomInfo) => {
-  const router = useRouter();
   return (
-    <div
+    <Link
+      href={`/waiting-room/${roomId}`}
       className={`${styles.gameCard} ${styles.gameCardHover}`}
-      onClick={() => router.push(`/waiting-room/${roomId}`)}
     >
-      <div className={styles.gameTitle}>{name}</div>
+      <div className={`${styles.gameTitle} ${styles.textEllipsis}`}>{name}</div>
       <div className={styles.gameInfo}>
-        <div className={styles.gameDescription}>{description}</div>
+        <div className={`${styles.gameDescription} ${styles.textEllipsis}`}>
+          {description}
+        </div>
         <div className={styles.gameParticipants}>
           <Image
             src="/images/Participant.svg"
@@ -32,7 +33,7 @@ const GameCard = ({
         </div>
       </div>
       <div className={styles.overlay}>join!</div>
-    </div>
+    </Link>
   );
 };
 

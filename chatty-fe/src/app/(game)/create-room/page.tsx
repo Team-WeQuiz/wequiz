@@ -36,11 +36,10 @@ export default function CreateRoom() {
     try {
       const response = await postRoom(
         title,
+        description,
         numberOfProblems,
-        time,
         numberOfParticipants,
         password,
-        problemType,
         files,
         description,
       );

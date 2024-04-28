@@ -34,11 +34,18 @@ export const name = style({
   color: 'white',
 });
 
+export const textEllipsis = style({
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
 export const description = style({
   width: '100%',
+  display: 'flex',
   minHeight: 110,
   padding: '16px 12px',
-  textAlign: 'center',
+  justifyContent: 'flex-start',
   color: globals.color.black_3,
   fontSize: 16,
   fontWeight: 400,
@@ -48,8 +55,6 @@ export const detail = style({
   width: '100%',
   display: 'flex',
   flexWrap: 'wrap',
-  justifyContent: 'space-around',
-  gridGap: 16,
 });
 
 export const detailBlock = style({
@@ -70,11 +75,14 @@ export const detailBlock = style({
 export const detailText = style({
   display: 'flex',
   alignItems: 'center',
-  lineHeight: 2,
+  gap: 2,
+  verticalAlign: 'bottom',
 });
 
 export const numText = style({
-  fontSize: 26,
+  display: 'flex',
+  alignItems: 'center',
+  fontSize: 24,
   fontFamily: 'var(--bagel-font)',
-  lineHeight: 0.8,
+  lineHeight: 1.2,
 });
