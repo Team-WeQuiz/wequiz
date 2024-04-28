@@ -19,7 +19,7 @@ export const title = style({
 });
 
 export const contentsContainer = style({
-  width: 'inherit',
+  width: '100%',
   padding: 20,
   margin: 'auto',
   display: 'flex',
@@ -53,4 +53,14 @@ export const buttonContainer = style({
 
 export const buttonWrapper = style({
   width: 252,
+});
+
+export const ContainerTitle = style({
+  fontSize: 16,
+  fontWeight: 600,
+  padding: '10px',
+});
+
+export const FullWrapper = style({
+  width: 956,
 });

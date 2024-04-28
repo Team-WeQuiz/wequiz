@@ -19,3 +19,11 @@ export const Answer = style({
   fontSize: 40,
   fontFamily: 'var(--bagel-font)',
 });
+
+export const RadioButtonWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 10,
+  borderRadius: 12,
+});

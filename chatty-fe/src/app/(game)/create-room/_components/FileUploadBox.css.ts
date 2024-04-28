@@ -13,7 +13,7 @@ const colorChange = keyframes({
 export const container = recipe({
   base: {
     display: 'flex',
-    width: 956,
+    width: 'inherit',
     height: 228,
     padding: '20px 12px',
     flexDirection: 'column',

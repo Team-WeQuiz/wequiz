@@ -8,6 +8,8 @@ import RadioInputField from '@/app/_components/RadioInputField';
 import { postRoom } from '@/app/_api/createRoom';
 import { useRouter } from 'next/navigation';
 import GradButton from '@/app/_components/GradButton';
+import QuestionMaker from './_components/QuestionMaker/QuestionMaker';
+import DropBox from './_components/DropBox/DropBox';
 
 export default function CreateRoom() {
   const problemTypeOptions = [
@@ -25,12 +27,9 @@ export default function CreateRoom() {
   const [time, setTime] = useState(0);
   const [problemType, setProblemType] = useState('객관식');
   const [numberOfProblems, setNumberOfProblems] = useState(0);
+  const [qustionType, setQuestionType] = useState<'list' | 'create'>('list');
 
   const router = useRouter();
-
-  const handleRadioChange = (value: string) => {
-    setProblemType(value);
-  };
 
   const onSubmit = async () => {
     setIsLoading(true);
@@ -42,6 +41,7 @@ export default function CreateRoom() {
         numberOfParticipants,
         password,
         files,
+        description,
       );
       console.log(response);
       if (response) {
@@ -58,6 +58,7 @@ export default function CreateRoom() {
       <div className={styles.container}>
         <h1 className={styles.title}>방 만들기</h1>
         <div className={styles.contentsContainer}>
+          <h1 className={styles.ContainerTitle}>설정</h1>
           {/* 방 제목 */}
           <div className={styles.contentsWrapper}>
             <ContentsBox imgSrc="/images/Home.svg" title="방 제목" />
@@ -112,41 +113,6 @@ export default function CreateRoom() {
             </div>
           </div>
 
-          {/* 시간 */}
-          <div className={styles.contentsWrapper}>
-            <ContentsBox imgSrc="/images/Tumer_fill.svg" title="시간" />
-            <div className={styles.defaultWrapper}>
-              <TextInputField
-                type="number"
-                value={String(time)}
-                onChange={(e) => setTime(Number(e.target.value))}
-                borderRadius={12}
-              />
-            </div>
-          </div>
-        </div>
-        <div className={styles.contentsContainer}>
-          {/* 파일 업로드*/}
-          <div className={styles.contentsWrapper}>
-            <ContentsBox imgSrc="/images/paper_clip.svg" title="파일" />
-            <div className={styles.titleWrapper}>
-              {/* <input type="file" onChange={handleFileChange} /> */}
-              <FileUploadBox setFiles={setFiles} />
-            </div>
-          </div>
-
-          {/* 문제 유형 */}
-          <div className={styles.contentsWrapper}>
-            <ContentsBox imgSrc="/images/edit.svg" title="문제 유형" />
-            <div className={styles.defaultWrapper}>
-              <RadioInputField
-                name="radioGroup"
-                options={problemTypeOptions}
-                selectedValue={problemType}
-                onChange={handleRadioChange}
-              />
-            </div>
-          </div>
           {/* 문제 수 */}
           <div className={styles.contentsWrapper}>
             <ContentsBox imgSrc="/images/Book_open_alt.svg" title="문제 수" />
@@ -159,6 +125,20 @@ export default function CreateRoom() {
               />
             </div>
           </div>
+        </div>
+        <div className={styles.contentsContainer}>
+          {/* 파일 업로드*/}
+          <h1 className={styles.ContainerTitle}>문제 만들기</h1>
+
+          <QuestionMaker
+            questionType={qustionType}
+            setQuestionType={setQuestionType}
+          />
+          {qustionType === 'create' ? (
+            <FileUploadBox setFiles={setFiles} />
+          ) : (
+            <DropBox />
+          )}
         </div>
         <div className={styles.buttonContainer}>
           <div className={styles.buttonWrapper}>
