@@ -125,8 +125,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 class Vectorizer():
-    def __init__(self, openai_api_key):
-        self.embedding = OpenAIEmbeddings(openai_api_key=openai_api_key)
+    def __init__(self):
+        self.embedding = OpenAIEmbeddings(model="text-embedding-3-large")
 
         # text to vector convertor
     def vectorize(self, split_docs):
