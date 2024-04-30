@@ -21,14 +21,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
       <body className={`${pretendard.variable} ${bagel.variable}`}>
         <div id="main-layout">
-          <div id="root">{children}</div>
+          <div id="root">
+            {children}
+            {modal}
+          </div>
           <div id="modal-root" />
         </div>
       </body>
