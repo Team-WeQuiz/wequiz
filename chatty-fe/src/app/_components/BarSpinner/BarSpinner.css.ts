@@ -1,4 +1,3 @@
-import { globals } from '@/app/globals.css';
 import { keyframes, style } from '@vanilla-extract/css';
 
 export const Spin = keyframes({
