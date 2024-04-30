@@ -2,8 +2,8 @@ from fastapi import FastAPI
 import json, random
 import boto3
 import uuid
-import time
 import asyncio
+import os
 
 from schema import *
 from data.preprocessor import Parser
@@ -13,8 +13,7 @@ from utils.logger import log
 
 app = FastAPI()
 
-### credential key
-OPENAI_API_KEY = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
+os.environ["OPENAI_API_KEY"] = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
 AWS_ACCESS_KEY = json.loads(get_aws_access_key())
 
 ## DynamoDB
@@ -23,52 +22,15 @@ QUIZ_TABLE = 'wequiz-quiz'
 MARK_TABLE = 'wequiz-mark'
 dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
 
+
 @app.get("/ping")
 def ping():
     return {"ping": "pong"}
 
-@app.post("/test")
-async def test(generate_request: GenerateRequest):
-    # Parsing and split file
-    start_time = time.time()
-    parser = Parser(generate_request.user_id)
-    split_docs = parser.parse()
-    end_time = time.time()
-
-    # Generate description
-    s_time = time.time()
-    summarizer = Summarizer(OPENAI_API_KEY)
-    summary, inters = await summarizer.summarize(split_docs)
-    e_time = time.time()
-
-    meta = {
-        "file": generate_request.user_id,
-        "size": '3000, 500',
-        "length": len(split_docs),
-        "parsing_time": end_time - start_time,
-        "summary_time": e_time - s_time,
-    }
-
-    print(meta)
-
-    with open('../log/batch2/async_3000_500.txt', 'a') as f:
-        f.write('\n')
-        f.write(str(meta))
-        f.write('\n')
-        f.write('*************************************')
-        for inter in inters:
-            f.write('\n')
-            f.write(inter)
-        f.write('\n')
-        f.write('*************************************')
-        f.write(summary)
-
-    # return summary
-
 
 @app.post("/mark")
 def mark(mark_request: MarkRequest):
-    marker = Marker(OPENAI_API_KEY)
+    marker = Marker()
     answers = []
 
     try:
@@ -157,28 +119,11 @@ def create_id(generate_request, id):
         raise e
 
 
-async def generate_description_async(generate_request, id, split_docs):
-    try:
-        # Generate description
-        summarizer = Summarizer(OPENAI_API_KEY)
-        summary = await summarizer.summarize(split_docs)
-
-        dynamodb.update_item(
-            TableName=QUIZ_TABLE,
-            Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-            UpdateExpression='SET description = :val',
-            ExpressionAttributeValues={':val': {'S': summary}}
-        )
-
-    except Exception as e:
-        log('error', f'Failed to Generate Description: {str(e)}')
-        raise e
-
 
 async def generate_quiz_async(generate_request, id, split_docs):
     try:
         # Generate description
-        summarizer = Summarizer(OPENAI_API_KEY)
+        summarizer = Summarizer()
         summary, inters = await summarizer.summarize(split_docs)
 
         dynamodb.update_item(
@@ -193,7 +138,7 @@ async def generate_quiz_async(generate_request, id, split_docs):
         raise e
 
     # Generate quiz
-    quiz_generator = QuizGenerator(split_docs, OPENAI_API_KEY)
+    quiz_generator = QuizGenerator(split_docs)
     if len(inters) <= generate_request.numOfQuiz:
         inters = inters * ((generate_request.numOfQuiz // len(inters)) + 1)
     contents = inters[:generate_request.numOfQuiz]
@@ -242,14 +187,9 @@ async def generate(generate_request: GenerateRequest):
     split_docs = parser.parse()
 
     try:
-        # Call create_id to obtain the ID
         res = create_id(generate_request, id)
-
-        # # Create tasks for generating description and quiz asynchronously
-        # description_task = asyncio.create_task(generate_description_async(generate_request, id, split_docs))
         quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, split_docs))
         
-        # Return the ID as the response
         return res
 
     except Exception as e:
