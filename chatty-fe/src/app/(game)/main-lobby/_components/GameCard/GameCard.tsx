@@ -12,7 +12,7 @@ const GameCard = ({
 }: RoomInfo) => {
   return (
     <Link
-      href={`localhost:3000/enter-room/${roomId}`}
+      href={`/enter-room/${roomId}`}
       className={`${styles.gameCard} ${styles.gameCardHover}`}
     >
       <div className={`${styles.gameTitle} ${styles.textEllipsis}`}>{name}</div>
