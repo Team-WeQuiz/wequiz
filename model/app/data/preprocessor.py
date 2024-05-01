@@ -1,6 +1,6 @@
 import tiktoken, json, re
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from data.settings import BUCKET_NAME, CHUNK_SIZE, CHUNK_OVERLAP, PARSING_RETRY
+from data.settings import *
 from utils.security import get_minio_access_key
 from data.loader import MinioLoader
 from langchain_community.document_loaders.parsers.pdf import (
@@ -59,24 +59,13 @@ class Parser():
         encoding = tiktoken.get_encoding("cl100k_base")
 
         total_tokens = len(encoding.encode(documents))
-        print(f'예상되는 토큰 수: {total_tokens}')
 
         return total_tokens
     
-    def split_docs(self, documents):
-        
-        total_text = ''
-        page_num = 0
-        for document in documents:
-            total_text += document.page_content
-            page_num += 1
-        
-        print(f'페이지 수: {page_num}')
-
-        total_tokens = self.num_tokens_from_string(total_text)
+    def split_docs(self, total_text, chunk_size, chunk_overlap):
 
         # 결과 출력
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP, length_function=len)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap, length_function=len)
         splitted_text = text_splitter.split_text(total_text)
         splitted_docs = text_splitter.create_documents(splitted_text)
 
@@ -84,17 +73,29 @@ class Parser():
 
 
     def get_parsed_docs(self, parser, loader, files):
-        docs_list = []
+        summary_docs_list = []
+        vector_docs_list = []
+
         for file in files:
             file_obj = loader.load_file(file)
 
             # PDF 파싱
             documents = parser.lazy_parse(file_obj)
 
-            splitted_docs = self.split_docs(documents)
-            docs_list += splitted_docs
+            # documents를 하나의 text로 병합
+            total_text = ''
+            page_num = 0
+            for document in documents:
+                total_text += document.page_content
+                page_num += 1
+            
+            print(f'페이지 수: {page_num}')
+            print(f'예상되는 토큰 수: {self.num_tokens_from_string(total_text)}')
 
-        return docs_list
+            summary_docs_list += self.split_docs(total_text, SUMMARY_CHUNK_SIZE, SUMMARY_CHUNK_OVERLAP)
+            vector_docs_list += self.split_docs(total_text, VECTOR_CHUNK_SIZE, VECTOR_CHUNK_OVERLAP)
+
+        return summary_docs_list, vector_docs_list
 
 
     # parse files
@@ -108,15 +109,16 @@ class Parser():
             try:
                 # retry 횟수에 따라 파서 선정
                 parser = parsers[retry%3]
-                docs_list = self.get_parsed_docs(parser, loader, minio_files)
+                summary_docs_list, vector_docs_list = self.get_parsed_docs(parser, loader, minio_files)
                 break
             except Exception as e:
                 print(f"An unexpected parsing error occurred: {e}")
                 retry += 1
                 continue
         
-        print(f"총 {len(docs_list)}개의 문서 조각이 준비되었습니다.")
-        return docs_list
+        print(f"요약을 위한 {len(summary_docs_list)}개의 문서 조각이 준비되었습니다.")
+        print(f"벡터화를 위한 {len(vector_docs_list)}개의 문서 조각이 준비되었습니다.")
+        return summary_docs_list, vector_docs_list
 
 
 ##############################################################################
@@ -125,8 +127,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 class Vectorizer():
-    def __init__(self, openai_api_key):
-        self.embedding = OpenAIEmbeddings(openai_api_key=openai_api_key)
+    def __init__(self):
+        self.embedding = OpenAIEmbeddings(model="text-embedding-3-large")
 
         # text to vector convertor
     def vectorize(self, split_docs):

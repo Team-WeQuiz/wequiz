@@ -1,34 +1,41 @@
 from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE
 from model.schema import ChoiceOutput, ShortOutput
-from langchain_openai import OpenAI, ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from langchain.memory import VectorStoreRetrieverMemory
 from langchain.chains import LLMChain
+from langchain.globals import set_debug
+
+set_debug(True)
 
 
 # LLM 체인 클래스
 class Chain():
-    def __init__(self, indices, openai_api_key):
+    def __init__(self, indices):
         # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
-        self.retriever = indices.as_retriever(search_kwargs=dict(k=3))
-        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-3.5-turbo-0125")
+        self.retriever = indices.as_retriever(search_kwargs=dict(k=1))
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
         self.types = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
         self.schems = [ChoiceOutput, ShortOutput]
     
-    # 객관식 문제 생성 함수
     def prob(self, type, message):
         parser = JsonOutputParser(pydantic_object=self.schems[type])
         prompt = PromptTemplate(
             template=self.types[type],
-            input_variables=["message"],
+            input_variables=["context"],
             partial_variables={"format_instructions": parser.get_format_instructions()}
         )
-        memory = VectorStoreRetrieverMemory(retriever=self.retriever)
-        chain = LLMChain(llm=self.llm, prompt=prompt, memory=memory, output_parser=parser)
         
-        return chain.invoke(message)
+        rag_chain = LLMChain(
+            prompt=prompt,
+            llm=self.llm, 
+            output_parser=parser,
+        )
 
+        relevant_docs = self.retriever.invoke(message)
+        context = " ".join([doc.page_content for doc in relevant_docs])[:200]
+        
+        return rag_chain.invoke(context)
 
 #######################################################################################################
 
@@ -40,8 +47,8 @@ from langchain_core.output_parsers import StrOutputParser
 
 
 class SummaryChain():
-    def __init__(self, openai_api_key):
-        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-3.5-turbo-0125")
+    def __init__(self):
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
 
     # meta data generate, map reduce 방식으로 문서를 쪼개서 요약하고 합침.
     async def summary(self, split_docs):
@@ -94,8 +101,8 @@ class SummaryChain():
 from model.prompt import MARK_TEMPLATE
 
 class MarkChain():
-    def __init__(self, openai_api_key):
-        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-3.5-turbo-0125")
+    def __init__(self):
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
     
     def mark(self, answer, user):
         prompt = PromptTemplate(

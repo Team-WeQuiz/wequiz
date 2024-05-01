@@ -13,7 +13,7 @@ public class AnswerData {
     private final Integer majorityNum;
     private final String quizId;
     private final Integer quizNum;
-    private final String answer;
+    private final String correct;
 
     public synchronized SubmitStatus addAnswer(Long playerId, String playerAnswer) {
         playerAnswers.add(Answer.builder()

@@ -5,7 +5,6 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
-import com.chatty.chatty.config.AWSKey;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +22,10 @@ public class DynamoDBRepository {
 
     private final AmazonDynamoDB amazonDynamoDB;
     private final DynamoDB dynamoDB;
-    private final AWSKey awsKey;
 
-    public DynamoDBRepository(AmazonDynamoDB amazonDynamoDB, AWSKey awsKey) {
+    public DynamoDBRepository(AmazonDynamoDB amazonDynamoDB) {
         this.amazonDynamoDB = amazonDynamoDB;
         this.dynamoDB = new DynamoDB(amazonDynamoDB);
-        this.awsKey = awsKey;
     }
 
     public String getDescriptionFromDB(String itemId, String timestamp) {

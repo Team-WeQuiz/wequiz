@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class BaseEntity {
-
+  
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Column(updatable = false, nullable = false)
@@ -32,6 +33,15 @@ public abstract class BaseEntity {
 
     @PrePersist
     public void onPrePersist() {
-        this.createdAt = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
+        this.createdAt = getCurrentDateTimeFormatted();
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        this.updatedAt = getCurrentDateTimeFormatted();
+    }
+
+    private LocalDateTime getCurrentDateTimeFormatted() {
+      return LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
     }
 }

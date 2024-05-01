@@ -16,6 +16,7 @@ public record Quiz(
 
         List<String> options,
 
-        String answer
+        @JsonProperty("answer")
+        String correct
 ) {
 }
