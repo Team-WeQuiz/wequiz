@@ -120,11 +120,11 @@ def create_id(generate_request, id):
 
 
 
-async def generate_quiz_async(generate_request, id, split_docs):
+async def generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs):
     try:
         # Generate description
         summarizer = Summarizer()
-        summary, inters = await summarizer.summarize(split_docs)
+        summary, inters = await summarizer.summarize(summary_split_docs)
 
         dynamodb.update_item(
             TableName=QUIZ_TABLE,
@@ -138,9 +138,12 @@ async def generate_quiz_async(generate_request, id, split_docs):
         raise e
 
     # Generate quiz
-    quiz_generator = QuizGenerator(split_docs)
-    if len(inters) <= generate_request.numOfQuiz:
-        inters = inters * ((generate_request.numOfQuiz // len(inters)) + 1)
+    quiz_generator = QuizGenerator(vector_split_docs)
+
+    if len(inters) < generate_request.numOfQuiz:
+        repeat_count = generate_request.numOfQuiz // len(inters) + 1
+        inters = inters * repeat_count
+        
     contents = inters[:generate_request.numOfQuiz]
 
     if len(contents) != generate_request.numOfQuiz:
@@ -184,11 +187,11 @@ async def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     # Parsing and split file
     parser = Parser(generate_request.user_id, generate_request.timestamp)
-    split_docs = parser.parse()
+    summary_split_docs, vector_split_docs = parser.parse()
 
     try:
         res = create_id(generate_request, id)
-        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, split_docs))
+        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs))
         
         return res
 
