@@ -166,7 +166,7 @@ async def generate_quiz_async(generate_request, id, split_docs):
                 "type": {"S": question["type"]},
                 "question": {"S": question["question"]},
                 "options": {"L": [{"S": option} for option in question["options"]]},
-                "answer": {"S": question["answer"]}
+                "correct": {"S": question["correct"]}
             }
         }
         questions.append(new_question)

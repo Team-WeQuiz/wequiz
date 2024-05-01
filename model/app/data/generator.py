@@ -25,7 +25,7 @@ class QuizGenerator():
                         "type": types[type],
                         "question": response["text"]["question"],
                         "options": response["text"]["choices"],
-                        "answer": response["text"]["answer"]
+                        "correct": response["text"]["correct"]
                     }
                     break
                 except KeyError:
