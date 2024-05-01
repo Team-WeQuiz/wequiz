@@ -1,6 +1,10 @@
 package com.chatty.chatty.player.repository;
 
+import static com.chatty.chatty.player.exception.PlayerExceptionType.DUPLICATE_NICKNAME;
+
+import com.chatty.chatty.player.domain.PlayerStatus;
 import com.chatty.chatty.player.domain.PlayersStatus;
+import com.chatty.chatty.player.exception.PlayerException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +23,9 @@ public class PlayersStatusRepository {
         return Optional.ofNullable(playersStatusMap.get(roomId));
     }
 
-    public PlayersStatus saveUserToRoom(Long roomId, Long userId) {
+    public PlayersStatus saveUserToRoom(Long roomId, Long userId, String nickname) {
         PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
-        log.info("saveUserToRoom: {}", playersStatus);
-        log.info("roomId: {}", roomId);
-        updateStatus(roomId, playersStatus.updateWithNewUser(userId));
+        updateStatus(roomId, playersStatus.updateWithNewUser(userId, nickname));
         return playersStatus;
     }
 
@@ -37,6 +39,13 @@ public class PlayersStatusRepository {
         PlayersStatus playersStatus = findByRoomId(roomId).get();
         updateStatus(roomId, playersStatus.toggleReady(userId));
         return playersStatus;
+    }
+
+    private void validateNicknameDuplicate(PlayersStatus playersStatus, String nickname) {
+        if (playersStatus.playerStatusSet().stream()
+                .anyMatch(playerStatus -> playerStatus.nickname().equals(nickname))) {
+            throw new PlayerException(DUPLICATE_NICKNAME);
+        }
     }
 
     public void clear(Long roomId) {

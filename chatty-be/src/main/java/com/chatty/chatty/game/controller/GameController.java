@@ -6,6 +6,7 @@ import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.service.GameService;
+import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.time.LocalDateTime;
@@ -50,9 +51,10 @@ public class GameController {
 
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
-    public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+    public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor,
+            NicknameRequest request) {
         quizRoomService.broadcastUpdatedRoomList();
-        return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor));
+        return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
     }
 
     @MessageMapping("/rooms/{roomId}/leave")
