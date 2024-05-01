@@ -64,12 +64,6 @@ public class GameService {
                 .build();
     }
 
-    @Async
-    public void initQuiz(Long roomId) {
-        QuizData quizData = gameRepository.getQuizData(roomId);
-        fillQuiz(quizData);
-    }
-
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
