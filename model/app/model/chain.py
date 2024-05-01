@@ -33,7 +33,7 @@ class Chain():
         )
 
         relevant_docs = self.retriever.invoke(message)
-        context = " ".join([doc.page_content for doc in relevant_docs])[:200]
+        context = " ".join([doc.page_content for doc in relevant_docs])
         
         return rag_chain.invoke(context)
 
