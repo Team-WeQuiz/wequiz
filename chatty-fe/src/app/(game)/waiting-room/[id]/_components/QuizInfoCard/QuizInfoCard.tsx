@@ -1,16 +1,9 @@
 import Image from 'next/image';
 import * as styles from './QuizInfoCard.css';
+import { QuizInfo } from '@/app/_types/QuizInfoType';
 import { getQuizInfo } from '@/app/_api/quiz';
 import { useState, useEffect } from 'react';
 import useAuthStore from '@/app/_store/useAuthStore';
-
-type QuizInfo = {
-  roomId: number;
-  name: string;
-  maxPlayers: number;
-  description: string;
-  numOfQuiz: number;
-};
 
 const initialData: QuizInfo = {
   roomId: 0,
@@ -66,9 +59,7 @@ const QuizInfoCard = ({
           <h3 className={styles.textEllipsis}>{data.name}</h3>
         </div>
       </div>
-      <div
-        className={styles.description}
-      >
+      <div className={styles.description}>
         <p className={styles.textEllipsis}>{data.description}</p>
       </div>
       <div className={styles.detail}>
