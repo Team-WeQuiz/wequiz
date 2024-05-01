@@ -1,9 +1,15 @@
 # # preprocessor.py
 BUCKET_NAME = 'wequiz-files'
 PORT = 9010
-CHUNK_SIZE = 2000
-CHUNK_OVERLAP = 400
 PARSING_RETRY = 3
+
+# summary chunk
+SUMMARY_CHUNK_SIZE = 3000
+SUMMARY_CHUNK_OVERLAP = 500
+
+# vector chunk
+VECTOR_CHUNK_SIZE = 1000
+VECTOR_CHUNK_OVERLAP = 200
 
 
 # generator.py
