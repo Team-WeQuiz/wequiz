@@ -9,7 +9,6 @@ export const postRoom = async (
   playerLimitNum: number,
   code: string,
   files: File[],
-  description: string,
 ) => {
   try {
     const formData = new FormData();
