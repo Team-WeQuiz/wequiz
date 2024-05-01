@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
     private static final Integer QUIZ_SIZE = 5;
-    private static final Long QUIZ_POLLING_SLEEP_TIME = 5000L;
     private final PlayersStatusRepository playersStatusRepository;
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
@@ -70,7 +69,7 @@ public class GameService {
             fillQuiz(quizData);
             log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
-        log.info("Send: Quiz: {}", quizData.getQuizQueue().peek());
+        log.info("Send: Quiz: {}", quizData.getQuiz());
         return buildQuizResponse(quizData);
     }
 
@@ -80,15 +79,14 @@ public class GameService {
         List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
                 currentRound, QUIZ_SIZE);
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
-        quizData.getQuizQueue().addAll(currentQuizzes);
-        quizData.increaseCurrentRound();
+        quizData.fillQuiz(currentQuizzes);
         log.info("filled queue: {}", quizData.getQuizQueue());
     }
 
-    public void removeAndSendQuiz(Long roomId) {
+    public Quiz removeQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        quizData.getQuizQueue().poll();
         log.info("Remove: QuizQueue: {}", quizData.getQuizQueue());
+        return quizData.removeQuiz();
     }
 
     /*
@@ -110,32 +108,30 @@ public class GameService {
     }
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
-        Quiz quiz = quizData.getQuizQueue().peek();
         return QuizResponse.builder()
-                .quiz(quiz)
+                .quiz(quizData.getQuiz())
                 .totalRound(quizData.getTotalRound())
                 .currentRound(quizData.getCurrentRound())
                 .build();
     }
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
-        SubmitStatus status = answerRepository.addPlayerAnswer(roomId, request);
-        log.info("Add: AnswerData: {}", answerRepository.getAnswerData(roomId, request));
+        AnswerData answerData = answerRepository.getAnswerData(roomId, request.quizNum());
+        SubmitStatus status = answerData.addAnswer(request.playerId(), request.playerAnswer());
+        log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
-            removeAndSendQuiz(roomId);
-
+            Quiz removedQuiz = removeQuiz(roomId);
             String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
-            AnswerData answerData = answerRepository.getAnswerData(roomId, request);
             modelService.requestMark(MarkRequest.builder()
                     .id(quizDocId)
-                    .quiz_id(answerData.getQuizId())
+                    .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
-                    .correct(answerData.getAnswer())
+                    .correct(removedQuiz.correct())
                     .answers(answerData.getPlayerAnswers())
                     .build());
             calculateScore();
-            answerRepository.clearAnswer(roomId);
+            answerRepository.clearAnswerData(roomId);
         }
         return SubmitAnswerResponse.builder()
                 .status(status)

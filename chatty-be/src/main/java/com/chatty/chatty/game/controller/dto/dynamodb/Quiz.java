@@ -16,6 +16,6 @@ public record Quiz(
 
         List<String> options,
 
-        String answer
+        String correct
 ) {
 }
