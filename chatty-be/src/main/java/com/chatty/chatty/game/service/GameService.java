@@ -5,8 +5,10 @@ import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.model.AnswerDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
 import com.chatty.chatty.game.domain.AnswerData;
+import com.chatty.chatty.game.domain.PlayerAnswerData;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.SubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
@@ -19,6 +21,8 @@ import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -123,7 +127,7 @@ public class GameService {
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
         AnswerData answerData = answerRepository.getAnswerData(roomId, request.quizNum());
-        SubmitStatus status = answerData.addAnswer(request.playerId(), request.playerAnswer());
+        SubmitStatus status = answerData.addAnswer(request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
@@ -134,7 +138,7 @@ public class GameService {
                     .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
                     .correct(removedQuiz.correct())
-                    .answers(answerData.getPlayerAnswers())
+                    .answers(getAnswers(answerData.getPlayerAnswers()))
                     .build());
             calculateScore();
             answerRepository.clearAnswerData(roomId);
@@ -143,6 +147,15 @@ public class GameService {
                 .status(status)
                 .timestamp(LocalDateTime.now())
                 .build();
+    }
+
+    private List<AnswerDTO> getAnswers(Map<Long, PlayerAnswerData> playerAnswers) {
+        return playerAnswers.entrySet().stream()
+                .map(entry -> AnswerDTO.builder()
+                        .user_id(entry.getKey())
+                        .user(entry.getValue().playerAnswer())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private void calculateScore() {

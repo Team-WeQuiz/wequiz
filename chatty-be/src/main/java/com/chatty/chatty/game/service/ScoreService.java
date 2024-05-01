@@ -1,4 +1,4 @@
 package com.chatty.chatty.game.service;
 
-public class QuizDataService {
+public class ScoreService {
 }

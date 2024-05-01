@@ -1,6 +1,5 @@
 package com.chatty.chatty.game.controller.dto.model;
 
-import com.chatty.chatty.game.domain.Answer;
 import java.util.List;
 import lombok.Builder;
 
@@ -10,6 +9,6 @@ public record MarkRequest(
         String quiz_id,
         Integer question_number,
         String correct,
-        List<Answer> answers
+        List<AnswerDTO> answers
 ) {
 }
