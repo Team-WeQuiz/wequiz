@@ -1,5 +1,7 @@
 import client from './client';
 
+
+
 export const getQuizInfo = async (id: number, accessToken: string) => {
   try {
     const response = await client.get(`rooms/${id}`, {
