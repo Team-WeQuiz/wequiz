@@ -108,10 +108,14 @@ public class GameService {
     }
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
+        Quiz quiz = quizData.getQuiz();
         return QuizResponse.builder()
-                .quiz(quizData.getQuiz())
                 .totalRound(quizData.getTotalRound())
                 .currentRound(quizData.getCurrentRound())
+                .quizNumber(quiz.questionNumber())
+                .type(quiz.type())
+                .quiz(quiz.question())
+                .options(quiz.options())
                 .build();
     }
 
