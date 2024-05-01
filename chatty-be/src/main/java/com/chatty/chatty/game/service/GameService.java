@@ -68,9 +68,9 @@ public class GameService {
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
             fillQuiz(quizData);
-            log.info("Fill: QuizData: {}", quizData);
+            log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
-        log.info("Send: QuizData: {}", quizData);
+        log.info("Send: Quiz: {}", quizData.getQuizQueue().peek());
         return buildQuizResponse(quizData);
     }
 
@@ -82,14 +82,13 @@ public class GameService {
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.getQuizQueue().addAll(currentQuizzes);
         quizData.increaseCurrentRound();
-        log.info("filled queue: {}", quizData);
+        log.info("filled queue: {}", quizData.getQuizQueue());
     }
 
     public void removeAndSendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         quizData.getQuizQueue().poll();
-        log.info("Remove: QuizData: {}", quizData);
-        sendQuiz(roomId);
+        log.info("Remove: QuizQueue: {}", quizData.getQuizQueue());
     }
 
     /*
@@ -115,7 +114,7 @@ public class GameService {
         return QuizResponse.builder()
                 .quiz(quiz)
                 .totalRound(quizData.getTotalRound())
-                .currentRound(quizData.getCurrentRound() + 1)
+                .currentRound(quizData.getCurrentRound())
                 .build();
     }
 
