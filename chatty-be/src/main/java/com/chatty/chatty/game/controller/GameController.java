@@ -1,6 +1,5 @@
 package com.chatty.chatty.game.controller;
 
-import com.chatty.chatty.common.dto.CommonMessageDTO;
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
@@ -9,22 +8,16 @@ import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
-import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,7 +28,6 @@ public class GameController {
     private final GameService gameService;
     private final QuizRoomService quizRoomService;
     private final SimpMessagingTemplate template;
-    private final QuizRoomRepository quizRoomRepository;
 
     @MessageMapping("/rooms/{roomId}/chat")
     @SendTo("/sub/rooms/{roomId}/chat")
@@ -72,19 +64,6 @@ public class GameController {
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO toggleReady(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         return gameService.toggleReady(roomId, getUserIdFromHeader(headerAccessor));
-    }
-
-    @PostMapping("/rooms/{roomId}/start")
-    public ResponseEntity<CommonMessageDTO> startGame(@PathVariable Long roomId) {
-        quizRoomService.startRoom(roomId);
-        quizRoomService.broadcastUpdatedRoomList();
-        return ResponseEntity.status(HttpStatus.OK).body(gameService.startGame(roomId));
-    }
-
-    @DeleteMapping("/rooms/{roomId}/end")
-    public ResponseEntity<CommonMessageDTO> endGame(@PathVariable Long roomId) {
-        quizRoomService.finishRoom(roomId);
-        return ResponseEntity.status(HttpStatus.OK).body(gameService.endGame(roomId));
     }
 
     /*

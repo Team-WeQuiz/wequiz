@@ -1,11 +1,9 @@
 package com.chatty.chatty.game.service;
 
-import com.chatty.chatty.common.dto.CommonMessageDTO;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
-import com.chatty.chatty.game.domain.UserSubmitStatus;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
 import com.chatty.chatty.game.domain.AnswerData;
@@ -57,22 +55,6 @@ public class GameService {
     public PlayersStatusDTO toggleReady(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.toggleReady(roomId, userId);
         return buildDTO(roomId, playersStatus);
-    }
-
-    public CommonMessageDTO startGame(Long roomId) {
-        PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
-        userSubmitStatusRepository.init(players, roomId);
-        return CommonMessageDTO.builder()
-                .message(roomId + "번 방의 게임이 시작되었습니다.")
-                .build();
-    }
-
-    public CommonMessageDTO endGame(Long roomId) {
-        playersStatusRepository.clear(roomId);
-        userSubmitStatusRepository.clear(roomId);
-        return CommonMessageDTO.builder()
-                .message(roomId + "번 방의 게임이 종료되었습니다.")
-                .build();
     }
 
 
@@ -156,6 +138,8 @@ public class GameService {
                     .answers(answerData.getPlayerAnswers())
                     .build());
             calculateScore();
+            PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+            userSubmitStatusRepository.init(players, roomId);
             answerRepository.clearAnswerData(roomId);
         }
         return SubmitAnswerResponse.builder()

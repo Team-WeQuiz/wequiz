@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +45,19 @@ public class QuizRoomController {
             @AuthUser Long userId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getReadyRoomDetails(roomId, userId));
+    }
+
+    @PostMapping("/{roomId}/start")
+    public ResponseEntity<Void> startRoom(@PathVariable Long roomId) {
+        quizRoomService.startRoom(roomId);
+        quizRoomService.broadcastUpdatedRoomList();
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/{roomId}/end")
+    public ResponseEntity<Void> finishRoom(@PathVariable Long roomId) {
+        quizRoomService.finishRoom(roomId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @MessageMapping("/rooms?page={page}")

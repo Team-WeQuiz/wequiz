@@ -6,8 +6,10 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
+import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.model.ModelService;
+import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
@@ -44,6 +46,7 @@ public class QuizRoomService {
     private final MinioRepository minioRepository;
     private final SimpMessagingTemplate template;
     private final PlayersStatusRepository playersStatusRepository;
+    private final UserSubmitStatusRepository userSubmitStatusRepository;
 
 
     public RoomListResponse getRooms(Integer page) {
@@ -112,9 +115,30 @@ public class QuizRoomService {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom
                         -> {
+                    if (quizRoom.getStatus() == Status.STARTED) {
+                        return;
+                    }
+                    PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+                    userSubmitStatusRepository.init(players, roomId);
                     validateRoomIfReady(quizRoom.getStatus());
-                    quizRoomRepository.updateStatusById(roomId, Status.STARTED);
+                    updateRoomStatus(roomId, Status.STARTED);
                     savePlayersCount(quizRoom);
+                }, () -> {
+                    throw new QuizRoomException(ROOM_NOT_FOUND);
+                });
+    }
+    
+    public void finishRoom(Long roomId) {
+        quizRoomRepository.findById(roomId)
+                .ifPresentOrElse(quizRoom
+                        -> {
+                    if (quizRoom.getStatus() == Status.FINISHED) {
+                        return;
+                    }
+                    validateRoomIfStarted(quizRoom.getStatus());
+                    updateRoomStatus(roomId, Status.FINISHED);
+                    playersStatusRepository.clear(roomId);
+                    userSubmitStatusRepository.clear(roomId);
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
@@ -125,19 +149,8 @@ public class QuizRoomService {
         quizRoomRepository.save(quizRoom);
     }
 
-    public void finishRoom(Long roomId) {
-        quizRoomRepository.findById(roomId)
-                .ifPresentOrElse(quizRoom
-                        -> {
-                    validateRoomIfStarted(quizRoom.getStatus());
-                    updateRoomStatus(roomId);
-                }, () -> {
-                    throw new QuizRoomException(ROOM_NOT_FOUND);
-                });
-    }
-
-    private void updateRoomStatus(Long roomId) {
-        quizRoomRepository.updateStatusById(roomId, Status.FINISHED);
+    private void updateRoomStatus(Long roomId, Status status) {
+        quizRoomRepository.updateStatusById(roomId, status);
     }
 
     public void broadcastUpdatedRoomList() {
