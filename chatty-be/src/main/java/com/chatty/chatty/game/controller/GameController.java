@@ -103,8 +103,9 @@ public class GameController {
 
     @MessageMapping("/rooms/{roomId}/submit")
     @SendTo("/sub/rooms/{roomId}/submit")
-    public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request) {
-        return gameService.addPlayerAnswer(roomId, request);
+    public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
+            SimpMessageHeaderAccessor headerAccessor) {
+        return gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

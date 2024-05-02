@@ -5,13 +5,16 @@ import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
+import com.chatty.chatty.game.domain.UserSubmitStatus;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
 import com.chatty.chatty.game.domain.AnswerData;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.SubmitStatus;
+import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
@@ -34,6 +37,7 @@ public class GameService {
     private static final Integer QUIZ_SIZE = 5;
 
     private final PlayersStatusRepository playersStatusRepository;
+    private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
     private final DynamoDBService dynamoDBService;
@@ -56,6 +60,8 @@ public class GameService {
     }
 
     public CommonMessageDTO startGame(Long roomId) {
+        PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+        userSubmitStatusRepository.init(players, roomId);
         return CommonMessageDTO.builder()
                 .message(roomId + "번 방의 게임이 시작되었습니다.")
                 .build();
@@ -63,6 +69,7 @@ public class GameService {
 
     public CommonMessageDTO endGame(Long roomId) {
         playersStatusRepository.clear(roomId);
+        userSubmitStatusRepository.clear(roomId);
         return CommonMessageDTO.builder()
                 .message(roomId + "번 방의 게임이 종료되었습니다.")
                 .build();
@@ -132,10 +139,11 @@ public class GameService {
                 .build();
     }
 
-    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
+    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
         AnswerData answerData = answerRepository.getAnswerData(roomId, request.quizNum());
-        SubmitStatus status = answerData.addAnswer(request.playerId(), request.playerAnswer());
+        SubmitStatus status = answerData.addAnswer(userId, request.playerAnswer());
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
+        UsersSubmitStatus submitStatus = userSubmitStatusRepository.submit(roomId, userId);
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
             Quiz removedQuiz = removeQuiz(roomId);
@@ -153,6 +161,7 @@ public class GameService {
         return SubmitAnswerResponse.builder()
                 .status(status)
                 .timestamp(LocalDateTime.now())
+                .submitStatuses(submitStatus.usersSubmitStatus())
                 .build();
     }
 
