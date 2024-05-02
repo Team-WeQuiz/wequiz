@@ -5,14 +5,17 @@ import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
-import com.chatty.chatty.game.controller.dto.model.AnswerDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
+import com.chatty.chatty.game.controller.dto.model.MarkRequest.AnswerDTO;
+import com.chatty.chatty.game.controller.dto.model.MarkResponse;
 import com.chatty.chatty.game.domain.AnswerData;
-import com.chatty.chatty.game.domain.PlayerAnswerData;
+import com.chatty.chatty.game.domain.AnswerData.PlayerAnswerData;
 import com.chatty.chatty.game.domain.QuizData;
+import com.chatty.chatty.game.domain.ScoreData;
 import com.chatty.chatty.game.domain.SubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.game.repository.ScoreRepository;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
@@ -39,6 +42,7 @@ public class GameService {
     private final PlayersStatusRepository playersStatusRepository;
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
+    private final ScoreRepository scoreRepository;
     private final DynamoDBService dynamoDBService;
     private final ModelService modelService;
     private final SimpMessagingTemplate template;
@@ -133,15 +137,19 @@ public class GameService {
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
             Quiz removedQuiz = removeQuiz(roomId);
+
             String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
-            modelService.requestMark(MarkRequest.builder()
+            MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
                     .id(quizDocId)
                     .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
                     .correct(removedQuiz.correct())
                     .answers(getAnswers(answerData.getPlayerAnswers()))
                     .build());
-            calculateScore();
+
+            ScoreData scoreData = scoreRepository.getScoreData(roomId);
+            scoreData.addScore(answerData, markResponse.answers());
+
             answerRepository.clearAnswerData(roomId);
         }
         return SubmitAnswerResponse.builder()
@@ -158,8 +166,4 @@ public class GameService {
                         .build())
                 .collect(Collectors.toList());
     }
-
-    private void calculateScore() {
-    }
-
 }
