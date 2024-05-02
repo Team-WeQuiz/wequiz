@@ -11,18 +11,57 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
 import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
+import { useSearchParams } from 'next/navigation';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
+  const searchParams = useSearchParams();
+  const nickname = searchParams.get('nickname');
   const [isConnected, setIsConnected] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { accessToken } = useAuthStore();
-  const { userStatuses, updateUsers, setMessage } = useWaitingStore();
+  const { userStatuses, updateUsers, setMessage, allUsersReady } =
+    useWaitingStore();
   // 퀴즈 요약
-  const [quizSummary, setQuizSummary] =
-    useState<string>('');
+  const [quizSummary, setQuizSummary] = useState<string>('');
   // 퀴즈 생성 완료 체크
-  const [isQuizReady] = useState(true);
+  const [isQuizReady, setIsQuizReady] = useState(false);
+
+  // quiz 생성 확인
+  const getQuiz = (roomId: number, accessToken: string) => {
+    if (isConnected) {
+      stompClient.publish({
+        destination: `/pub/rooms/${roomId}/quiz`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    }
+  };
+
+  // polling
+  const startQuizPolling = (roomId: number, accessToken: string) => {
+    return setInterval(() => {
+      getQuiz(roomId, accessToken);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    console.log('allUsersReady:', allUsersReady);
+    if (!accessToken) return;
+    let interval: NodeJS.Timeout | null = null;
+    if (allUsersReady && !isQuizReady) {
+      interval = startQuizPolling(params.id, accessToken);
+    } else {
+      if (interval) clearInterval(interval);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [allUsersReady, accessToken, isQuizReady]);
 
   const disconnect = () => {
     console.log('Disconnecting from WebSocket');
@@ -57,6 +96,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       });
     };
 
+    // 채팅 구독
     const subscribeToChat = (roomId: number) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/chat`, (message) => {
         const chatMessage = JSON.parse(message.body);
@@ -66,6 +106,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       });
     };
 
+    // 요약 정보 구독
     const subscribeToDescription = (
       userId: number | undefined,
       roomId: number,
@@ -80,9 +121,23 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       );
     };
 
+    const subscribeQuiz = (roomId: number) => {
+      stompClient.subscribe(
+        `/user/${userId}/queue/rooms/${roomId}/quiz`,
+        (quiz) => {
+          const quizData = JSON.parse(quiz.body);
+          if (quizData.currentRound === 1) {
+            setIsQuizReady(true);
+          }
+        },
+      );
+    };
+
+    // 방 참가
     const joinRoom = (roomId: number) => {
       stompClient.publish({
         destination: `/pub/rooms/${roomId}/join`,
+        body: JSON.stringify({ nickname: nickname }),
       });
     };
 
@@ -108,6 +163,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       joinRoom(params.id);
       subscribeToDescription(userId, params.id);
       setIsSubscribed(true);
+      subscribeQuiz(params.id);
     };
 
     if (accessToken && userId) stompClient.activate();

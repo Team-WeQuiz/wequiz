@@ -40,7 +40,6 @@ const QuizInfoCard = ({
       }
     };
     if (accessToken && isSubscribed) {
-      console.log('sub?', isSubscribed);
       fetchData();
     }
   }, [isSubscribed, accessToken]);

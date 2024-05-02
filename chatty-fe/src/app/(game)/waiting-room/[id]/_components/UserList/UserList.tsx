@@ -12,6 +12,7 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
   const [botStatus, setBotStatus] = useState<UserStatus>({
     userId: -1,
     isReady: isQuizReady,
+    nickname: '문제 생성 확인 봇',
   });
 
   useEffect(() => {
@@ -20,6 +21,7 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
         userId: -1,
         isReady: isQuizReady,
         message: '나도 준비 완료!',
+        nickname: '문제 생성 확인 봇',
       });
     }
   }, [isQuizReady]);

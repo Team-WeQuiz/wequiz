@@ -69,7 +69,6 @@ const EnteringModals = ({
 
   const handleBack = () => {
     closeModal();
-    console.log('closing modal');
     goingBack();
   };
 
@@ -91,8 +90,10 @@ const EnteringModals = ({
         ) : (
           <NicknameModal
             name={requestState.data?.name}
+            roomId={id}
             isOpen={isOpen}
-            onClose={handleBack}
+            closeModal={closeModal}
+            goingBack={goingBack}
           />
         ))}
     </>

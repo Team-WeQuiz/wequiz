@@ -41,7 +41,7 @@ const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
       </div>
       <div className={styles.userInfo}>
         <div className={styles.line}></div>
-        <div className={styles.userName}>{userStatus.userId}</div>
+        <div className={styles.userName}>{userStatus.nickname}</div>
         <div className={styles.line}></div>
       </div>
     </div>
