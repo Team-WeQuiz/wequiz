@@ -61,4 +61,8 @@ public class QuizRoom extends BaseEntity {
     public void setStatus(Status status) {
         this.status = status;
     }
+
+    public void setPlayerNum(Integer playerNum) {
+        this.playerNum = playerNum;
+    }
 }

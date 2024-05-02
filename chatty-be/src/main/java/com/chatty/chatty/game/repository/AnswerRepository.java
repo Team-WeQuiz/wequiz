@@ -15,10 +15,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class AnswerRepository {
+
     private static final Map<Long, AnswerData> answerDataMap = new ConcurrentHashMap<>();
+
     private final QuizRoomRepository quizRoomRepository;
     private final GameRepository gameRepository;
-
 
     public AnswerData getAnswerData(Long roomId, Integer quizNum) {
         return answerDataMap.computeIfAbsent(roomId, id -> initAnswerData(id, quizNum));

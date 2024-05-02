@@ -1,13 +1,15 @@
 package com.chatty.chatty.quizroom.service;
 
 import static com.chatty.chatty.quizroom.exception.FileExceptionType.FILE_INPUT_STREAM_FAILED;
-import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_FINISHED;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
-import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_STARTED;
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_READY;
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
+import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.model.ModelService;
+import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
@@ -44,6 +46,7 @@ public class QuizRoomService {
     private final MinioRepository minioRepository;
     private final SimpMessagingTemplate template;
     private final PlayersStatusRepository playersStatusRepository;
+    private final UserSubmitStatusRepository userSubmitStatusRepository;
 
 
     public RoomListResponse getRooms(Integer page) {
@@ -66,10 +69,10 @@ public class QuizRoomService {
                 .build();
     }
 
-    public RoomDetailResponse getRoomDetail(Long roomId, Long userId) {
+    public RoomDetailResponse getReadyRoomDetails(Long roomId, Long userId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
-        validateRoomStatus(quizRoom.getStatus());
+        validateRoomIfReady(quizRoom.getStatus());
         gameService.sendDescription(quizRoom.getId(), userId);
 
         return RoomDetailResponse.builder()
@@ -103,12 +106,51 @@ public class QuizRoomService {
         savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
 
-        // 방 목록 업데이트 소켓 메세지 전송
-        broadcastUpdatedRoomList();
-
         return CreateRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())
                 .build();
+    }
+
+    public void startRoom(Long roomId) {
+        quizRoomRepository.findById(roomId)
+                .ifPresentOrElse(quizRoom
+                        -> {
+                    if (quizRoom.getStatus() == Status.STARTED) {
+                        return;
+                    }
+                    PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+                    userSubmitStatusRepository.init(players, roomId);
+                    validateRoomIfReady(quizRoom.getStatus());
+                    updateRoomStatus(roomId, Status.STARTED);
+                    savePlayersCount(quizRoom);
+                }, () -> {
+                    throw new QuizRoomException(ROOM_NOT_FOUND);
+                });
+    }
+    
+    public void finishRoom(Long roomId) {
+        quizRoomRepository.findById(roomId)
+                .ifPresentOrElse(quizRoom
+                        -> {
+                    if (quizRoom.getStatus() == Status.FINISHED) {
+                        return;
+                    }
+                    validateRoomIfStarted(quizRoom.getStatus());
+                    updateRoomStatus(roomId, Status.FINISHED);
+                    playersStatusRepository.clear(roomId);
+                    userSubmitStatusRepository.clear(roomId);
+                }, () -> {
+                    throw new QuizRoomException(ROOM_NOT_FOUND);
+                });
+    }
+
+    private void savePlayersCount(QuizRoom quizRoom) {
+        quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
+        quizRoomRepository.save(quizRoom);
+    }
+
+    private void updateRoomStatus(Long roomId, Status status) {
+        quizRoomRepository.updateStatusById(roomId, status);
     }
 
     public void broadcastUpdatedRoomList() {
@@ -133,20 +175,15 @@ public class QuizRoomService {
                 });
     }
 
-    private void validateRoomStatus(Status status) {
-        validateRoomStarted(status);
-        validateRoomFinished(status);
-    }
-
-    private void validateRoomStarted(Status status) {
-        if (status == Status.STARTED) {
-            throw new QuizRoomException(ROOM_STARTED);
+    private void validateRoomIfReady(Status status) {
+        if (status != Status.READY) {
+            throw new QuizRoomException(ROOM_NOT_READY);
         }
     }
 
-    private void validateRoomFinished(Status status) {
-        if (status == Status.FINISHED) {
-            throw new QuizRoomException(ROOM_FINISHED);
+    private void validateRoomIfStarted(Status status) {
+        if (status != Status.STARTED) {
+            throw new QuizRoomException(ROOM_NOT_STARTED);
         }
     }
 }
