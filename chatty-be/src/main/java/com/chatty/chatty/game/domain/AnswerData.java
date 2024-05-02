@@ -1,6 +1,7 @@
 package com.chatty.chatty.game.domain;
 
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Builder;
@@ -15,6 +16,7 @@ public class AnswerData {
     private final String quizId;
     private final Integer quizNum;
     private final String correct;
+    private final LocalDateTime startedTime;
 
     public synchronized SubmitStatus addAnswer(SubmitAnswerRequest request) {
         playerAnswers.put(request.playerId(), PlayerAnswerData.builder()

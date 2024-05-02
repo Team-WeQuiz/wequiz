@@ -76,6 +76,7 @@ public class GameService {
             log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
+        answerRepository.getAnswerData(roomId, quizData.getQuiz().questionNumber());
         return buildQuizResponse(quizData);
     }
 
@@ -159,6 +160,6 @@ public class GameService {
     }
 
     private void calculateScore() {
-        // TODO: 점수 계산
     }
+
 }

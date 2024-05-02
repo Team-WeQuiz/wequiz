@@ -7,6 +7,7 @@ import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class AnswerRepository {
                 .quizId(quizData.getQuiz().id())
                 .quizNum(quizNum)
                 .correct(quizData.getQuiz().correct())
+                .startedTime(LocalDateTime.now())
                 .build();
     }
 
