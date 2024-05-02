@@ -11,12 +11,13 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
 import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const searchParams = useSearchParams();
   const nickname = searchParams.get('nickname');
+
   const [isConnected, setIsConnected] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { accessToken } = useAuthStore();
@@ -63,6 +64,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     };
   }, [allUsersReady, accessToken, isQuizReady]);
 
+  // 연결 해제
   const disconnect = () => {
     console.log('Disconnecting from WebSocket');
     stompClient.publish({
@@ -76,6 +78,14 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
 
     stompClient.deactivate();
   };
+
+  const pathname = usePathname();
+  useEffect(() => {
+    if (!pathname.includes(`waiting-room/${params.id}`)) {
+      console.log('is detecting?');
+      disconnect();
+    }
+  }, [pathname]);
 
   useEffect(() => {
     window.addEventListener('popstate', disconnect);
@@ -149,9 +159,8 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     };
 
     stompClient.onDisconnect = () => {
-      stompClient.publish({
-        destination: `/pub/rooms/${params.id}/leave`,
-      });
+      console.log('Disconnected from WebSocket');
+      disconnect();
     };
 
     stompClient.onConnect = () => {
@@ -174,33 +183,35 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   }, [accessToken, userId, nickname]);
 
   return (
-    <div className={styles.roomContainer}>
-      <div className={styles.wideArea}>
-        <div className={styles.userList}>
-          <UserList isQuizReady={isQuizReady} />
+    <>
+      <div className={styles.roomContainer}>
+        <div className={styles.wideArea}>
+          <div className={styles.userList}>
+            <UserList isQuizReady={isQuizReady} />
+          </div>
+          <div className={styles.chattingArea}>
+            <ChatInput
+              roomId={params.id}
+              userId={userId}
+              disabled={!isConnected}
+            />
+          </div>
         </div>
-        <div className={styles.chattingArea}>
-          <ChatInput
-            roomId={params.id}
-            userId={userId}
-            disabled={!isConnected}
-          />
+        <div className={styles.narrowArea}>
+          <div className={styles.detailArea}>
+            <QuizInfoCard roomId={params.id} isSubscribed={isSubscribed} />
+            <QuizSummaryCard summary={quizSummary} />
+          </div>
+          <div className={styles.buttonWrapper}>
+            <ReadyButton
+              roomId={params.id}
+              userId={userId}
+              isQuizReady={isQuizReady}
+            />
+          </div>
         </div>
       </div>
-      <div className={styles.narrowArea}>
-        <div className={styles.detailArea}>
-          <QuizInfoCard roomId={params.id} isSubscribed={isSubscribed} />
-          <QuizSummaryCard summary={quizSummary} />
-        </div>
-        <div className={styles.buttonWrapper}>
-          <ReadyButton
-            roomId={params.id}
-            userId={userId}
-            isQuizReady={isQuizReady}
-          />
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
