@@ -13,9 +13,11 @@ import com.chatty.chatty.game.domain.AnswerData.PlayerAnswerData;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.ScoreData;
 import com.chatty.chatty.game.domain.SubmitStatus;
+import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.repository.ScoreRepository;
+import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
@@ -40,6 +42,7 @@ public class GameService {
     private static final Integer QUIZ_SIZE = 5;
 
     private final PlayersStatusRepository playersStatusRepository;
+    private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
     private final ScoreRepository scoreRepository;
@@ -62,9 +65,6 @@ public class GameService {
         return buildDTO(roomId, playersStatus);
     }
 
-    public void endGame(Long roomId) {
-        playersStatusRepository.clear(roomId);
-    }
 
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()
@@ -130,10 +130,11 @@ public class GameService {
                 .build();
     }
 
-    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
+    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
         AnswerData answerData = answerRepository.getAnswerData(roomId);
         SubmitStatus status = answerData.addAnswer(request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
+        UsersSubmitStatus submitStatus = userSubmitStatusRepository.submit(roomId, userId);
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
             Quiz removedQuiz = removeQuiz(roomId);
@@ -149,12 +150,15 @@ public class GameService {
 
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
-
+          
+            PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+            userSubmitStatusRepository.init(players, roomId);
             answerRepository.clearAnswerData(roomId);
         }
         return SubmitAnswerResponse.builder()
                 .status(status)
                 .timestamp(LocalDateTime.now())
+                .submitStatuses(submitStatus.usersSubmitStatus())
                 .build();
     }
 

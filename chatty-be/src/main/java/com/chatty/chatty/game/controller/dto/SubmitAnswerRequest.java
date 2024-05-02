@@ -5,10 +5,9 @@ import java.time.LocalDateTime;
 public record SubmitAnswerRequest(
         Integer quizNum,
 
-        Long playerId,
-
         String playerAnswer,
 
         LocalDateTime submittedTime
 ) {
+
 }

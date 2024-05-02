@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,19 +30,41 @@ public class QuizRoomController {
     private final QuizRoomService quizRoomService;
 
     @PostMapping
-    public ResponseEntity<CreateRoomResponse> createRoom(@ModelAttribute CreateRoomRequest request,
-                                                         @AuthUser Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.createRoom(request, userId));
+    public ResponseEntity<CreateRoomResponse> createRoom(
+            @ModelAttribute CreateRoomRequest request,
+            @AuthUser Long userId
+    ) {
+        CreateRoomResponse response = quizRoomService.createRoom(request, userId);
+        quizRoomService.broadcastUpdatedRoomList();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId, @AuthUser Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomDetail(roomId, userId));
+    public ResponseEntity<RoomDetailResponse> getReadyRoomDetails(
+            @PathVariable Long roomId,
+            @AuthUser Long userId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getReadyRoomDetails(roomId, userId));
+    }
+
+    @PostMapping("/{roomId}/start")
+    public ResponseEntity<Void> startRoom(@PathVariable Long roomId) {
+        quizRoomService.startRoom(roomId);
+        quizRoomService.broadcastUpdatedRoomList();
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/{roomId}/end")
+    public ResponseEntity<Void> finishRoom(@PathVariable Long roomId) {
+        quizRoomService.finishRoom(roomId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @MessageMapping("/rooms?page={page}")
     @SendTo("/sub/rooms?page={page}")
-    public RoomListResponse getRooms(@DestinationVariable Integer page) {
+    public RoomListResponse getRooms(
+            @DestinationVariable Integer page
+    ) {
         return quizRoomService.getRooms(page);
     }
 }
