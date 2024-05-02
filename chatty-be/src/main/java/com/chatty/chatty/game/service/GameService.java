@@ -76,7 +76,7 @@ public class GameService {
             log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
-        answerRepository.getAnswerData(roomId, quizData.getQuiz().questionNumber());
+        answerRepository.getAnswerData(roomId);
         return buildQuizResponse(quizData);
     }
 
@@ -127,7 +127,7 @@ public class GameService {
     }
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
-        AnswerData answerData = answerRepository.getAnswerData(roomId, request.quizNum());
+        AnswerData answerData = answerRepository.getAnswerData(roomId);
         SubmitStatus status = answerData.addAnswer(request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
 
