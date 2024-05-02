@@ -114,9 +114,15 @@ public class QuizRoomService {
                         -> {
                     validateRoomIfReady(quizRoom.getStatus());
                     quizRoomRepository.updateStatusById(roomId, Status.STARTED);
+                    savePlayersCount(quizRoom);
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
+    }
+
+    private void savePlayersCount(QuizRoom quizRoom) {
+        quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
+        quizRoomRepository.save(quizRoom);
     }
 
     public void finishRoom(Long roomId) {
