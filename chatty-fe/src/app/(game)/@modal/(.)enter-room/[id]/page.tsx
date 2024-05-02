@@ -1,7 +1,8 @@
 'use client';
 
 import EnteringModals from '@/app/(game)/enter-room/[id]/_component/EnteringModals/EnteringModals';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+
 
 const EnterRoomModal = ({
   params: { id: roomId },
@@ -9,7 +10,16 @@ const EnterRoomModal = ({
   params: { id: number };
 }) => {
   const router = useRouter();
-  return <EnteringModals id={roomId} goingBack={() => router.back()} />;
+  const searchParams = useSearchParams();
+
+  const creation = Boolean(searchParams.get('create')) || false;
+
+  console.log('creation', creation);
+  const handleBack = () => {
+    if (creation) return;
+    router.back();
+  };
+  return <EnteringModals id={roomId} goingBack={handleBack} />;
 };
 
 export default EnterRoomModal;

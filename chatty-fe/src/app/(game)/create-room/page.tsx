@@ -44,7 +44,7 @@ export default function CreateRoom() {
       );
       console.log(response);
       if (response) {
-        router.push(`waiting-room/${response.roomId}`);
+        router.push(`enter-room/${response.roomId}?create=true`);
       }
     } catch (error) {
       console.error(error);
