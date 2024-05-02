@@ -1,5 +1,6 @@
 package com.chatty.chatty.game.service;
 
+import com.chatty.chatty.common.dto.CommonMessageDTO;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
@@ -54,9 +55,19 @@ public class GameService {
         return buildDTO(roomId, playersStatus);
     }
 
-    public void endGame(Long roomId) {
-        playersStatusRepository.clear(roomId);
+    public CommonMessageDTO startGame(Long roomId) {
+        return CommonMessageDTO.builder()
+                .message(roomId + "번 방의 게임이 시작되었습니다.")
+                .build();
     }
+
+    public CommonMessageDTO endGame(Long roomId) {
+        playersStatusRepository.clear(roomId);
+        return CommonMessageDTO.builder()
+                .message(roomId + "번 방의 게임이 종료되었습니다.")
+                .build();
+    }
+
 
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()

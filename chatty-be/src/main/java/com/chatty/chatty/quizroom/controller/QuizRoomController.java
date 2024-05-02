@@ -29,19 +29,28 @@ public class QuizRoomController {
     private final QuizRoomService quizRoomService;
 
     @PostMapping
-    public ResponseEntity<CreateRoomResponse> createRoom(@ModelAttribute CreateRoomRequest request,
-                                                         @AuthUser Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(quizRoomService.createRoom(request, userId));
+    public ResponseEntity<CreateRoomResponse> createRoom(
+            @ModelAttribute CreateRoomRequest request,
+            @AuthUser Long userId
+    ) {
+        CreateRoomResponse response = quizRoomService.createRoom(request, userId);
+        quizRoomService.broadcastUpdatedRoomList();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId, @AuthUser Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getRoomDetail(roomId, userId));
+    public ResponseEntity<RoomDetailResponse> getReadyRoomDetails(
+            @PathVariable Long roomId,
+            @AuthUser Long userId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getReadyRoomDetails(roomId, userId));
     }
 
     @MessageMapping("/rooms?page={page}")
     @SendTo("/sub/rooms?page={page}")
-    public RoomListResponse getRooms(@DestinationVariable Integer page) {
+    public RoomListResponse getRooms(
+            @DestinationVariable Integer page
+    ) {
         return quizRoomService.getRooms(page);
     }
 }
