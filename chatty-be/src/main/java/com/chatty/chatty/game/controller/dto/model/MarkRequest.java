@@ -11,4 +11,10 @@ public record MarkRequest(
         String correct,
         List<AnswerDTO> answers
 ) {
+    @Builder
+    public record AnswerDTO(
+            Long user_id,
+            String user
+    ) {
+    }
 }

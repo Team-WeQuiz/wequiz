@@ -10,6 +10,13 @@ import lombok.Getter;
 @Builder
 @Getter
 public class AnswerData {
+    @Builder
+    public record PlayerAnswerData(
+            String playerAnswer,
+            LocalDateTime submittedTime
+    ) {
+    }
+
     private final Map<Long, PlayerAnswerData> playerAnswers = new ConcurrentHashMap<>();
     private final Integer playerNum;
     private final Integer majorityNum;
