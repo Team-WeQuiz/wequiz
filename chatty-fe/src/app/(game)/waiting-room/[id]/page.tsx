@@ -171,7 +171,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     return () => {
       stompClient.deactivate();
     };
-  }, [accessToken, userId]);
+  }, [accessToken, userId, nickname]);
 
   return (
     <div className={styles.roomContainer}>
