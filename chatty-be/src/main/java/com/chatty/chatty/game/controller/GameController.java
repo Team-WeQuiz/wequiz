@@ -88,6 +88,10 @@ public class GameController {
         return gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
     }
 
+    /*
+    publication URL : /pub/rooms/{roomId}/score
+    subscription URL : /user/{userId}/queue/rooms/{roomId}/score
+     */
     @MessageMapping("/rooms/{roomId}/score")
     public void sendScore(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         ScoreResponse scoreResponse = gameService.sendScore(roomId);

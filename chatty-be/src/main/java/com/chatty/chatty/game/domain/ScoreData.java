@@ -19,17 +19,15 @@ public class ScoreData {
     public void addScore(AnswerData answerData, List<Mark> markList) {
         int totalScore = SCORE_PER_PLAYER * answerData.getPlayerNum();
         int correctPlayersNum = countCorrectPlayers(markList);
-        if (correctPlayersNum == 0) {
-            return;
-        }
-        int defaultScore = totalScore / correctPlayersNum;
+        int defaultScore = (correctPlayersNum == 0) ? 0 : totalScore / correctPlayersNum;
 
         markList.forEach(mark -> {
             int currentScore = playersScore.computeIfAbsent(mark.user_id(), k -> ZERO);
             if (mark.marking()) {
                 LocalDateTime submittedTime = answerData.getPlayerAnswers().get(mark.user_id()).submittedTime();
                 int newScore = defaultScore - calculateSolvingTime(answerData.getStartedTime(), submittedTime);
-                int updatedScore = Math.max(1, Math.min(totalScore / 2, currentScore + newScore));
+                newScore = Math.max(1, Math.min(totalScore / 2, newScore));
+                int updatedScore = currentScore + newScore;
                 playersScore.put(mark.user_id(), updatedScore);
             }
         });
