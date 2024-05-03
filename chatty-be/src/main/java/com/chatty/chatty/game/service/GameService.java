@@ -3,7 +3,7 @@ package com.chatty.chatty.game.service;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
-import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScore;
+import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
@@ -179,12 +179,12 @@ public class GameService {
     }
 
     private ScoreResponse buildScoreResponse(Map<Long, Integer> playersScore) {
-        List<PlayerScore> scores = playersScore.entrySet().stream()
-                .map(entry -> PlayerScore.builder()
+        List<PlayerScoreDTO> scores = playersScore.entrySet().stream()
+                .map(entry -> PlayerScoreDTO.builder()
                         .playerId(entry.getKey())
                         .score(entry.getValue())
                         .build())
-                .sorted(Comparator.comparing(PlayerScore::score).reversed())
+                .sorted(Comparator.comparing(PlayerScoreDTO::score).reversed())
                 .toList();
         return ScoreResponse.builder()
                 .scores(scores)

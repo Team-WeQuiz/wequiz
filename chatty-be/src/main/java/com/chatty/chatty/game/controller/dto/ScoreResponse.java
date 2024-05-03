@@ -5,10 +5,10 @@ import lombok.Builder;
 
 @Builder
 public record ScoreResponse(
-        List<PlayerScore> scores
+        List<PlayerScoreDTO> scores
 ) {
     @Builder
-    public record PlayerScore(
+    public record PlayerScoreDTO(
             Long playerId,
             Integer score
     ) {
