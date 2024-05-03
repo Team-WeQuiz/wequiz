@@ -28,7 +28,7 @@ public class AnswerData {
     public synchronized SubmitStatus addAnswer(Long userId, SubmitAnswerRequest request) {
         playerAnswers.put(userId, PlayerAnswerData.builder()
                 .playerAnswer(request.playerAnswer())
-                .submittedTime(request.submittedTime())
+                .submittedTime(LocalDateTime.now())
                 .build());
         return checkSubmitStatus();
     }
