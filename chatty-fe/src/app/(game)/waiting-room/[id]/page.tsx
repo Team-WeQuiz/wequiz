@@ -75,7 +75,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         destination: `/pub/rooms/${params.id}/end`,
       });
     }
-
     stompClient.deactivate();
   };
 
@@ -207,6 +206,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
               roomId={params.id}
               userId={userId}
               isQuizReady={isQuizReady}
+              accessToken={accessToken}
             />
           </div>
         </div>

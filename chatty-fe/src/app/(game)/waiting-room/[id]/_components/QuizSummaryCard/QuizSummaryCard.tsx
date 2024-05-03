@@ -21,12 +21,12 @@ const QuizSummaryCard = ({ summary }: { summary: string }) => {
 
   return (
     <div className={styles.summaryCard}>
-      <h2 className={styles.header}>퀴즈 요약</h2>
+      <h2 className={styles.header}>문서 요약</h2>
       <div className={styles.summaryTextContainer}>
         {summary ? (
           <p>{text}</p>
         ) : (
-          <p className={styles.blinkingText}>퀴즈 요약을 불러오는 중 입니다.</p>
+          <p className={styles.blinkingText}>문서 요약을 불러오는 중 입니다.</p>
         )}
       </div>
     </div>
