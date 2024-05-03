@@ -14,7 +14,7 @@ import lombok.Getter;
 public class ScoreData {
     private static final Integer SCORE_PER_PLAYER = 100;
     private static final Integer ZERO = 0;
-    private final Map<Long, Integer> playerScores = new ConcurrentHashMap<>();
+    private final Map<Long, Integer> playersScore = new ConcurrentHashMap<>();
 
     public void addScore(AnswerData answerData, List<Mark> markList) {
         int totalScore = SCORE_PER_PLAYER * answerData.getPlayerNum();
@@ -25,12 +25,12 @@ public class ScoreData {
         int defaultScore = totalScore / correctPlayersNum;
 
         markList.forEach(mark -> {
-            int currentScore = playerScores.computeIfAbsent(mark.user_id(), k -> ZERO);
+            int currentScore = playersScore.computeIfAbsent(mark.user_id(), k -> ZERO);
             if (mark.marking()) {
                 LocalDateTime submittedTime = answerData.getPlayerAnswers().get(mark.user_id()).submittedTime();
                 int newScore = defaultScore - calculateSolvingTime(answerData.getStartedTime(), submittedTime);
                 int updatedScore = Math.max(1, Math.min(totalScore / 2, currentScore + newScore));
-                playerScores.put(mark.user_id(), updatedScore);
+                playersScore.put(mark.user_id(), updatedScore);
             }
         });
     }

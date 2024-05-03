@@ -3,6 +3,7 @@ package com.chatty.chatty.game.controller;
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.service.GameService;
@@ -48,7 +49,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor,
-            NicknameRequest request) {
+                                     NicknameRequest request) {
         quizRoomService.broadcastUpdatedRoomList();
         return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
     }
@@ -85,6 +86,16 @@ public class GameController {
     public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
             SimpMessageHeaderAccessor headerAccessor) {
         return gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
+    }
+
+    @MessageMapping("/rooms/{roomId}/score")
+    public void sendScore(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        ScoreResponse scoreResponse = gameService.sendScore(roomId);
+        template.convertAndSendToUser(
+                getUserIdFromHeader(headerAccessor).toString(),
+                "/queue/rooms/" + roomId + "/score",
+                scoreResponse
+        );
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {

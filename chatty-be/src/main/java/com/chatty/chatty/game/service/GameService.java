@@ -2,6 +2,8 @@ package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.controller.dto.ScoreResponse;
+import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScore;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
@@ -25,9 +27,9 @@ import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -168,6 +170,24 @@ public class GameService {
                         .user_id(entry.getKey())
                         .user(entry.getValue().playerAnswer())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    public ScoreResponse sendScore(Long roomId) {
+        ScoreData scoreData = scoreRepository.getScoreData(roomId);
+        return buildScoreResponse(scoreData.getPlayersScore());
+    }
+
+    private ScoreResponse buildScoreResponse(Map<Long, Integer> playersScore) {
+        List<PlayerScore> scores = playersScore.entrySet().stream()
+                .map(entry -> PlayerScore.builder()
+                        .playerId(entry.getKey())
+                        .score(entry.getValue())
+                        .build())
+                .sorted(Comparator.comparing(PlayerScore::score).reversed())
+                .toList();
+        return ScoreResponse.builder()
+                .scores(scores)
+                .build();
     }
 }
