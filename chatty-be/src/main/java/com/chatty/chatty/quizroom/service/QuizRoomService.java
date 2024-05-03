@@ -127,7 +127,7 @@ public class QuizRoomService {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
     }
-    
+
     public void finishRoom(Long roomId) {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom

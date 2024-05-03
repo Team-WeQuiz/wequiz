@@ -2,16 +2,23 @@ package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
+import com.chatty.chatty.game.controller.dto.ScoreResponse;
+import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
+import com.chatty.chatty.game.controller.dto.model.MarkRequest.AnswerDTO;
+import com.chatty.chatty.game.controller.dto.model.MarkResponse;
 import com.chatty.chatty.game.domain.AnswerData;
+import com.chatty.chatty.game.domain.AnswerData.PlayerAnswerData;
 import com.chatty.chatty.game.domain.QuizData;
+import com.chatty.chatty.game.domain.ScoreData;
 import com.chatty.chatty.game.domain.SubmitStatus;
 import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.game.repository.ScoreRepository;
 import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
@@ -20,7 +27,9 @@ import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -38,6 +47,7 @@ public class GameService {
     private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
+    private final ScoreRepository scoreRepository;
     private final DynamoDBService dynamoDBService;
     private final ModelService modelService;
     private final SimpMessagingTemplate template;
@@ -72,6 +82,7 @@ public class GameService {
             log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
+        answerRepository.getAnswerData(roomId);
         return buildQuizResponse(quizData);
     }
 
@@ -122,22 +133,26 @@ public class GameService {
     }
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
-        AnswerData answerData = answerRepository.getAnswerData(roomId, request.quizNum());
-        SubmitStatus status = answerData.addAnswer(userId, request.playerAnswer());
+        AnswerData answerData = answerRepository.getAnswerData(roomId);
+        SubmitStatus status = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
         UsersSubmitStatus submitStatus = userSubmitStatusRepository.submit(roomId, userId);
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
             Quiz removedQuiz = removeQuiz(roomId);
+
             String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
-            modelService.requestMark(MarkRequest.builder()
+            MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
                     .id(quizDocId)
                     .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
                     .correct(removedQuiz.correct())
-                    .answers(answerData.getPlayerAnswers())
+                    .answers(getAnswers(answerData.getPlayerAnswers()))
                     .build());
-            calculateScore();
+
+            ScoreData scoreData = scoreRepository.getScoreData(roomId);
+            scoreData.addScore(answerData, markResponse.answers());
+
             PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
             userSubmitStatusRepository.init(players, roomId);
             answerRepository.clearAnswerData(roomId);
@@ -149,7 +164,30 @@ public class GameService {
                 .build();
     }
 
-    private void calculateScore() {
-        // TODO: 점수 계산
+    private List<AnswerDTO> getAnswers(Map<Long, PlayerAnswerData> playerAnswers) {
+        return playerAnswers.entrySet().stream()
+                .map(entry -> AnswerDTO.builder()
+                        .user_id(entry.getKey())
+                        .user(entry.getValue().playerAnswer())
+                        .build())
+                .toList();
+    }
+
+    public ScoreResponse sendScore(Long roomId) {
+        ScoreData scoreData = scoreRepository.getScoreData(roomId);
+        return buildScoreResponse(scoreData.getPlayersScore());
+    }
+
+    private ScoreResponse buildScoreResponse(Map<Long, Integer> playersScore) {
+        List<PlayerScoreDTO> scores = playersScore.entrySet().stream()
+                .map(entry -> PlayerScoreDTO.builder()
+                        .playerId(entry.getKey())
+                        .score(entry.getValue())
+                        .build())
+                .sorted(Comparator.comparing(PlayerScoreDTO::score).reversed())
+                .toList();
+        return ScoreResponse.builder()
+                .scores(scores)
+                .build();
     }
 }

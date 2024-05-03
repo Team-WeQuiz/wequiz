@@ -7,8 +7,8 @@ public record MarkResponse(
         String quiz_id,
         List<Mark> answers
 ) {
-    private record Mark(
-            Integer user_id,
+    public record Mark(
+            Long user_id,
             String user,
             Boolean marking
     ) {

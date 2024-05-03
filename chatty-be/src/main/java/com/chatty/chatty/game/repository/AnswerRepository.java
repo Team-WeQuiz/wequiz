@@ -7,6 +7,7 @@ import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,11 @@ public class AnswerRepository {
     private final QuizRoomRepository quizRoomRepository;
     private final GameRepository gameRepository;
 
-    public AnswerData getAnswerData(Long roomId, Integer quizNum) {
-        return answerDataMap.computeIfAbsent(roomId, id -> initAnswerData(id, quizNum));
+    public AnswerData getAnswerData(Long roomId) {
+        return answerDataMap.computeIfAbsent(roomId, this::initAnswerData);
     }
-
-    private AnswerData initAnswerData(Long roomId, Integer quizNum) {
+    
+    private AnswerData initAnswerData(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         QuizData quizData = gameRepository.getQuizData(roomId);
@@ -34,8 +35,9 @@ public class AnswerRepository {
                 .playerNum(quizRoom.getPlayerNum())
                 .majorityNum((quizRoom.getPlayerNum() + 1) / 2)
                 .quizId(quizData.getQuiz().id())
-                .quizNum(quizNum)
+                .quizNum(quizData.getQuiz().questionNumber())
                 .correct(quizData.getQuiz().correct())
+                .startedTime(LocalDateTime.now())
                 .build();
     }
 
