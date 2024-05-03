@@ -11,34 +11,42 @@ import { useEffect, useState } from 'react';
 import useAuthStore from '@/app/_store/useAuthStore';
 import stompClient from '../../_utils/stomp';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
-
-type Quiz = {
-  id: string;
-  questionNumber: number;
-  type: '단답형' | '객관식';
-  question: string;
-  options: string[];
-  answer: string;
-};
+import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
 
 type QuizSet = {
   totalRound: number;
   currentRound: number;
-  quiz: Quiz;
+  quizNumber: number;
+  type: '객관식' | '단답형';
+  quiz: string;
+  options: string[];
 };
 
 type SubmitStatus = {
   status: 'ALL_SUBMITTED' | 'MAJORITY_SUBMITTED' | 'PARTIAL_SUBMITTED';
   time: string;
 };
-
+// 제출 -> answered 트루 -> 버튼비활성화 -> PARTIAL일 경우 무한대기 -> 그외의 경우 3초 카운트 -> 3초 후에 ANSWERED FALSE, 문제 바뀌기, SETSUBMIT NULL
 const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [quizSet, setQuizSet] = useState<QuizSet>();
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>();
+  const [isAnswered, setIsAnswered] = useState(false); // => 제출 상태 체크
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const [count, setCount] = useState(4);
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
+
+  const countDown = () => {
+    const interval = setInterval(() => {
+      setCount(count - 1);
+    }, 1000);
+    if (count === 0) {
+      clearInterval(interval);
+      setIsAnswered(false);
+      setSubmitStatus(null);
+      setCount(4);
+    }
+  };
 
   const subscribeQuiz = (roomId: number) => {
     stompClient.subscribe(
@@ -63,11 +71,13 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       });
     }
   };
-  const subscribeSubmitQuiz = (roomId: number) => {
+  const subscribeSubmitStatus = (roomId: number) => {
     stompClient.subscribe(
       `/sub/rooms/${roomId}/submit`,
       (submitStatus) => {
-        console.log('ss', submitStatus);
+        const statusData = JSON.parse(submitStatus.body);
+        console.log('ss', statusData);
+        setSubmitStatus(statusData);
       },
       {
         Authorization: `Bearer ${accessToken}`,
@@ -76,19 +86,33 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   };
 
   const submitQuiz = (roomId: number) => {
+    setIsAnswered(true);
+    // if (isAnswered) {
+    //   countDown();
+    // }
     stompClient.publish({
       destination: `/pub/rooms/${roomId}/submit`,
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        quizId: quizSet?.quiz.id,
-        quizNum: quizSet?.quiz.questionNumber,
-        answer: quizSet?.quiz.answer,
-        userAnswer,
-        playerId: userId,
+        quizNum: quizSet?.quizNumber,
+        playerAnswer: userAnswer,
       }),
     });
+  };
+
+  const getSubmitMessage = () => {
+    if (!isAnswered) return '';
+    switch (submitStatus?.status) {
+      case 'PARTIAL_SUBMITTED':
+        return '다른 참여자가 답변을 제출할 때 까지 기다려주세요 :)';
+      case 'MAJORITY_SUBMITTED':
+      case 'ALL_SUBMITTED':
+        return '과반수의 답안이 제출되어 다음 라운드로 넘어갑니다.';
+      default:
+        return '';
+    }
   };
 
   useEffect(() => {
@@ -106,7 +130,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         console.log('connected');
         subscribeQuiz(params.id);
         getQuiz(params.id);
-        subscribeSubmitQuiz(params.id);
+        subscribeSubmitStatus(params.id);
       };
       stompClient.activate();
     }
@@ -119,6 +143,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   useEffect(() => {
     console.log(params.id);
   }, [params.id]);
+
+  useEffect(() => {}, [submitStatus, isAnswered]);
 
   return (
     <div className={styles.Main}>
@@ -135,20 +161,31 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
                 Round {quizSet?.currentRound || 0}
               </div>
               <QuestionProgess
-                questionNumber={quizSet?.quiz.questionNumber || 0}
-                totalQuestions={5}
+                questionNumber={quizSet?.quizNumber || 0}
+                totalQuestions={quizSet?.totalRound || 0}
               />
             </div>
 
             <div className={styles.QuestionContainer}>
-              <QuestionArea contents={quizSet?.quiz.question || ''} />
+              <QuestionArea contents={quizSet?.quiz || ''} />
               <AnswerArea
-                type={quizSet?.quiz.type || '단답형'}
-                options={quizSet?.quiz.options}
+                type={quizSet?.type || '객관식'}
+                options={quizSet?.options}
                 answer={userAnswer}
                 setAnswer={setUserAnswer}
               />
             </div>
+          </div>
+          <div className={styles.StatusWrapper}>
+            {(isAnswered && submitStatus?.status === 'MAJORITY_SUBMITTED') ||
+            (isAnswered && submitStatus?.status === 'ALL_SUBMITTED') ? (
+              <div>{count - 1}</div>
+            ) : isAnswered && submitStatus?.status === 'PARTIAL_SUBMITTED' ? (
+              <BarSpinner />
+            ) : (
+              ''
+            )}
+            <div>{getSubmitMessage()}</div>
           </div>
           <div className={styles.ButtonWrapper}>
             <GradButton
@@ -156,8 +193,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
               color={'primary'}
               fullWidth
               onClick={() => submitQuiz(params.id)}
+              disabled={isAnswered}
             >
-              제 출
+              {isAnswered ? '기다리쇼' : '제출'}
             </GradButton>
           </div>
         </div>
