@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,7 +38,8 @@ public class QuizRoom extends BaseEntity {
     private Integer numOfQuiz;
 
     @Column(nullable = false)
-    private Integer playerNum;
+    @Builder.Default
+    private Integer playerNum = 1;
 
     @Column(nullable = false)
     private Integer playerLimitNum;
@@ -48,16 +48,11 @@ public class QuizRoom extends BaseEntity {
     private String code;
 
     @Column(nullable = false)
-    private Status status;
+    @Builder.Default
+    private Status status = Status.READY;
 
     @Column
     private String quizDocId;
-
-    @PrePersist
-    public void setDefaultColumns() {
-        this.playerNum = this.playerNum == null ? 1 : this.playerNum;
-        this.status = this.status == null ? Status.READY : this.status;
-    }
 
     public void setQuizDocId(String id) {
         this.quizDocId = id;
@@ -65,5 +60,9 @@ public class QuizRoom extends BaseEntity {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setPlayerNum(Integer playerNum) {
+        this.playerNum = playerNum;
     }
 }

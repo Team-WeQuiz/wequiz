@@ -9,7 +9,6 @@ export const postRoom = async (
   playerLimitNum: number,
   code: string,
   files: File[],
-  description: string,
 ) => {
   try {
     const formData = new FormData();
@@ -18,7 +17,6 @@ export const postRoom = async (
     formData.append('numOfQuiz', String(numOfQuiz));
     formData.append('playerLimitNum', String(playerLimitNum));
     formData.append('code', code);
-    formData.append('description', description);
 
     // files를 하나씩 FormData에 추가
     files.forEach((file) => {

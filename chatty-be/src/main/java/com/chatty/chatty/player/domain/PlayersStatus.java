@@ -17,8 +17,8 @@ public record PlayersStatus(
                 .build();
     }
 
-    public PlayersStatus updateWithNewUser(Long userId) {
-        playerStatusSet.add(PlayerStatus.initNewUser(userId));
+    public PlayersStatus updateWithNewUser(Long userId, String nickname) {
+        playerStatusSet.add(PlayerStatus.initNewUser(userId, nickname));
         return new PlayersStatus(playerStatusSet);
     }
 

@@ -9,7 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -41,19 +40,15 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(nullable = false)
-    private Boolean isValid;
+    @Builder.Default
+    private Boolean isValid = false;
 
     @Column(nullable = false)
-    private String profileImage;
+    @Builder.Default
+    private String profileImage = DEFAULT_PROFILE_IMAGE;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Provider loginType;
-
-    @PrePersist
-    public void setDefaultColumns() {
-        this.loginType = this.loginType == null ? Provider.NORMAL : this.loginType;
-        this.isValid = this.isValid != null && this.isValid;
-        this.profileImage = this.profileImage == null ? DEFAULT_PROFILE_IMAGE : this.profileImage;
-    }
+    @Builder.Default
+    private Provider loginType = Provider.NORMAL;
 }

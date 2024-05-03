@@ -1,21 +1,27 @@
 CHOICE_PROB_TEMPLATE = """
-From the document, make a multiple choice type exam question related to the CONTENT below. Be sure to answer in Korean. I'll tip you if you make a quality exam question.
+From the document, make a multiple choice type exam question related to the CONTENT below. I'll tip you if you make a quality exam question.
 
 CONTENT:
-{message}
+{context}
 
 {format_instructions}
+
+
+Be sure to answer in Korean. 
 
 YOUR ANSWER:"""
 
 ######################################################################
 SHORT_PROB_TEMPLATE = """
-From the document, make a short answer type exam question that people can answer in one word related to the CONTENT below. Be sure to answer in Korean. I'll tip you if you make a quality exam question.
+From the document, make a short answer type exam question that people can answer in one word related to the CONTENT below. I'll tip you if you make a quality exam question.
 
 CONTENT:
-{message}
+{context}
 
 {format_instructions}
+
+
+Be sure to answer in Korean. 
 
 YOUR ANSWER:"""
 

@@ -19,11 +19,9 @@ public class PlayersStatusRepository {
         return Optional.ofNullable(playersStatusMap.get(roomId));
     }
 
-    public PlayersStatus saveUserToRoom(Long roomId, Long userId) {
+    public PlayersStatus saveUserToRoom(Long roomId, Long userId, String nickname) {
         PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
-        log.info("saveUserToRoom: {}", playersStatus);
-        log.info("roomId: {}", roomId);
-        updateStatus(roomId, playersStatus.updateWithNewUser(userId));
+        updateStatus(roomId, playersStatus.updateWithNewUser(userId, nickname));
         return playersStatus;
     }
 

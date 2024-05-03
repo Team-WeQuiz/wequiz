@@ -4,7 +4,7 @@ import * as styles from './page.css';
 import ContentsBox from './_components/ContentsBox';
 import TextInputField from '@/app/_components/TextInputField';
 import FileUploadBox from './_components/FileUploadBox';
-import RadioInputField from '@/app/_components/RadioInputField';
+// import RadioInputField from '@/app/_components/RadioInputField';
 import { postRoom } from '@/app/_api/createRoom';
 import { useRouter } from 'next/navigation';
 import GradButton from '@/app/_components/GradButton';
@@ -12,11 +12,11 @@ import QuestionMaker from './_components/QuestionMaker/QuestionMaker';
 import DropBox from './_components/DropBox/DropBox';
 
 export default function CreateRoom() {
-  const problemTypeOptions = [
-    { id: '객관식', value: '객관식', label: '객관식' },
-    { id: '객관식', value: '주관식', label: '주관식' },
-    { id: '객관식', value: '단답형', label: '단답형' },
-  ];
+  // const problemTypeOptions = [
+  //   { id: '객관식', value: '객관식', label: '객관식' },
+  //   { id: '객관식', value: '주관식', label: '주관식' },
+  //   { id: '객관식', value: '단답형', label: '단답형' },
+  // ];
 
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -24,8 +24,8 @@ export default function CreateRoom() {
   const [description, setDescription] = useState('');
   const [numberOfParticipants, setNumberOfParticipants] = useState(0);
   const [password, setPassword] = useState('');
-  const [time, setTime] = useState(0);
-  const [problemType, setProblemType] = useState('객관식');
+  // const [time, setTime] = useState(0);
+  // const [problemType, setProblemType] = useState('객관식');
   const [numberOfProblems, setNumberOfProblems] = useState(0);
   const [qustionType, setQuestionType] = useState<'list' | 'create'>('list');
 
@@ -41,11 +41,10 @@ export default function CreateRoom() {
         numberOfParticipants,
         password,
         files,
-        description,
       );
       console.log(response);
       if (response) {
-        router.push(`waiting-room/${response.roomId}`);
+        router.push(`enter-room/${response.roomId}?create=true`);
       }
     } catch (error) {
       console.error(error);

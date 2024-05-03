@@ -9,10 +9,13 @@ import com.chatty.chatty.game.controller.dto.model.MarkRequest;
 import com.chatty.chatty.game.domain.AnswerData;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.SubmitStatus;
+import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
+import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
@@ -30,16 +33,17 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
     private static final Integer QUIZ_SIZE = 5;
-    private static final Long QUIZ_POLLING_SLEEP_TIME = 5000L;
+
     private final PlayersStatusRepository playersStatusRepository;
+    private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
     private final DynamoDBService dynamoDBService;
     private final ModelService modelService;
     private final SimpMessagingTemplate template;
 
-    public PlayersStatusDTO joinRoom(Long roomId, Long userId) {
-        PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId);
+    public PlayersStatusDTO joinRoom(Long roomId, Long userId, NicknameRequest request) {
+        PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId, request.nickname());
         return buildDTO(roomId, playersStatus);
     }
 
@@ -53,9 +57,6 @@ public class GameService {
         return buildDTO(roomId, playersStatus);
     }
 
-    public void endGame(Long roomId) {
-        playersStatusRepository.clear(roomId);
-    }
 
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()
@@ -64,38 +65,30 @@ public class GameService {
                 .build();
     }
 
-    @Async
-    public void initQuiz(Long roomId) {
-        QuizData quizData = gameRepository.getQuizData(roomId);
-        fillQuiz(quizData);
-    }
-
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
             fillQuiz(quizData);
-            log.info("Fill: QuizData: {}", quizData);
+            log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
-        log.info("Send: QuizData: {}", quizData);
+        log.info("Send: Quiz: {}", quizData.getQuiz());
         return buildQuizResponse(quizData);
     }
 
     @Async
-    private void fillQuiz(QuizData quizData) {
+    protected void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
         List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
                 currentRound, QUIZ_SIZE);
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
-        quizData.getQuizQueue().addAll(currentQuizzes);
-        quizData.increaseCurrentRound();
-        log.info("filled queue: {}", quizData);
+        quizData.fillQuiz(currentQuizzes);
+        log.info("filled queue: {}", quizData.getQuizQueue());
     }
 
-    public void removeAndSendQuiz(Long roomId) {
+    public Quiz removeQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        quizData.getQuizQueue().poll();
-        log.info("Remove: QuizData: {}", quizData);
-        sendQuiz(roomId);
+        log.info("Remove: QuizQueue: {}", quizData.getQuizQueue());
+        return quizData.removeQuiz();
     }
 
     /*
@@ -117,36 +110,42 @@ public class GameService {
     }
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
-        Quiz quiz = quizData.getQuizQueue().peek();
+        Quiz quiz = quizData.getQuiz();
         return QuizResponse.builder()
-                .quiz(quiz)
                 .totalRound(quizData.getTotalRound())
-                .currentRound(quizData.getCurrentRound() + 1)
+                .currentRound(quizData.getCurrentRound())
+                .quizNumber(quiz.questionNumber())
+                .type(quiz.type())
+                .quiz(quiz.question())
+                .options(quiz.options())
                 .build();
     }
 
-    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request) {
-        SubmitStatus status = answerRepository.addPlayerAnswer(roomId, request);
-        log.info("Add: AnswerData: {}", answerRepository.getAnswerData(roomId, request));
+    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
+        AnswerData answerData = answerRepository.getAnswerData(roomId, request.quizNum());
+        SubmitStatus status = answerData.addAnswer(userId, request.playerAnswer());
+        log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
+        UsersSubmitStatus submitStatus = userSubmitStatusRepository.submit(roomId, userId);
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
-            removeAndSendQuiz(roomId);
-
+            Quiz removedQuiz = removeQuiz(roomId);
             String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
-            AnswerData answerData = answerRepository.getAnswerData(roomId, request);
             modelService.requestMark(MarkRequest.builder()
                     .id(quizDocId)
-                    .quiz_id(answerData.getQuizId())
+                    .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
-                    .correct(answerData.getAnswer())
+                    .correct(removedQuiz.correct())
                     .answers(answerData.getPlayerAnswers())
                     .build());
             calculateScore();
-            answerRepository.clearAnswer(roomId);
+            PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+            userSubmitStatusRepository.init(players, roomId);
+            answerRepository.clearAnswerData(roomId);
         }
         return SubmitAnswerResponse.builder()
                 .status(status)
                 .timestamp(LocalDateTime.now())
+                .submitStatuses(submitStatus.usersSubmitStatus())
                 .build();
     }
 

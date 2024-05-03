@@ -1,6 +1,7 @@
 package com.chatty.chatty.game.domain;
 
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.Builder;
@@ -18,7 +19,16 @@ public class QuizData {
     private final Integer totalRound;
     private Integer currentRound;
 
-    public void increaseCurrentRound() {
+    public Quiz getQuiz() {
+        return quizQueue.peek();
+    }
+
+    public void fillQuiz(List<Quiz> quizzes) {
+        quizQueue.addAll(quizzes);
         this.currentRound++;
+    }
+
+    public Quiz removeQuiz() {
+        return quizQueue.poll();
     }
 }

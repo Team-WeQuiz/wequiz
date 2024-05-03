@@ -1,6 +1,6 @@
 package com.chatty.chatty.game.controller.dto;
 
-import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import java.util.List;
 import lombok.Builder;
 
 @Builder
@@ -10,6 +10,12 @@ public record QuizResponse(
 
         Integer currentRound,
 
-        Quiz quiz
+        Integer quizNumber,
+
+        String type,
+
+        String quiz,
+
+        List<String> options
 ) {
 }

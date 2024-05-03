@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -45,10 +44,6 @@ public class Player extends BaseEntity {
     private String nickname;
 
     @Column(nullable = false)
-    private Integer timeTaken;
-
-    @PrePersist
-    public void setDefaultColumns() {
-        this.timeTaken = this.timeTaken == null ? -1 : this.timeTaken;
-    }
+    @Builder.Default
+    private Integer timeTaken = -1;
 }

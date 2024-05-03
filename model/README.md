@@ -1,8 +1,8 @@
 # WeQuiz ML Server
-
+.
 ## Overview
-1. 문제 생성
-2. 문서 요약
+1. 문서 요약
+2. 문제 생성
 3. 답안 채점
 
 ## Architecture
@@ -20,6 +20,13 @@ graph LR;
 
 ### Generate Quiz
 to be continued...
+
+### Generate Mark
+
+```mermaid
+graph LR;
+    user_answer-->|mark|marked_answer-->|rule_based_process|marked_result;
+```
 
 ## Skills
 - Langchain

@@ -6,6 +6,7 @@ import useWaitingStore from '@/app/_store/useWaitingStore';
 import { UserStatus } from '@/app/_types/WaitingStatus';
 import stompClient from '../../../../_utils/stomp';
 import * as styles from './ReadyButton.css';
+import { useRouter } from 'next/navigation';
 
 const ReadyButton = ({
   roomId,
@@ -19,6 +20,7 @@ const ReadyButton = ({
   const { userStatuses, allUsersReady } = useWaitingStore();
   const [isReady, setIsReady] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(3);
+  const router = useRouter();
 
   useEffect(() => {
     setIsReady(
@@ -42,7 +44,7 @@ const ReadyButton = ({
           const nextCount = prevCount - 1;
           if (nextCount === -1) {
             clearInterval(timer!);
-            // 페이지 이동 시키기
+            router.push(`/quiz-room/${roomId}`);
           }
           return nextCount;
         });
