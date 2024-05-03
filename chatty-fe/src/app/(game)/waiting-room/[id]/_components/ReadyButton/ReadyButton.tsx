@@ -7,20 +7,24 @@ import { UserStatus } from '@/app/_types/WaitingStatus';
 import stompClient from '../../../../_utils/stomp';
 import * as styles from './ReadyButton.css';
 import { useRouter } from 'next/navigation';
+import { startQuiz } from '@/app/_api/quiz';
 
 const ReadyButton = ({
   roomId,
   userId,
   isQuizReady,
+  accessToken,
 }: {
   roomId: number;
   userId: number | undefined;
   isQuizReady: boolean;
+  accessToken: string;
 }) => {
   const { userStatuses, allUsersReady } = useWaitingStore();
   const [isReady, setIsReady] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(3);
   const router = useRouter();
+  const [toggleBlock, setToggleBlock] = useState<boolean>(false);
 
   useEffect(() => {
     setIsReady(
@@ -42,6 +46,10 @@ const ReadyButton = ({
       timer = setInterval(() => {
         setCountdown((prevCount) => {
           const nextCount = prevCount - 1;
+          if (nextCount === 0) {
+            setToggleBlock(true);
+            startQuiz(roomId, accessToken);
+          }
           if (nextCount === -1) {
             clearInterval(timer!);
             router.push(`/quiz-room/${roomId}`);
@@ -67,7 +75,13 @@ const ReadyButton = ({
             waiting
           </span>
         ))}
-      <GradButton color="secondary" fullWidth rounded onClick={toggleReady}>
+      <GradButton
+        color="secondary"
+        fullWidth
+        rounded
+        onClick={toggleReady}
+        disabled={toggleBlock}
+      >
         <span className={`${styles.buttonText} ${!isReady && styles.blinking}`}>
           {isReady ? '준비취소' : '준비하기'}
         </span>
