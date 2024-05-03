@@ -8,6 +8,7 @@ import os
 from schema import *
 from data.preprocessor import Parser
 from data.generator import QuizGenerator, Marker, Summarizer
+from data.keyword import *
 from utils.security import get_openai_api_key, get_aws_access_key
 from utils.logger import log
 
@@ -119,8 +120,7 @@ def create_id(generate_request, id):
         raise e
 
 
-
-async def generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs):
+async def generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs, keywords):
     try:
         # Generate description
         summarizer = Summarizer()
@@ -140,16 +140,9 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
     # Generate quiz
     quiz_generator = QuizGenerator(vector_split_docs)
 
-    if len(inters) < generate_request.numOfQuiz:
-        repeat_count = generate_request.numOfQuiz // len(inters) + 1
-        inters = inters * repeat_count
-        
-    contents = inters[:generate_request.numOfQuiz]
-
-    if len(contents) != generate_request.numOfQuiz:
-        raise Exception('키워드가 충분히 생성되지 않았습니다.')
-
-    for idx, keyword in enumerate(contents):
+    idx = 0
+    i = 0
+    while idx < generate_request.numOfQuiz:
         response = dynamodb.get_item(
             TableName=QUIZ_TABLE,
             Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
@@ -160,38 +153,98 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         # Randomly select type (0: multiple choice, 1: short answer, 2: OX quiz)
         type = random.randrange(0, 2)
 
-        # Generate a new question
-        question = quiz_generator.generate(type, keyword, idx + 1)
-        new_question = {
-            "M": {
-                "id": {"S": str(question["id"])},
-                "question_number": {"N": str(question["question_number"])},
-                "type": {"S": question["type"]},
-                "question": {"S": question["question"]},
-                "options": {"L": [{"S": option} for option in question["options"]]},
-                "correct": {"S": question["correct"]}
-            }
-        }
-        questions.append(new_question)
+        max_attempts = 10  # 최대 시도 횟수
 
-        # Update item in DynamoDB
-        dynamodb.update_item(
-            TableName=QUIZ_TABLE,
-            Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-            UpdateExpression='SET questions = :val',
-            ExpressionAttributeValues={':val': {'L': questions}}
-        )
+        while True:
+            try:
+                keyword = keywords[i % len(keywords)]
+                question = quiz_generator.generate(type, keyword, idx + 1)
+                new_question = {
+                    "M": {
+                        "id": {"S": str(question["id"])},
+                        "question_number": {"N": str(question["question_number"])},
+                        "type": {"S": question["type"]},
+                        "question": {"S": question["question"]},
+                        "options": {"L": [{"S": option} for option in question["options"]]},
+                        "correct": {"S": question["correct"]}
+                    }
+                }
+                questions.append(new_question)
+                # Update item in DynamoDB
+                dynamodb.update_item(
+                    TableName=QUIZ_TABLE,
+                    Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+                    UpdateExpression='SET questions = :val',
+                    ExpressionAttributeValues={':val': {'L': questions}}
+                )
+                idx += 1
+                i += 1
+                break  # 성공적으로 생성되면 반복문 종료
+            except:
+                i += 1
+                if i >= max_attempts:
+                    print("Failed to generate question after {} attempts".format(max_attempts))
+                    raise Exception("Failed to generate question after {} attempts".format(max_attempts))
+
+
+    # if len(inters) < generate_request.numOfQuiz:
+    #     repeat_count = generate_request.numOfQuiz // len(inters) + 1
+    #     inters = inters * repeat_count
+        
+    # contents = inters[:generate_request.numOfQuiz]
+
+    # if len(contents) != generate_request.numOfQuiz:
+    #     raise Exception('키워드가 충분히 생성되지 않았습니다.')
+
+    # for idx, keyword in enumerate(contents):
+    #     response = dynamodb.get_item(
+    #         TableName=QUIZ_TABLE,
+    #         Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
+    #     )
+    #     item = response.get('Item', {})
+    #     questions = item.get('questions', {'L': []})['L']
+
+    #     # Randomly select type (0: multiple choice, 1: short answer, 2: OX quiz)
+    #     type = random.randrange(0, 2)
+
+    #     # Generate a new question
+    #     question = quiz_generator.generate(type, keyword, idx + 1)
+    #     new_question = {
+    #         "M": {
+    #             "id": {"S": str(question["id"])},
+    #             "question_number": {"N": str(question["question_number"])},
+    #             "type": {"S": question["type"]},
+    #             "question": {"S": question["question"]},
+    #             "options": {"L": [{"S": option} for option in question["options"]]},
+    #             "correct": {"S": question["correct"]}
+    #         }
+    #     }
+    #     questions.append(new_question)
+
+    #     # Update item in DynamoDB
+    #     dynamodb.update_item(
+    #         TableName=QUIZ_TABLE,
+    #         Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+    #         UpdateExpression='SET questions = :val',
+    #         ExpressionAttributeValues={':val': {'L': questions}}
+    #     )
 
 @app.post("/generate")
 async def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     # Parsing and split file
-    parser = Parser(generate_request.user_id, generate_request.timestamp)
-    summary_split_docs, vector_split_docs = parser.parse()
+    parser = Parser()
+    ner_split_docs, summary_split_docs, vector_split_docs = parser.parse(generate_request.user_id, generate_request.timestamp)
+    keywords = extract_keywords(ner_split_docs, top_n=generate_request.numOfQuiz*2)  # 키워드는 개수를 여유롭게 생성합니다.
+    if len(keywords) < generate_request.numOfQuiz:
+        raise Exception('키워드가 충분히 생성되지 않았습니다.')
+    else:
+        log('info', f'Extracted Keywords: {keywords}')
+        print(keywords)
 
     try:
         res = create_id(generate_request, id)
-        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs))
+        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs, keywords))
         
         return res
 
