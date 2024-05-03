@@ -134,7 +134,7 @@ public class GameService {
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
         AnswerData answerData = answerRepository.getAnswerData(roomId);
-        SubmitStatus status = answerData.addAnswer(request);
+        SubmitStatus status = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
         UsersSubmitStatus submitStatus = userSubmitStatusRepository.submit(roomId, userId);
 
@@ -152,7 +152,7 @@ public class GameService {
 
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
-          
+
             PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
             userSubmitStatusRepository.init(players, roomId);
             answerRepository.clearAnswerData(roomId);

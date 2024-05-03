@@ -24,7 +24,8 @@ public class AnswerRepository {
 
     public AnswerData getAnswerData(Long roomId) {
         return answerDataMap.computeIfAbsent(roomId, this::initAnswerData);
-
+    }
+    
     private AnswerData initAnswerData(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));

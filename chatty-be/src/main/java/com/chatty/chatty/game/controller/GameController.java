@@ -69,7 +69,7 @@ public class GameController {
 
     /*
     publication URL : /pub/rooms/{roomId}/quiz
-    subscription URL : /user/{userId}/queue/rooms/{roodId}/quiz
+    subscription URL : /user/{userId}/queue/rooms/{roomId}/quiz
      */
     @MessageMapping("/rooms/{roomId}/quiz")
     public void sendQuiz(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
@@ -84,7 +84,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/submit")
     @SendTo("/sub/rooms/{roomId}/submit")
     public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
-            SimpMessageHeaderAccessor headerAccessor) {
+                                             SimpMessageHeaderAccessor headerAccessor) {
         return gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
     }
 

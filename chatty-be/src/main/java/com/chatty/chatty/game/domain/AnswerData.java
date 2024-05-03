@@ -25,8 +25,8 @@ public class AnswerData {
     private final String correct;
     private final LocalDateTime startedTime;
 
-    public synchronized SubmitStatus addAnswer(SubmitAnswerRequest request) {
-        playerAnswers.put(request.playerId(), PlayerAnswerData.builder()
+    public synchronized SubmitStatus addAnswer(Long userId, SubmitAnswerRequest request) {
+        playerAnswers.put(userId, PlayerAnswerData.builder()
                 .playerAnswer(request.playerAnswer())
                 .submittedTime(request.submittedTime())
                 .build());
