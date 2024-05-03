@@ -71,3 +71,10 @@ export const UserContainer = style({
   background: globals.color.blue_6,
   gap: 30,
 });
+
+export const StatusWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-end',
+  gap: 24,
+});
