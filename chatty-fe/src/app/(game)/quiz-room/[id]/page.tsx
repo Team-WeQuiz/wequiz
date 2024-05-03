@@ -38,14 +38,17 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
 
   const countDown = () => {
     const interval = setInterval(() => {
-      setCount(count - 1);
+      setCount((currentCount) => {
+        if (currentCount === 1) {
+          clearInterval(interval);
+          setIsAnswered(false);
+          setSubmitStatus(null);
+          getQuiz(params.id);
+          return 4; // 초기화
+        }
+        return currentCount - 1;
+      });
     }, 1000);
-    if (count === 0) {
-      clearInterval(interval);
-      setIsAnswered(false);
-      setSubmitStatus(null);
-      setCount(4);
-    }
   };
 
   const subscribeQuiz = (roomId: number) => {
@@ -62,14 +65,13 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     );
   };
   const getQuiz = (roomId: number) => {
-    if (!isAnswered) {
-      stompClient.publish({
-        destination: `/pub/rooms/${roomId}/quiz`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-    }
+    setUserAnswer('');
+    stompClient.publish({
+      destination: `/pub/rooms/${roomId}/quiz`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
   };
   const subscribeSubmitStatus = (roomId: number) => {
     stompClient.subscribe(
@@ -87,9 +89,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
 
   const submitQuiz = (roomId: number) => {
     setIsAnswered(true);
-    // if (isAnswered) {
-    //   countDown();
-    // }
     stompClient.publish({
       destination: `/pub/rooms/${roomId}/submit`,
       headers: {
@@ -144,7 +143,14 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     console.log(params.id);
   }, [params.id]);
 
-  useEffect(() => {}, [submitStatus, isAnswered]);
+  useEffect(() => {
+    if (
+      submitStatus?.status === 'MAJORITY_SUBMITTED' ||
+      submitStatus?.status === 'ALL_SUBMITTED'
+    ) {
+      countDown();
+    }
+  }, [submitStatus, isAnswered]);
 
   return (
     <div className={styles.Main}>
