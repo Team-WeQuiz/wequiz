@@ -51,9 +51,6 @@ def preprocess(docs):
 
 
 class Parser():
-    def __init__(self, user_id, timestamp):
-        self.user_id = user_id
-        self.timestamp = timestamp
 
     def num_tokens_from_string(self, documents) -> int:
         encoding = tiktoken.get_encoding("cl100k_base")
@@ -73,6 +70,7 @@ class Parser():
 
 
     def get_parsed_docs(self, parser, loader, files):
+        ner_docs_list = []
         summary_docs_list = []
         vector_docs_list = []
 
@@ -92,16 +90,17 @@ class Parser():
             print(f'페이지 수: {page_num}')
             print(f'예상되는 토큰 수: {self.num_tokens_from_string(total_text)}')
 
+            ner_docs_list += self.split_docs(total_text, NER_CHUNK_SIZE, NER_CHUNK_OVERLAP)
             summary_docs_list += self.split_docs(total_text, SUMMARY_CHUNK_SIZE, SUMMARY_CHUNK_OVERLAP)
             vector_docs_list += self.split_docs(total_text, VECTOR_CHUNK_SIZE, VECTOR_CHUNK_OVERLAP)
 
-        return summary_docs_list, vector_docs_list
+        return ner_docs_list, summary_docs_list, vector_docs_list
 
 
     # parse files
-    def parse(self):
+    def parse(self, user_id, timestamp):
         loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
-        minio_files = loader.get_list(self.user_id, self.timestamp, 'pdf')
+        minio_files = loader.get_list(user_id, timestamp, 'pdf')
         parsers = [PyPDFium2Parser(extract_images=False), PyMuPDFParser(extract_images=False), PDFMinerParser(extract_images=False)]
         retry = 0
 
@@ -109,16 +108,17 @@ class Parser():
             try:
                 # retry 횟수에 따라 파서 선정
                 parser = parsers[retry%3]
-                summary_docs_list, vector_docs_list = self.get_parsed_docs(parser, loader, minio_files)
+                ner_docs_list, summary_docs_list, vector_docs_list = self.get_parsed_docs(parser, loader, minio_files)
                 break
             except Exception as e:
                 print(f"An unexpected parsing error occurred: {e}")
                 retry += 1
                 continue
         
+        print(f"키워드 추출을 위한 {len(ner_docs_list)}개의 문서 조각이 준비되었습니다.")
         print(f"요약을 위한 {len(summary_docs_list)}개의 문서 조각이 준비되었습니다.")
         print(f"벡터화를 위한 {len(vector_docs_list)}개의 문서 조각이 준비되었습니다.")
-        return summary_docs_list, vector_docs_list
+        return ner_docs_list, summary_docs_list, vector_docs_list
 
 
 ##############################################################################
