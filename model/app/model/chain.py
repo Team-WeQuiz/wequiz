@@ -1,4 +1,5 @@
 from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE
+from data.settings import VECTOR_CHUNK_SIZE
 from model.schema import ChoiceOutput, ShortOutput
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
@@ -7,9 +8,9 @@ from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.schema import BaseRetriever
 from typing import List, Dict, Any
-from langchain.globals import set_debug
-
-set_debug(True)
+from utils.logger import *
+# 로깅 설정
+setup_logging()
 
 # Retrieval 체인
 class RetrievalChain(Chain):
@@ -27,6 +28,9 @@ class RetrievalChain(Chain):
         message = inputs["message"]
         relevant_docs = self.retriever.invoke(message)
         context = " ".join([doc.page_content for doc in relevant_docs])
+        if len(context) < VECTOR_CHUNK_SIZE * 0.3:
+            log('error', f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
+            raise ValueError('Retrieved Context is not sufficient.')
         return {"context": context}
 
 # 문제 생성 체인
