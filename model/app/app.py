@@ -234,8 +234,8 @@ async def generate(generate_request: GenerateRequest):
     id = f'quizset-{uuid.uuid4()}'
     # Parsing and split file
     parser = Parser()
-    ner_split_docs, summary_split_docs, vector_split_docs = parser.parse(generate_request.user_id, generate_request.timestamp)
-    keywords = extract_keywords(ner_split_docs, top_n=generate_request.numOfQuiz*2)  # 키워드는 개수를 여유롭게 생성합니다.
+    keyword_split_docs, summary_split_docs, vector_split_docs = parser.parse(generate_request.user_id, generate_request.timestamp)
+    keywords = extract_keywords(keyword_split_docs, top_n=generate_request.numOfQuiz*2)  # 키워드는 개수를 여유롭게 생성합니다.
     if len(keywords) < generate_request.numOfQuiz:
         raise Exception('키워드가 충분히 생성되지 않았습니다.')
     else:
