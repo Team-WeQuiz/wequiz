@@ -35,11 +35,11 @@ class QuizGenerator():
                 }
                 break
             except KeyError:
-                log("warning", "[generator.py > line 37] retry generating quiz due to KeyError")
+                log("warning", "[generator.py > quiz] retry generating quiz due to KeyError")
                 retry += 1
                 continue
             except Exception as e:
-                log("warning", f"[generator.py > line 41] An unexpected quiz generate error occurred: {e}")
+                log("warning", f"[generator.py > quiz] An unexpected quiz generate error occurred: {e}")
                 retry += 1
                 continue
         return data

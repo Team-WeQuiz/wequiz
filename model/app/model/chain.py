@@ -30,7 +30,7 @@ class RetrievalChain(Chain):
         context = " ".join([doc.page_content for doc in relevant_docs])
         if len(context) < VECTOR_CHUNK_SIZE * 0.3:
             log('error', f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
-            raise ValueError('Retrieved Context is not sufficient.')
+            raise ValueError(f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
         return {"context": context}
 
 # 문제 생성 체인

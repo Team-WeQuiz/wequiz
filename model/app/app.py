@@ -47,7 +47,7 @@ def mark(mark_request: MarkRequest):
             }
             answers.append(data)
     except Exception as e:
-        log('error', f'[app.py > line 50] Failed to Mark answer: {str(e)}')
+        log('error', f'[app.py > mark] Failed to Mark answer: {str(e)}')
         raise e
 
     # DynamoDB에 채점 결과 업데이트
@@ -86,7 +86,7 @@ def mark(mark_request: MarkRequest):
                 ExpressionAttributeValues={":new_answer": {"L": [{"M": marked_item}]}}
             )
     except Exception as e:
-        log('error', f'[app.py > line 89] Failed to push marked result to dynamodb: {str(e)}')
+        log('error', f'[app.py > mark] Failed to push marked result to dynamodb: {str(e)}')
         raise e
 
     # 응답 반환
@@ -95,7 +95,7 @@ def mark(mark_request: MarkRequest):
         "quiz_id": mark_request.quiz_id,
         "answers": answers
     }
-    log('info', f'[app.py > line 98] Marking is generated: {res}')
+    log('info', f'[app.py > mark] Marking is generated: {res}')
     return res
 
 
@@ -111,10 +111,10 @@ def create_id(generate_request, id):
         }
         dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
         res = {"id": id}
-        log('info', f'[app.py > line 114] Create Empty Quiz Object: {res}')
+        log('info', f'[app.py > quiz] Create Empty Quiz Object: {res}')
         return res
     except Exception as e:
-        log('error', f'[app.py > line 117] Failed to Generate Quiz: {str(e)}')
+        log('error', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
         raise e
 
 
@@ -132,7 +132,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         )
 
     except Exception as e:
-        log('error', f'[app.py > line 135] Failed to Generate Description: {str(e)}')
+        log('error', f'[app.py > quiz] Failed to Generate Description: {str(e)}')
         raise e
 
     # Generate quiz
@@ -179,7 +179,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
             except:
                 i += 1
         if not success:
-            log('error', "[app.py > line 185] Failed to generate question after {} attempts".format(max_attempts))
+            log('error', "[app.py > quiz] Failed to generate question after {} attempts".format(max_attempts))
             raise Exception("Failed to generate question after {} attempts".format(max_attempts))
 
 
@@ -194,14 +194,14 @@ async def generate(generate_request: GenerateRequest):
     if len(keywords) < generate_request.numOfQuiz:
         raise Exception('키워드가 충분히 생성되지 않았습니다.')
     else:
-        log('info', f'[app.py > line 199] Extracted Keywords: {keywords}')
+        log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
 
     try:
         res = create_id(generate_request, id)
         quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs, keywords))  
         return res
     except Exception as e:
-        log('error', f'[app.py > line 206] Failed to Generate Quiz: {str(e)}')
+        log('error', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
         raise e
 
 
