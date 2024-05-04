@@ -10,7 +10,9 @@ from data.preprocessor import Parser
 from data.generator import QuizGenerator, Marker, Summarizer
 from data.keyword import *
 from utils.security import get_openai_api_key, get_aws_access_key
-from utils.logger import log
+from utils.logger import *
+# 로깅 설정
+setup_logging()
 
 app = FastAPI()
 
@@ -45,7 +47,7 @@ def mark(mark_request: MarkRequest):
             }
             answers.append(data)
     except Exception as e:
-        log('error', f'Failed to Mark answer: {str(e)}')
+        log('error', f'[app.py > line 50] Failed to Mark answer: {str(e)}')
         raise e
 
     # DynamoDB에 채점 결과 업데이트
@@ -84,7 +86,7 @@ def mark(mark_request: MarkRequest):
                 ExpressionAttributeValues={":new_answer": {"L": [{"M": marked_item}]}}
             )
     except Exception as e:
-        log('error', f'Failed to push marked result to dynamodb: {str(e)}')
+        log('error', f'[app.py > line 89] Failed to push marked result to dynamodb: {str(e)}')
         raise e
 
     # 응답 반환
@@ -93,7 +95,7 @@ def mark(mark_request: MarkRequest):
         "quiz_id": mark_request.quiz_id,
         "answers": answers
     }
-    print(f'Marking is generated: {res}')
+    log('info', f'[app.py > line 98] Marking is generated: {res}')
     return res
 
 
@@ -107,16 +109,12 @@ def create_id(generate_request, id):
             "questions": {"L": []},
             "description": {"S": ''}
         }
-
-        # Insert data into DynamoDB
         dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
-
         res = {"id": id}
-        print(f'Create Empty Quiz Object: {res}')
+        log('info', f'[app.py > line 114] Create Empty Quiz Object: {res}')
         return res
-
     except Exception as e:
-        log('error', f'Failed to Generate Quiz: {str(e)}')
+        log('error', f'[app.py > line 117] Failed to Generate Quiz: {str(e)}')
         raise e
 
 
@@ -134,7 +132,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         )
 
     except Exception as e:
-        log('error', f'Failed to Generate Description: {str(e)}')
+        log('error', f'[app.py > line 135] Failed to Generate Description: {str(e)}')
         raise e
 
     # Generate quiz
@@ -150,15 +148,12 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         item = response.get('Item', {})
         questions = item.get('questions', {'L': []})['L']
 
-        # Randomly select type (0: multiple choice, 1: short answer, 2: OX quiz)
-        type = random.randrange(0, 2)
-
-        max_attempts = 10  # 최대 시도 횟수
-
-        while True:
+        max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
+        success = False
+        for _ in range(max_attempts):
             try:
                 keyword = keywords[i % len(keywords)]
-                question = quiz_generator.generate(type, keyword, idx + 1)
+                question = quiz_generator.generate(keyword, idx + 1)
                 new_question = {
                     "M": {
                         "id": {"S": str(question["id"])},
@@ -179,55 +174,14 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 )
                 idx += 1
                 i += 1
+                success = True
                 break  # 성공적으로 생성되면 반복문 종료
             except:
                 i += 1
-                if i >= max_attempts:
-                    print("Failed to generate question after {} attempts".format(max_attempts))
-                    raise Exception("Failed to generate question after {} attempts".format(max_attempts))
+        if not success:
+            log('error', "[app.py > line 185] Failed to generate question after {} attempts".format(max_attempts))
+            raise Exception("Failed to generate question after {} attempts".format(max_attempts))
 
-
-    # if len(inters) < generate_request.numOfQuiz:
-    #     repeat_count = generate_request.numOfQuiz // len(inters) + 1
-    #     inters = inters * repeat_count
-        
-    # contents = inters[:generate_request.numOfQuiz]
-
-    # if len(contents) != generate_request.numOfQuiz:
-    #     raise Exception('키워드가 충분히 생성되지 않았습니다.')
-
-    # for idx, keyword in enumerate(contents):
-    #     response = dynamodb.get_item(
-    #         TableName=QUIZ_TABLE,
-    #         Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
-    #     )
-    #     item = response.get('Item', {})
-    #     questions = item.get('questions', {'L': []})['L']
-
-    #     # Randomly select type (0: multiple choice, 1: short answer, 2: OX quiz)
-    #     type = random.randrange(0, 2)
-
-    #     # Generate a new question
-    #     question = quiz_generator.generate(type, keyword, idx + 1)
-    #     new_question = {
-    #         "M": {
-    #             "id": {"S": str(question["id"])},
-    #             "question_number": {"N": str(question["question_number"])},
-    #             "type": {"S": question["type"]},
-    #             "question": {"S": question["question"]},
-    #             "options": {"L": [{"S": option} for option in question["options"]]},
-    #             "correct": {"S": question["correct"]}
-    #         }
-    #     }
-    #     questions.append(new_question)
-
-    #     # Update item in DynamoDB
-    #     dynamodb.update_item(
-    #         TableName=QUIZ_TABLE,
-    #         Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-    #         UpdateExpression='SET questions = :val',
-    #         ExpressionAttributeValues={':val': {'L': questions}}
-    #     )
 
 @app.post("/generate")
 async def generate(generate_request: GenerateRequest):
@@ -236,20 +190,18 @@ async def generate(generate_request: GenerateRequest):
     parser = Parser()
     keyword_split_docs, summary_split_docs, vector_split_docs = parser.parse(generate_request.user_id, generate_request.timestamp)
     keywords = extract_keywords(keyword_split_docs, top_n=generate_request.numOfQuiz*2)  # 키워드는 개수를 여유롭게 생성합니다.
+    
     if len(keywords) < generate_request.numOfQuiz:
         raise Exception('키워드가 충분히 생성되지 않았습니다.')
     else:
-        log('info', f'Extracted Keywords: {keywords}')
-        print(keywords)
+        log('info', f'[app.py > line 199] Extracted Keywords: {keywords}')
 
     try:
         res = create_id(generate_request, id)
-        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs, keywords))
-        
+        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs, keywords))  
         return res
-
     except Exception as e:
-        log('error', f'Failed to Generate Quiz: {str(e)}')
+        log('error', f'[app.py > line 206] Failed to Generate Quiz: {str(e)}')
         raise e
 
 
