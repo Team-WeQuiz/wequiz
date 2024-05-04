@@ -75,23 +75,26 @@ class Parser():
         summary_docs_list = []
         vector_docs_list = []
 
+        page_num = 0
+        total_token = 0
         for file in files:
             file_obj = loader.load_file(file)
             documents = parser.lazy_parse(file_obj)
 
             # documents를 하나의 text로 병합
             total_text = ''
-            page_num = 0
             for document in documents:
                 total_text += document.page_content
                 page_num += 1
+            total_token += self.num_tokens_from_string(total_text)
             
-            log('info', f'[preprocessor.py > line 89] 페이지 수: {page_num}')
-            log('info', f'[preprocessor.py > line 90] 예상되는 토큰 수: {self.num_tokens_from_string(total_text)}')
-
             keyword_docs_list += self.split_docs(total_text, KEYWORD_CHUNK_SIZE, KEYWORD_CHUNK_OVERLAP)
             summary_docs_list += self.split_docs(total_text, SUMMARY_CHUNK_SIZE, SUMMARY_CHUNK_OVERLAP)
             vector_docs_list += self.split_docs(total_text, VECTOR_CHUNK_SIZE, VECTOR_CHUNK_OVERLAP)
+
+        log('info', f'[preprocessor.py > Parser] 파일 수: {len(files)}')
+        log('info', f'[preprocessor.py > Parser] 페이지 수: {page_num}')
+        log('info', f'[preprocessor.py > Parser] 예상되는 토큰 수: {total_token}')
 
         return keyword_docs_list, summary_docs_list, vector_docs_list
 
@@ -109,11 +112,11 @@ class Parser():
                 keyword_docs_list, summary_docs_list, vector_docs_list = self.get_parsed_docs(parser, loader, minio_files)
                 break
             except Exception as e:
-                log('warning', f"[preprocessor.py > line 112] An unexpected parsing error occurred: {e}")
+                log('warning', f"[preprocessor.py > Parser] An unexpected parsing error occurred: {e}")
                 retry += 1
                 continue
         
-        log('info', f'[preprocessor.py > line 116] 키워드 추출을 위한 {len(keyword_docs_list)}개의 문서 조각이 준비되었습니다.')
-        log('info', f'[preprocessor.py > line 117] 요약을 위한 {len(summary_docs_list)}개의 문서 조각이 준비되었습니다.')
-        log('info', f'[preprocessor.py > line 118] 벡터화를 위한 {len(vector_docs_list)}개의 문서 조각이 준비되었습니다.')
+        log('info', f'[preprocessor.py > Parser] 키워드 추출을 위한 {len(keyword_docs_list)}개의 문서 조각이 준비되었습니다.')
+        log('info', f'[preprocessor.py > Parser] 요약을 위한 {len(summary_docs_list)}개의 문서 조각이 준비되었습니다.')
+        log('info', f'[preprocessor.py > Parser] 벡터화를 위한 {len(vector_docs_list)}개의 문서 조각이 준비되었습니다.')
         return keyword_docs_list, summary_docs_list, vector_docs_list

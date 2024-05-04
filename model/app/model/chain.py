@@ -1,42 +1,85 @@
 from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE
+from data.settings import VECTOR_CHUNK_SIZE
 from model.schema import ChoiceOutput, ShortOutput
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.chains import LLMChain
-from langchain.globals import set_debug
+from langchain.chains.base import Chain
+from langchain.schema import BaseRetriever
+from typing import List, Dict, Any
+from utils.logger import *
+# 로깅 설정
+setup_logging()
 
-set_debug(True)
+# Retrieval 체인
+class RetrievalChain(Chain):
+    retriever: BaseRetriever
 
+    @property
+    def input_keys(self) -> List[str]:
+        return ["message"]
 
-# LLM 체인 클래스
-class Chain():
-    def __init__(self, indices):
-        # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
-        self.retriever = indices.as_retriever(search_kwargs=dict(k=1))
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
-        self.types = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
-        self.schems = [ChoiceOutput, ShortOutput]
+    @property
+    def output_keys(self) -> List[str]:
+        return ["context"]
+
+    def _call(self, inputs: Dict[str, Any]) -> Dict[str, str]:
+        message = inputs["message"]
+        relevant_docs = self.retriever.invoke(message)
+        context = " ".join([doc.page_content for doc in relevant_docs])
+        if len(context) < VECTOR_CHUNK_SIZE * 0.3:
+            log('error', f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
+            raise ValueError(f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
+        return {"context": context}
+
+# 문제 생성 체인
+class QuizGenerationChain(Chain):
+    prompt: PromptTemplate
+    llm: ChatOpenAI
+    output_parser: JsonOutputParser
+
+    @property
+    def input_keys(self) -> List[str]:
+        return ["context"]
+
+    @property
+    def output_keys(self) -> List[str]:
+        return ["quiz"]
+
+    def _call(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        context = inputs["context"]
+        return {"quiz": self.llm_chain.invoke(context)}
+
+    @property
+    def llm_chain(self) -> LLMChain:
+        return LLMChain(
+            prompt=self.prompt,
+            llm=self.llm,
+            output_parser=self.output_parser,
+        )
     
-    def prob(self, type, message):
-        parser = JsonOutputParser(pydantic_object=self.schems[type])
+# 문제 생성 클래스
+class QuizPipeline:
+    def __init__(self, indices: object):
+        self.indices = indices
+        self.retriever = self.indices.as_retriever(search_kwargs=dict(k=1))  # 인덱스 객체로부터 retriever 초기화
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
+        self.question_templates = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
+        self.output_schemas = [ChoiceOutput, ShortOutput]
+
+    def generate_quiz(self, question_type: int, message: str) -> dict:
+        parser = JsonOutputParser(pydantic_object=self.output_schemas[question_type])
         prompt = PromptTemplate(
-            template=self.types[type],
+            template=self.question_templates[question_type],
             input_variables=["context"],
             partial_variables={"format_instructions": parser.get_format_instructions()}
         )
-        
-        rag_chain = LLMChain(
-            prompt=prompt,
-            llm=self.llm, 
-            output_parser=parser,
-        )
-
-        relevant_docs = self.retriever.invoke(message)
-        context = " ".join([doc.page_content for doc in relevant_docs])
-        
-        return rag_chain.invoke(context)
-
+        retrieval_chain = RetrievalChain(retriever=self.retriever)
+        quiz_generation_chain = QuizGenerationChain(prompt=prompt, llm=self.llm, output_parser=parser)
+        pipe = retrieval_chain | quiz_generation_chain
+        return pipe.invoke({"message": message})
+    
 #######################################################################################################
 
 
@@ -52,7 +95,6 @@ class SummaryChain():
 
     # meta data generate, map reduce 방식으로 문서를 쪼개서 요약하고 합침.
     async def summary(self, split_docs):
-        parser = StrOutputParser()
         
         # map 
         map_prompt = PromptTemplate.from_template(MAP_TEMPLATE)

@@ -1,7 +1,7 @@
 import uuid, random
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from model.chain import Chain
+from model.chain import QuizPipeline
 from data.settings import QUIZ_GENERATE_RETRY
 from utils.logger import *
 # 로깅 설정
@@ -14,7 +14,7 @@ class QuizGenerator():
             self.indices = FAISS.from_documents(split_docs, self.embedding)
         except Exception as e:
             raise e
-        self.chain = Chain(self.indices)
+        self.chain = QuizPipeline(self.indices)
     
     def generate(self, keyword, question_number):
         retry = 0
@@ -24,7 +24,7 @@ class QuizGenerator():
 
         while retry < QUIZ_GENERATE_RETRY:
             try:
-                response = self.chain.prob(type, keyword)
+                response = self.chain.generate_quiz(type, keyword)["quiz"]
                 data = {
                     "id": f'quiz-{uuid.uuid4()}',
                     "question_number": question_number,
@@ -35,11 +35,11 @@ class QuizGenerator():
                 }
                 break
             except KeyError:
-                log("warning", "[generator.py > line 37] retry generating quiz due to KeyError")
+                log("warning", "[generator.py > quiz] retry generating quiz due to KeyError")
                 retry += 1
                 continue
             except Exception as e:
-                log("warning", f"[generator.py > line 41] An unexpected quiz generate error occurred: {e}")
+                log("warning", f"[generator.py > quiz] An unexpected quiz generate error occurred: {e}")
                 retry += 1
                 continue
         return data
