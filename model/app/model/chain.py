@@ -1,13 +1,16 @@
-from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE, GENERATE_QUIZ_TEMPLATE, JSON_FORMAT_TEMPLATE
-from data.settings import VECTOR_CHUNK_SIZE
-from model.schema import ChoiceOutput, ShortOutput, QuizOutput
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.schema import BaseRetriever
 from typing import List, Dict, Any
+
+from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE, GENERATE_QUIZ_TEMPLATE, JSON_FORMAT_TEMPLATE
+from data.settings import VECTOR_CHUNK_SIZE
+from model.schema import ChoiceOutput, ShortOutput, QuizOutput
 from utils.logger import *
 # 로깅 설정
 setup_logging()
@@ -121,9 +124,6 @@ class QuizPipeline:
 
 
 from model.prompt import MAP_TEMPLATE, REDUCE_TEMPLATE
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
-from langchain_core.output_parsers import StrOutputParser
 
 
 class SummaryChain():
