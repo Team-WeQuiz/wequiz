@@ -21,7 +21,8 @@ RUN apt-get update && apt-get install -y \
     openjdk-8-jdk \
     python3-dev \
     python3-pip \
-    curl
+    curl \
+    automake
 
 # for our nltk data folder
 ENV NLTK_DATA /usr/share/nltk_data
@@ -38,7 +39,10 @@ RUN python3.10 -m nltk.downloader punkt -d /usr/share/nltk_data
 RUN python3.10 -m nltk.downloader stopwords -d /usr/share/nltk_data
 
 # MeCab 설치
-RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh | bash -
+RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh > mecab.sh \
+    && sed -i 's/config.guess/config.guess --force/g' mecab.sh \
+    && sed -i 's/config.sub/config.sub --force/g' mecab.sh \
+    && bash mecab.sh
 
 # Install AWS CLI
 RUN python3.10 -m pip install awscli
