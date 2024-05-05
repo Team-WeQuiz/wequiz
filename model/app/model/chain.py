@@ -1,6 +1,6 @@
-from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE
+from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE, GENERATE_QUIZ_TEMPLATE, JSON_FORMAT_TEMPLATE
 from data.settings import VECTOR_CHUNK_SIZE
-from model.schema import ChoiceOutput, ShortOutput
+from model.schema import ChoiceOutput, ShortOutput, QuizOutput
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
@@ -37,7 +37,6 @@ class RetrievalChain(Chain):
 class QuizGenerationChain(Chain):
     prompt: PromptTemplate
     llm: ChatOpenAI
-    output_parser: JsonOutputParser
 
     @property
     def input_keys(self) -> List[str]:
@@ -45,12 +44,33 @@ class QuizGenerationChain(Chain):
 
     @property
     def output_keys(self) -> List[str]:
-        return ["quiz"]
+        return ["raw_quiz"]
 
     def _call(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         context = inputs["context"]
-        return {"quiz": self.llm_chain.invoke(context)}
+        return {"raw_quiz": self.llm_chain.invoke(context)["text"]}
 
+    @property
+    def llm_chain(self) -> LLMChain:
+        return LLMChain(
+            prompt=self.prompt,
+            llm=self.llm,
+        )
+
+# json format 체인
+class JSONFormatterChain(Chain):
+    prompt: PromptTemplate
+    llm: ChatOpenAI
+    output_parser: JsonOutputParser
+
+    @property
+    def input_keys(self) -> List[str]:
+        return ["raw_quiz"]
+    
+    @property
+    def output_keys(self) -> List[str]:
+        return ["quiz"]
+    
     @property
     def llm_chain(self) -> LLMChain:
         return LLMChain(
@@ -58,6 +78,10 @@ class QuizGenerationChain(Chain):
             llm=self.llm,
             output_parser=self.output_parser,
         )
+
+    def _call(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        raw_quiz = inputs["raw_quiz"]
+        return {"quiz": self.llm_chain.invoke(raw_quiz)}
     
 # 문제 생성 클래스
 class QuizPipeline:
@@ -66,18 +90,31 @@ class QuizPipeline:
         self.retriever = self.indices.as_retriever(search_kwargs=dict(k=1))  # 인덱스 객체로부터 retriever 초기화
         self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
         self.question_templates = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
-        self.output_schemas = [ChoiceOutput, ShortOutput]
+        # self.output_schemas = [ChoiceOutput, ShortOutput]
+        self.output_schemas = QuizOutput
+        self.types = ['1. Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
+        # (0: multiple choice, 1: short answer, 2: OX quiz)
 
     def generate_quiz(self, question_type: int, message: str) -> dict:
-        parser = JsonOutputParser(pydantic_object=self.output_schemas[question_type])
-        prompt = PromptTemplate(
-            template=self.question_templates[question_type],
+        json_output_parser = JsonOutputParser(pydantic_object=self.output_schemas)
+
+        quiz_prompt = PromptTemplate(
+            template=GENERATE_QUIZ_TEMPLATE,
             input_variables=["context"],
-            partial_variables={"format_instructions": parser.get_format_instructions()}
+            partial_variables={"types": self.types}
         )
+        json_prompt = PromptTemplate(
+            template=JSON_FORMAT_TEMPLATE,
+            input_variables=["raw_quiz"],
+            partial_variables={"format_instructions": json_output_parser.get_format_instructions()}
+        )
+
         retrieval_chain = RetrievalChain(retriever=self.retriever)
-        quiz_generation_chain = QuizGenerationChain(prompt=prompt, llm=self.llm, output_parser=parser)
-        pipe = retrieval_chain | quiz_generation_chain
+        quiz_generation_chain = QuizGenerationChain(prompt= quiz_prompt, llm=self.llm)
+        json_formatter_chain = JSONFormatterChain(prompt=json_prompt, llm=self.llm, output_parser=json_output_parser)
+
+        pipe = retrieval_chain | quiz_generation_chain | json_formatter_chain
+
         return pipe.invoke({"message": message})
     
 #######################################################################################################
