@@ -99,7 +99,8 @@ def mark(mark_request: MarkRequest):
     return res
 
 
-def create_id(generate_request, id):
+def create_id(generate_request):
+    id = f'quizset-{uuid.uuid4()}'
     try: 
         # Prepare data for DynamoDB insertion
         data = {
@@ -189,7 +190,6 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
 
 @app.post("/generate")
 async def generate(generate_request: GenerateRequest):
-    id = f'quizset-{uuid.uuid4()}'
     # Parsing and split file
     parser = Parser()
     keyword_split_docs, summary_split_docs, vector_split_docs = parser.parse(generate_request.user_id, generate_request.timestamp)
@@ -201,7 +201,7 @@ async def generate(generate_request: GenerateRequest):
         log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
 
     try:
-        res = create_id(generate_request, id)
+        res = create_id(generate_request)
         quiz_task = asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))  
         return res
     except Exception as e:
