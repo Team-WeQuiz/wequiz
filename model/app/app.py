@@ -142,15 +142,13 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
     idx = 0
     i = 0
     while idx < generate_request.numOfQuiz:
-        try:
-            response = dynamodb.get_item(
-                TableName=QUIZ_TABLE,
-                Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
-            )
-            item = response.get('Item', {})
-            questions = item.get('questions', {'L': []})['L']
-        except:
-            raise FileNotFoundError('Cannot Found Dynamo doc.')
+        response = dynamodb.get_item(
+            TableName=QUIZ_TABLE,
+            Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
+        )
+        item = response.get('Item', {})
+        questions = item.get('questions', {'L': []})['L']
+        log('info', f'[app.py > quiz] get quiz list. {questions}')
 
         max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
         success = False
@@ -171,12 +169,14 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 questions.append(new_question)
                 log('info', f'[app.py > quiz] new quiz is ready to push. {new_question}')
                 # Update item in DynamoDB
+                log('debug', f'[app.py > quiz] Questions before update: {questions}')
                 dynamodb.update_item(
                     TableName=QUIZ_TABLE,
                     Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
                     UpdateExpression='SET questions = :val',
                     ExpressionAttributeValues={':val': {'L': questions}}
                 )
+                log('debug', f'[app.py > quiz] Questions after update: {questions}')
                 idx += 1
                 i += 1
                 success = True
