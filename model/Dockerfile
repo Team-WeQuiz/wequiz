@@ -36,7 +36,7 @@ RUN python3.10 -m nltk.downloader stopwords -d /usr/share/nltk_data
 
 # Mecab 설치
 RUN python3.10 -m pip install konlpy JPype1-py3 \
-    && bash <(curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh) \
+    && curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh | bash \
     && python3.10 -m pip install mecab-python3
 
 # Install AWS CLI
