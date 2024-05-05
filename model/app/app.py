@@ -171,7 +171,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 # Update item in DynamoDB
                 update_success = False
                 update_attempts = 10
-                for _ in range(update_attempts):
+                for update_attempt in range(update_attempts):
                     try:
                         # Update item in DynamoDB with optimistic locking
                         dynamodb.update_item(
@@ -189,8 +189,9 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                         break
                     except dynamodb.exceptions.ConditionalCheckFailedException:
                         # 버전 충돌로 인해 업데이트 실패
-                        log('warn', f'[app.py > quiz] Update failed due to version conflict. Retrying...')
-                        time.sleep(0.1)  # 0.1초 대기 후 재시도
+                        log('warning', f'[app.py > quiz] Update failed due to version conflict. Retrying...')
+                        backoff_time = 0.1 * (2 ** update_attempt)  # 지수 백오프 시간 계산
+                        await asyncio.sleep(backoff_time)  # 비동기적으로 대기
                 
                 if update_success:
                     log('info', f'[app.py > quiz] quiz push to dynamodb successed.')

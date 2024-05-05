@@ -1,5 +1,5 @@
 # Use the official Ubuntu image as a base
-FROM ubuntu:22.04
+FROM ubuntu:16.04
 
 # Set the working directory in the container
 WORKDIR /app
@@ -35,7 +35,7 @@ RUN python3.10 -m nltk.downloader punkt -d /usr/share/nltk_data
 RUN python3.10 -m nltk.downloader stopwords -d /usr/share/nltk_data
 
 # Mecab 설치
-RUN python3.10 -m pip install konlpy JPype1-py3
+RUN python3.10 -m pip3 install konlpy JPype1-py3
 RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh | bash
 RUN python3.10 -m pip install mecab-python3
 
