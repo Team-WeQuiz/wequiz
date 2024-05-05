@@ -87,24 +87,8 @@ public class GameService {
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
-            try {
-                fillQuiz(quizData);
-                log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
-            } catch (GameException e) {
-                Status status = quizRoomRepository.findById(roomId)
-                        .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND))
-                        .getStatus();
-
-                if (status == Status.READY) {
-                    gameRepository.clearQuizData(roomId);
-                    playersStatusRepository.clear(roomId);
-                    quizRoomRepository.deleteById(roomId);
-                } else if (status == Status.STARTED) {
-                    quizRoomService.finishRoom(roomId);
-                }
-                quizRoomService.broadcastUpdatedRoomList();
-                throw e;
-            }
+            fillQuiz(quizData, roomId);
+            log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
         answerRepository.getAnswerData(roomId);
@@ -112,10 +96,28 @@ public class GameService {
     }
 
     @Async
-    protected void fillQuiz(QuizData quizData) throws GameException {
+    protected void fillQuiz(QuizData quizData, Long roomId) {
         Integer currentRound = quizData.getCurrentRound();
-        List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
-                currentRound, QUIZ_SIZE);
+        List<Quiz> quizzes;
+        try {
+            quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
+                    currentRound, QUIZ_SIZE);
+        } catch (GameException e) {
+            Status status = quizRoomRepository.findById(roomId)
+                    .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND))
+                    .getStatus();
+
+            if (status == Status.READY) {
+                gameRepository.clearQuizData(roomId);
+                playersStatusRepository.clear(roomId);
+                quizRoomRepository.deleteById(roomId);
+            } else if (status == Status.STARTED) {
+                quizRoomService.finishRoom(roomId);
+            }
+            quizRoomService.broadcastUpdatedRoomList();
+            throw e;
+        }
+
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.fillQuiz(currentQuizzes);
         log.info("filled queue: {}", quizData.getQuizQueue());
