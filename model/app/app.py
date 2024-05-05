@@ -148,7 +148,6 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         item = response.get('Item', {})
         questions = item.get('questions', {'L': []})['L']
         version = int(item.get('version', {'N': '0'})['N'])
-        log('info', f'[app.py > quiz] get quiz list. {questions}')
 
         max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
         success = False
@@ -194,7 +193,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                         time.sleep(0.1)  # 0.1초 대기 후 재시도
                 
                 if update_success:
-                    log('info', f'[app.py > quiz] Questions after update: {questions}')
+                    log('info', f'[app.py > quiz] quiz push to dynamodb successed.')
                     idx += 1
                     i += 1
                     success = True
