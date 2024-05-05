@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import json, random
+import time
 import boto3
 import uuid
 import asyncio
@@ -190,6 +191,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                     except dynamodb.exceptions.ConditionalCheckFailedException:
                         # 버전 충돌로 인해 업데이트 실패
                         log('warn', f'[app.py > quiz] Update failed due to version conflict. Retrying...')
+                        time.sleep(0.1)  # 0.1초 대기 후 재시도
                 
                 if update_success:
                     log('info', f'[app.py > quiz] Questions after update: {questions}')
