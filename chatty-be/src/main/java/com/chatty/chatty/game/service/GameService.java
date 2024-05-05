@@ -26,7 +26,6 @@ import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
-import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -49,7 +48,6 @@ public class GameService {
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
     private final ScoreRepository scoreRepository;
-    private final QuizRoomRepository quizRoomRepository;
     private final DynamoDBService dynamoDBService;
     private final ModelService modelService;
     private final SimpMessagingTemplate template;
@@ -91,8 +89,7 @@ public class GameService {
     @Async
     protected void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
-        List<Quiz> quizzes;
-        quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
+        List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
                 currentRound, QUIZ_SIZE);
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.fillQuiz(currentQuizzes);
