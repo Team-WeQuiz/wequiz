@@ -124,14 +124,12 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         # Generate description
         summarizer = Summarizer()
         summary, inters = await summarizer.summarize(summary_split_docs)
-
         dynamodb.update_item(
             TableName=QUIZ_TABLE,
             Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-            UpdateExpression='SET description = :val',
-            ExpressionAttributeValues={':val': {'S': summary}}
+            UpdateExpression='SET description = :val, version = if_not_exists(version, :zero)',
+            ExpressionAttributeValues={':val': {'S': summary}, ':zero': {'N': '0'}}
         )
-
     except Exception as e:
         log('error', f'[app.py > quiz] Failed to Generate Description: {str(e)}')
         raise e
@@ -148,6 +146,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         )
         item = response.get('Item', {})
         questions = item.get('questions', {'L': []})['L']
+        version = int(item.get('version', {'N': '0'})['N'])
         log('info', f'[app.py > quiz] get quiz list. {questions}')
 
         max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
@@ -168,19 +167,39 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 }
                 questions.append(new_question)
                 log('info', f'[app.py > quiz] new quiz is ready to push. {new_question}')
+
                 # Update item in DynamoDB
-                log('debug', f'[app.py > quiz] Questions before update: {questions}')
-                dynamodb.update_item(
-                    TableName=QUIZ_TABLE,
-                    Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-                    UpdateExpression='SET questions = :val',
-                    ExpressionAttributeValues={':val': {'L': questions}}
-                )
-                log('debug', f'[app.py > quiz] Questions after update: {questions}')
-                idx += 1
-                i += 1
-                success = True
-                break  # 성공적으로 생성되면 반복문 종료
+                update_success = False
+                update_attempts = 10
+                for _ in range(update_attempts):
+                    try:
+                        # Update item in DynamoDB with optimistic locking
+                        dynamodb.update_item(
+                            TableName=QUIZ_TABLE,
+                            Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+                            UpdateExpression='SET questions = :val, version = :new_version',
+                            ConditionExpression='version = :current_version',
+                            ExpressionAttributeValues={
+                                ':val': {'L': questions},
+                                ':new_version': {'N': str(version + 1)},
+                                ':current_version': {'N': str(version)}
+                            }
+                        )
+                        update_success = True
+                        break
+                    except dynamodb.exceptions.ConditionalCheckFailedException:
+                        # 버전 충돌로 인해 업데이트 실패
+                        log('warn', f'[app.py > quiz] Update failed due to version conflict. Retrying...')
+                
+                if update_success:
+                    log('info', f'[app.py > quiz] Questions after update: {questions}')
+                    idx += 1
+                    i += 1
+                    success = True
+                    break  # 성공적으로 생성되면 반복문 종료
+                else:
+                    log('error', "[app.py > quiz] Failed to push questions to dynamo {} attempts".format(update_attempts))
+                    raise Exception("Failed to push questions to dynamo {} attempts".format(update_attempts))
             except:
                 i += 1
         if not success:
