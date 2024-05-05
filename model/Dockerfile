@@ -1,34 +1,47 @@
-# Use the official Python image as a base
-FROM python:3.10
+# Use the official Ubuntu image as a base
+FROM ubuntu:22.04
 
 # Set the working directory in the container
-WORKDIR /
+WORKDIR /app
 
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3.10-dev \
+    python3-pip \
+    g++ \
+    curl \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    git \
+    openjdk-8-jdk \
+    python3-dev \
+    python3-pip \
+    curl
+
 # for our nltk data folder
 ENV NLTK_DATA /usr/share/nltk_data
 
-# Install dependencies
+# Install Python dependencies
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python3.10 -m pip install --upgrade pip
+RUN python3.10 -m pip install --no-cache-dir -r requirements.txt
 
 # download punkt
-RUN python3 -m nltk.downloader punkt -d /usr/share/nltk_data
+RUN python3.10 -m nltk.downloader punkt -d /usr/share/nltk_data
+
 # download stopwords
-RUN python3 -m nltk.downloader stopwords -d /usr/share/nltk_data
+RUN python3.10 -m nltk.downloader stopwords -d /usr/share/nltk_data
 
-RUN apt-get update && apt-get install -y g++ curl ffmpeg libsm6 libxext6
-
-# MeCab-ko 설치
-RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh > mecab.sh
-RUN sed -i 's/make -j/make -j`nproc`/g' mecab.sh
-RUN bash mecab.sh
+# MeCab 설치
+RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh | bash -
 
 # Install AWS CLI
-RUN pip install awscli
+RUN python3.10 -m pip install awscli
 
 # Set the working directory in the container
 WORKDIR /app/app
