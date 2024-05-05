@@ -1,7 +1,5 @@
 package com.chatty.chatty.game.service;
 
-import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
-
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
@@ -18,7 +16,6 @@ import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.ScoreData;
 import com.chatty.chatty.game.domain.SubmitStatus;
 import com.chatty.chatty.game.domain.UsersSubmitStatus;
-import com.chatty.chatty.game.exception.GameException;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.repository.ScoreRepository;
@@ -29,10 +26,7 @@ import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
-import com.chatty.chatty.quizroom.entity.Status;
-import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -58,7 +52,6 @@ public class GameService {
     private final QuizRoomRepository quizRoomRepository;
     private final DynamoDBService dynamoDBService;
     private final ModelService modelService;
-    private final QuizRoomService quizRoomService;
     private final SimpMessagingTemplate template;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId, NicknameRequest request) {
@@ -87,7 +80,7 @@ public class GameService {
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
-            fillQuiz(quizData, roomId);
+            fillQuiz(quizData);
             log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
@@ -96,28 +89,11 @@ public class GameService {
     }
 
     @Async
-    protected void fillQuiz(QuizData quizData, Long roomId) {
+    protected void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
         List<Quiz> quizzes;
-        try {
-            quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
-                    currentRound, QUIZ_SIZE);
-        } catch (GameException e) {
-            Status status = quizRoomRepository.findById(roomId)
-                    .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND))
-                    .getStatus();
-
-            if (status == Status.READY) {
-                gameRepository.clearQuizData(roomId);
-                playersStatusRepository.clear(roomId);
-                quizRoomRepository.deleteById(roomId);
-            } else if (status == Status.STARTED) {
-                quizRoomService.finishRoom(roomId);
-            }
-            quizRoomService.broadcastUpdatedRoomList();
-            throw e;
-        }
-
+        quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
+                currentRound, QUIZ_SIZE);
         List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.fillQuiz(currentQuizzes);
         log.info("filled queue: {}", quizData.getQuizQueue());
