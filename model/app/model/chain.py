@@ -95,7 +95,7 @@ class QuizPipeline:
         self.types = ['1. Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
         # (0: multiple choice, 1: short answer, 2: OX quiz)
 
-    def generate_quiz(self, question_type: int, message: str) -> dict:
+    def generate_quiz(self, message: str) -> dict:
         json_output_parser = JsonOutputParser(pydantic_object=self.output_schemas)
 
         quiz_prompt = PromptTemplate(
