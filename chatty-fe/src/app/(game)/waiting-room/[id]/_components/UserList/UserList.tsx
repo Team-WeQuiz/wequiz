@@ -68,8 +68,8 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
   useEffect(() => {
     if (containerSize.width > 0 && containerSize.height > 0) {
       const calculatedSize = calculateCardSize(
-        containerSize.width,
-        containerSize.height,
+        containerSize.width - 48,
+        containerSize.height - 48,
         userStatuses.length + 1,
       );
       setCardSize(calculatedSize);

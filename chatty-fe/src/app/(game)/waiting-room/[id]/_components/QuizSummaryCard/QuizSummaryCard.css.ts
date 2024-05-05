@@ -22,7 +22,7 @@ export const summaryCard = style({
   padding: 12,
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
-  maxHeight: 'calc(100% - 410px)',
+  height: 'calc(100% - 410px)',
 });
 
 export const header = style({
@@ -31,7 +31,6 @@ export const header = style({
 
 export const summaryTextContainer = style({
   width: '100%',
-  minHeight: 100,
   display: 'flex',
   flexDirection: 'column',
   borderRadius: 16,
@@ -40,6 +39,11 @@ export const summaryTextContainer = style({
   alignItems: 'flex-start',
   lineHeight: 1.5,
   height: 'calc(100% - 47px)',
-  overflow: 'scroll',
+  overflowY: 'scroll',
   position: 'relative',
+  // hide scroll bar
+  '::-webkit-scrollbar': {
+    display: 'none',
+  },
+  scrollbarWidth: 'none',
 });

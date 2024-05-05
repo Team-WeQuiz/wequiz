@@ -31,13 +31,15 @@ const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
             <div className={styles.chatMessage}>{userStatus.message}</div>
           </div>
         )}
-        <Image
-          src="/images/Empty_profile.svg"
-          alt="avatar"
-          width={192}
-          height={192}
-          className={styles.profileImage}
-        />
+        <div className={styles.profileImage}>
+          <Image
+            src="/images/Empty_profile.svg"
+            alt="avatar"
+            layout="fill"
+            objectFit="contain"
+            className={styles.profileImage}
+          />
+        </div>
       </div>
       <div className={styles.userInfo}>
         <div className={styles.line}></div>
