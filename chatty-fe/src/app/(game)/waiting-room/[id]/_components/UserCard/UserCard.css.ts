@@ -25,16 +25,17 @@ export const readyContainer = style({
 export const avatar = style({
   position: 'relative',
   display: 'flex',
-  height: 250,
+  width: '100%',
+  height: 'calc(100% - 63px)',
   flexDirection: 'column',
-  justifyContent: 'flex-end',
+  justifyContent: 'flex',
   gap: 10,
 });
 
 export const chatContainer = recipe({
   base: {
     position: 'absolute',
-    bottom: 200,
+    bottom: 'calc(100% - 34px)',
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
@@ -54,7 +55,7 @@ export const chatContainer = recipe({
 
 export const chatMessage = style({
   position: 'relative',
-  width: '100%',
+  maxWidth: '80%',
   wordWrap: 'break-word',
   backgroundColor: 'white',
   borderRadius: 12,
@@ -77,9 +78,10 @@ export const chatMessage = style({
 });
 
 export const profileImage = style({
-  width: 192,
-  height: 192,
-  borderRadius: 192,
+  position: 'relative',
+  height: '80%',
+  minHeight: 80,
+  top: 50,
 });
 
 export const userInfo = style({
