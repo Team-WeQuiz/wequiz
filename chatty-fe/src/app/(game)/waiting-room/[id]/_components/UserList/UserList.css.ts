@@ -16,5 +16,5 @@ export const mainContainer = style({
 export const cardArea = style({
   maxWidth: 300,
   maxHeight: 350,
-  padding: 3,
+  padding: 5,
 });

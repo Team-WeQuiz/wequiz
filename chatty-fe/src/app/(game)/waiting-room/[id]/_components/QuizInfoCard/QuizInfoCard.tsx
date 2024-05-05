@@ -55,7 +55,9 @@ const QuizInfoCard = ({
           className={styles.decoIcon}
         />
         <div className={styles.name}>
-          <h3 className={styles.textEllipsis}>{data.name}</h3>
+          <h3 className={`${styles.textEllipsis} ${styles.nameText}`}>
+            {data.name}
+          </h3>
         </div>
       </div>
       <div className={styles.description}>
@@ -66,9 +68,13 @@ const QuizInfoCard = ({
           <div className={styles.detailText}>
             <span>최대&nbsp;</span>
             <span className={styles.numText}>{data.maxPlayers}</span>
-            <span>명의 참여자와&nbsp;</span>
+            <span>
+              명<span className={styles.mobileHidden}>의 참여자와&nbsp;</span>
+            </span>
             <span className={styles.numText}> {data.numOfQuiz}</span>
-            <span>문제를 풉니다</span>
+            <span>
+              문제<span className={styles.mobileHidden}>를 풉니다</span>
+            </span>
           </div>
         </div>
       </div>

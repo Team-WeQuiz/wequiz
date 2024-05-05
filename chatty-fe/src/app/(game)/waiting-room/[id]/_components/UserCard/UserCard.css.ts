@@ -15,7 +15,13 @@ export const cardContainer = style({
   borderRadius: 20,
   border: '2px solid #fff',
   position: 'relative',
+  overflow: 'hidden',
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+  '@media': {
+    '(max-width: 768px)': {
+      padding: '8px 0px',
+    },
+  },
 });
 
 export const readyContainer = style({
@@ -28,7 +34,6 @@ export const avatar = style({
   width: '100%',
   height: 'calc(100% - 63px)',
   flexDirection: 'column',
-  justifyContent: 'flex',
   gap: 10,
 });
 
@@ -43,6 +48,7 @@ export const chatContainer = recipe({
     alignItems: 'center',
     opacity: 1,
     transition: 'opacity 0.2s ease',
+    zIndex: 5,
   },
   variants: {
     fadeOut: {
@@ -73,7 +79,7 @@ export const chatMessage = style({
     borderStyle: 'solid',
     borderWidth: '10px 10px 0',
     borderColor: 'white transparent',
-    zIndex: 1,
+    zIndex: 5,
   },
 });
 
@@ -82,10 +88,16 @@ export const profileImage = style({
   height: '80%',
   minHeight: 80,
   top: 50,
+  '@media': {
+    '(max-width: 768px)': {
+      top: 0,
+    },
+  },
 });
 
 export const userInfo = style({
   width: '100%',
+  zIndex: 6,
 });
 
 export const line = style({
@@ -105,4 +117,10 @@ export const userName = style({
   fontWeight: 600,
   justifyContent: 'center',
   alignContent: 'center',
+  '@media': {
+    '(max-width: 768px)': {
+      height: 30,
+      fontSize: 14,
+    },
+  },
 });
