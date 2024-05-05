@@ -7,9 +7,18 @@ WORKDIR /
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Copy requirements.txt separately and install dependencies
+# for our nltk data folder
+ENV NLTK_DATA /usr/share/nltk_data
+
+# Install dependencies
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# download punkt
+RUN python3 -m nltk.downloader punkt -d /usr/share/nltk_data
+# download stopwords
+RUN python3 -m nltk.downloader stopwords -d /usr/share/nltk_data
 
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
 

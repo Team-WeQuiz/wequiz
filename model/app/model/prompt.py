@@ -1,3 +1,31 @@
+GENERATE_QUIZ_TEMPLATE = """
+Make exam question related to the CONTEXT below.
+You Just make only one exam question in the form of one of the below types list.
+types = {types}
+If it's not real exam quality, my life is in danger. 
+Be sure to write in Korean.
+
+CONTEXT: {context}
+
+QUESTION_TYPE:
+QUESTION:
+CORRECT ANSWER:
+"""
+JSON_FORMAT_TEMPLATE = """
+Convert the below exam question to match the OUTPUT format.
+If you don't match the format correctly, I'm in danger.
+Be sure to write in Korean.
+
+
+EXAM QUESTION:
+{raw_quiz}
+
+
+{format_instructions}
+
+
+YOUR ANSWER:"""
+###########################################################
 CHOICE_PROB_TEMPLATE = """
 Make a multiple choice type exam question related to the CONTEXT below. I'll tip you if you make a quality exam question.
 
