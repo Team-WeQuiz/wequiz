@@ -27,7 +27,7 @@ class QuizGenerator():
     
     def set_options(self, type, option_list):
         if type == "OX퀴즈":
-            return ["O", "X"]
+            return ["YES", "NO"]
         else:
             return option_list
     
