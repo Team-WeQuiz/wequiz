@@ -20,7 +20,10 @@ RUN python3 -m nltk.downloader punkt -d /usr/share/nltk_data
 # download stopwords
 RUN python3 -m nltk.downloader stopwords -d /usr/share/nltk_data
 
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
+RUN apt-get update && apt-get install -y g++ curl ffmpeg libsm6 libxext6
+
+# MeCab-ko 설치
+RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh | bash -
 
 # Install AWS CLI
 RUN pip install awscli
