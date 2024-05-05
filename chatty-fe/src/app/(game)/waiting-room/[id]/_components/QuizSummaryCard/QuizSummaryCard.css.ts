@@ -23,10 +23,21 @@ export const summaryCard = style({
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
   height: 'calc(100% - 410px)',
+  '@media': {
+    '(max-width: 768px)': {
+      width: 'calc(50% - 5px)',
+      height: '100%',
+    },
+  },
 });
 
 export const header = style({
   padding: 14,
+  '@media': {
+    '(max-width: 768px)': {
+      padding: 8,
+    },
+  },
 });
 
 export const summaryTextContainer = style({
@@ -46,4 +57,9 @@ export const summaryTextContainer = style({
     display: 'none',
   },
   scrollbarWidth: 'none',
+  '@media': {
+    '(max-width: 768px)': {
+      padding: 8,
+    },
+  },
 });

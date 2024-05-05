@@ -6,6 +6,11 @@ export const infoCard = style({
   padding: 12,
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
+  '@media': {
+    '(max-width: 768px)': {
+      width: 'calc(50% - 5px)',
+    },
+  },
 });
 
 export const header = style({
@@ -15,12 +20,22 @@ export const header = style({
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: 44,
+  '@media': {
+    '(max-width: 768px)': {
+      marginTop: 0,
+    },
+  },
 });
 
 export const decoIcon = style({
   position: 'absolute',
   top: -50,
   left: 0,
+  '@media': {
+    '(max-width: 768px)': {
+      display: 'none',
+    },
+  },
 });
 
 export const name = style({
@@ -32,6 +47,17 @@ export const name = style({
   fontSize: 20,
   fontWeight: 600,
   color: 'white',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 10,
+      padding: '6px 4px 6px 12px',
+    },
+  },
+});
+
+export const nameText = style({
+  position: 'relative',
+  zIndex: 1,
 });
 
 export const textEllipsis = style({
@@ -49,6 +75,14 @@ export const description = style({
   color: globals.color.black_3,
   fontSize: 16,
   fontWeight: 400,
+  '@media': {
+    '(max-width: 768px)': {
+      minHeight: 0,
+      maxHeight: 120,
+      overflowY: 'scroll',
+      fontSize: 8,
+    },
+  },
 });
 
 export const detail = style({
@@ -70,6 +104,11 @@ export const detailBlock = style({
   fontWeight: 400,
   backgroundColor: globals.color.blue_7,
   borderRadius: 16,
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 10,
+    },
+  },
 });
 
 export const detailText = style({
@@ -77,6 +116,20 @@ export const detailText = style({
   alignItems: 'center',
   gap: 2,
   verticalAlign: 'bottom',
+  '@media': {
+    '(max-width: 768px)': {
+      width: '100%',
+      justifyContent: 'center',
+    },
+  },
+});
+
+export const mobileHidden = style({
+  '@media': {
+    '(max-width: 768px)': {
+      display: 'none',
+    },
+  },
 });
 
 export const numText = style({
@@ -85,4 +138,9 @@ export const numText = style({
   fontSize: 24,
   fontFamily: 'var(--bagel-font)',
   lineHeight: 1.2,
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 12,
+    },
+  },
 });

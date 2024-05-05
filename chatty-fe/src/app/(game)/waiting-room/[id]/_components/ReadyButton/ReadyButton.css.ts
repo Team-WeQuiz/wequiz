@@ -38,6 +38,16 @@ export const buttonText = style({
   fontSize: 30,
   fontWeight: 600,
   lineHeight: '44px',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 15,
+      lineHeight: '22px',
+      height: 110,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  },
 });
 
 export const blinking = style({

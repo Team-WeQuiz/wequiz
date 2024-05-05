@@ -6,6 +6,12 @@ export const roomContainer = style({
   maxWidth: 1830,
   gap: 30,
   height: '100%',
+  '@media': {
+    '(max-width: 768px)': {
+      position: 'relative',
+      flexDirection: 'column',
+    },
+  },
 });
 
 export const wideArea = style({
@@ -15,6 +21,17 @@ export const wideArea = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 30,
+  '@media': {
+    '(max-width: 768px)': {
+      maxWidth: 768,
+      width: '100%',
+      position: 'absolute',
+      top: 170,
+      left: 0,
+      zIndex: 10,
+      height: 'calc(100% - 170px)',
+    },
+  },
 });
 
 export const narrowArea = style({
@@ -23,6 +40,17 @@ export const narrowArea = style({
   display: 'flex',
   position: 'relative',
   height: '100%',
+  '@media': {
+    '(max-width: 768px)': {
+      maxWidth: 768,
+      width: '100%',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      zIndex: 10,
+      height: 160,
+    },
+  },
 });
 
 export const userList = style({
@@ -44,6 +72,13 @@ export const detailArea = style({
   width: '100%',
   height: '100%',
   top: 0,
+  '@media': {
+    '(max-width: 768px)': {
+      width: 'calc(100% - 85px)',
+      flexDirection: 'row',
+      gap: 10,
+    },
+  },
 });
 
 export const buttonWrapper = style({
@@ -51,4 +86,12 @@ export const buttonWrapper = style({
   display: 'flex',
   width: '100%',
   bottom: 0,
+  '@media': {
+    '(max-width: 768px)': {
+      position: 'absolute',
+      right: 0,
+      width: 80,
+      padding: 5,
+    },
+  },
 });
