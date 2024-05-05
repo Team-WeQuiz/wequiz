@@ -141,12 +141,15 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
     idx = 0
     i = 0
     while idx < generate_request.numOfQuiz:
-        response = dynamodb.get_item(
-            TableName=QUIZ_TABLE,
-            Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
-        )
-        item = response.get('Item', {})
-        questions = item.get('questions', {'L': []})['L']
+        try:
+            response = dynamodb.get_item(
+                TableName=QUIZ_TABLE,
+                Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
+            )
+            item = response.get('Item', {})
+            questions = item.get('questions', {'L': []})['L']
+        except:
+            raise FileNotFoundError('Cannot Found Dynamo doc.')
 
         max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
         success = False
@@ -165,6 +168,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                     }
                 }
                 questions.append(new_question)
+                log('info', f'[app.py > quiz] new quiz is ready to push. {new_question}')
                 # Update item in DynamoDB
                 dynamodb.update_item(
                     TableName=QUIZ_TABLE,
@@ -198,7 +202,7 @@ async def generate(generate_request: GenerateRequest):
 
     try:
         res = create_id(generate_request, id)
-        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs, keywords))  
+        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))  
         return res
     except Exception as e:
         log('error', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
