@@ -61,7 +61,9 @@ const QuizInfoCard = ({
         </div>
       </div>
       <div className={styles.description}>
-        <p className={styles.textEllipsis}>{data.description}</p>
+        <p className={`${styles.descriptionText} ${styles.textEllipsis}`}>
+          {data.description}
+        </p>
       </div>
       <div className={styles.detail}>
         <div className={`${styles.detailBlock} ${styles.textEllipsis}`}>

@@ -36,6 +36,7 @@ export const header = style({
   '@media': {
     '(max-width: 768px)': {
       padding: 8,
+      fontSize: 12,
     },
   },
 });
@@ -59,7 +60,16 @@ export const summaryTextContainer = style({
   scrollbarWidth: 'none',
   '@media': {
     '(max-width: 768px)': {
+      height: 'calc(100% - 35px)',
       padding: 8,
+    },
+  },
+});
+
+export const summaryText = style({
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 12,
     },
   },
 });

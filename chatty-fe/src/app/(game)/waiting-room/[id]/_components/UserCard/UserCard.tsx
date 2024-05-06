@@ -26,12 +26,12 @@ const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
       className={`${styles.cardContainer} ${userStatus.isReady && styles.readyContainer}`}
     >
       <div className={styles.avatar}>
-        {userStatus.message && (
-          <div className={styles.chatContainer({ fadeOut: !showMessage })}>
-            <div className={styles.chatMessage}>{userStatus.message}</div>
-          </div>
-        )}
         <div className={styles.profileImage}>
+          {userStatus.message && (
+            <div className={styles.chatContainer({ fadeOut: !showMessage })}>
+              <div className={styles.chatMessage}>{userStatus.message}</div>
+            </div>
+          )}
           <Image
             src="/images/Empty_profile.svg"
             alt="avatar"

@@ -40,7 +40,7 @@ export const avatar = style({
 export const chatContainer = recipe({
   base: {
     position: 'absolute',
-    bottom: 'calc(100% - 34px)',
+    top: -25,
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
@@ -85,7 +85,7 @@ export const chatMessage = style({
 
 export const profileImage = style({
   position: 'relative',
-  height: '80%',
+  height: '75%',
   minHeight: 80,
   top: 50,
   '@media': {
