@@ -32,10 +32,16 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [quizSet, setQuizSet] = useState<QuizSet>();
   const [isAnswered, setIsAnswered] = useState(false); // => 제출 상태 체크
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
-  const [userAnswer, setUserAnswer] = useState('');
+  const [userAnswer, setUserAnswer] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [count, setCount] = useState(4);
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
+
+  const handleOptionChange = (option: string, index: number) => {
+    setUserAnswer(option);
+    setSelectedOption(index);
+  };
 
   const endRoom = () => {
     axios.delete(`/rooms/${params.id}/end`, {
@@ -81,13 +87,14 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     );
   };
   const getQuiz = (roomId: number) => {
-    setUserAnswer('');
+    setUserAnswer(null);
     stompClient.publish({
       destination: `/pub/rooms/${roomId}/quiz`,
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+    setSelectedOption(null);
   };
   const subscribeSubmitStatus = (roomId: number) => {
     stompClient.subscribe(
@@ -193,8 +200,10 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
               <AnswerArea
                 type={quizSet?.type || '객관식'}
                 options={quizSet?.options}
-                answer={userAnswer}
-                setAnswer={(answer) => setUserAnswer(answer)}
+                answer={userAnswer || null}
+                selectedOption={selectedOption}
+                setAnswer={setUserAnswer}
+                handleOptionChange={handleOptionChange}
               />
             </div>
           </div>
