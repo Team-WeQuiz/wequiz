@@ -12,6 +12,7 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import stompClient from '../../_utils/stomp';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
+import axios from 'axios';
 
 type QuizSet = {
   totalRound: number;
@@ -36,16 +37,31 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
 
+  const endRoom = () => {
+    axios.delete(`/rooms/${params.id}/end`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  };
+
   const countDown = () => {
     const interval = setInterval(() => {
       setCount((currentCount) => {
         if (currentCount === 1) {
+          if (!isAnswered) {
+            submitQuiz(params.id);
+          }
           clearInterval(interval);
           setIsAnswered(false);
           setSubmitStatus(null);
           getQuiz(params.id);
+          if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
+            endRoom();
+          }
           return 4; // 초기화
         }
+
         return currentCount - 1;
       });
     }, 1000);
@@ -167,8 +183,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
                 Round {quizSet?.currentRound || 0}
               </div>
               <QuestionProgess
-                questionNumber={quizSet?.quizNumber || 0}
-                totalQuestions={quizSet?.totalRound || 0}
+                questionNumber={(quizSet?.quizNumber || 0) % 5}
+                totalQuestions={5}
               />
             </div>
 
@@ -178,14 +194,14 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
                 type={quizSet?.type || '객관식'}
                 options={quizSet?.options}
                 answer={userAnswer}
-                setAnswer={setUserAnswer}
+                setAnswer={(answer) => setUserAnswer(answer)}
               />
             </div>
           </div>
           <div className={styles.StatusWrapper}>
             {(isAnswered && submitStatus?.status === 'MAJORITY_SUBMITTED') ||
             (isAnswered && submitStatus?.status === 'ALL_SUBMITTED') ? (
-              <div>{count - 1}</div>
+              <h1 className={styles.Count}>{count - 1}</h1>
             ) : isAnswered && submitStatus?.status === 'PARTIAL_SUBMITTED' ? (
               <BarSpinner />
             ) : (
@@ -201,7 +217,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
               onClick={() => submitQuiz(params.id)}
               disabled={isAnswered}
             >
-              {isAnswered ? '기다리쇼' : '제출'}
+              {isAnswered ? '완료' : '제출'}
             </GradButton>
           </div>
         </div>
