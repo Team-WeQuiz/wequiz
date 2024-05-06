@@ -1,49 +1,129 @@
-from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE
-from model.schema import ChoiceOutput, ShortOutput
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
 from langchain.chains import LLMChain
-from langchain.globals import set_debug
+from langchain.chains.base import Chain
+from langchain.schema import BaseRetriever
+from typing import List, Dict, Any
 
-set_debug(True)
+from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE, GENERATE_QUIZ_TEMPLATE, JSON_FORMAT_TEMPLATE
+from data.settings import VECTOR_CHUNK_SIZE
+from model.schema import ChoiceOutput, ShortOutput, QuizOutput
+from utils.logger import *
+# 로깅 설정
+setup_logging()
 
+# Retrieval 체인
+class RetrievalChain(Chain):
+    retriever: BaseRetriever
 
-# LLM 체인 클래스
-class Chain():
-    def __init__(self, indices):
-        # self.vectorstore= FAISS.load_local(db_path, embeddings=OpenAIEmbeddings(openai_api_key=openai_api_key))
-        self.retriever = indices.as_retriever(search_kwargs=dict(k=1))
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
-        self.types = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
-        self.schems = [ChoiceOutput, ShortOutput]
-    
-    def prob(self, type, message):
-        parser = JsonOutputParser(pydantic_object=self.schems[type])
-        prompt = PromptTemplate(
-            template=self.types[type],
-            input_variables=["context"],
-            partial_variables={"format_instructions": parser.get_format_instructions()}
-        )
-        
-        rag_chain = LLMChain(
-            prompt=prompt,
-            llm=self.llm, 
-            output_parser=parser,
-        )
+    @property
+    def input_keys(self) -> List[str]:
+        return ["message"]
 
+    @property
+    def output_keys(self) -> List[str]:
+        return ["context"]
+
+    def _call(self, inputs: Dict[str, Any]) -> Dict[str, str]:
+        message = inputs["message"]
         relevant_docs = self.retriever.invoke(message)
         context = " ".join([doc.page_content for doc in relevant_docs])
-        
-        return rag_chain.invoke(context)
+        if len(context) < VECTOR_CHUNK_SIZE * 0.3:
+            log('error', f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
+            raise ValueError(f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
+        return {"context": context}
 
+# 문제 생성 체인
+class QuizGenerationChain(Chain):
+    prompt: PromptTemplate
+    llm: ChatOpenAI
+
+    @property
+    def input_keys(self) -> List[str]:
+        return ["context"]
+
+    @property
+    def output_keys(self) -> List[str]:
+        return ["raw_quiz"]
+
+    def _call(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        context = inputs["context"]
+        return {"raw_quiz": self.llm_chain.invoke(context)["text"]}
+
+    @property
+    def llm_chain(self) -> LLMChain:
+        return LLMChain(
+            prompt=self.prompt,
+            llm=self.llm,
+        )
+
+# json format 체인
+class JSONFormatterChain(Chain):
+    prompt: PromptTemplate
+    llm: ChatOpenAI
+    output_parser: JsonOutputParser
+
+    @property
+    def input_keys(self) -> List[str]:
+        return ["raw_quiz"]
+    
+    @property
+    def output_keys(self) -> List[str]:
+        return ["quiz"]
+    
+    @property
+    def llm_chain(self) -> LLMChain:
+        return LLMChain(
+            prompt=self.prompt,
+            llm=self.llm,
+            output_parser=self.output_parser,
+        )
+
+    def _call(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        raw_quiz = inputs["raw_quiz"]
+        return {"quiz": self.llm_chain.invoke(raw_quiz)}
+    
+# 문제 생성 클래스
+class QuizPipeline:
+    def __init__(self, indices: object):
+        self.indices = indices
+        self.retriever = self.indices.as_retriever(search_kwargs=dict(k=1))  # 인덱스 객체로부터 retriever 초기화
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
+        self.question_templates = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
+        # self.output_schemas = [ChoiceOutput, ShortOutput]
+        self.output_schemas = QuizOutput
+        self.types = ['1. Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
+        # (0: multiple choice, 1: short answer, 2: OX quiz)
+
+    def generate_quiz(self, message: str) -> dict:
+        json_output_parser = JsonOutputParser(pydantic_object=self.output_schemas)
+
+        quiz_prompt = PromptTemplate(
+            template=GENERATE_QUIZ_TEMPLATE,
+            input_variables=["context"],
+            partial_variables={"types": self.types}
+        )
+        json_prompt = PromptTemplate(
+            template=JSON_FORMAT_TEMPLATE,
+            input_variables=["raw_quiz"],
+            partial_variables={"format_instructions": json_output_parser.get_format_instructions()}
+        )
+
+        retrieval_chain = RetrievalChain(retriever=self.retriever)
+        quiz_generation_chain = QuizGenerationChain(prompt= quiz_prompt, llm=self.llm)
+        json_formatter_chain = JSONFormatterChain(prompt=json_prompt, llm=self.llm, output_parser=json_output_parser)
+
+        pipe = retrieval_chain | quiz_generation_chain | json_formatter_chain
+
+        return pipe.invoke({"message": message})
+    
 #######################################################################################################
 
 
 from model.prompt import MAP_TEMPLATE, REDUCE_TEMPLATE
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains import ReduceDocumentsChain, MapReduceDocumentsChain
-from langchain_core.output_parsers import StrOutputParser
 
 
 class SummaryChain():
@@ -52,7 +132,6 @@ class SummaryChain():
 
     # meta data generate, map reduce 방식으로 문서를 쪼개서 요약하고 합침.
     async def summary(self, split_docs):
-        parser = StrOutputParser()
         
         # map 
         map_prompt = PromptTemplate.from_template(MAP_TEMPLATE)
