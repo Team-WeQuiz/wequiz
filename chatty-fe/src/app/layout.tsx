@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import './layout.css';
+import { Suspense } from 'react';
 
 const pretendard = localFont({
   src: '../../public/fonts/PretendardVariable.ttf',
@@ -28,8 +29,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${pretendard.variable} ${bagel.variable}`}>
         <div id="main-layout">
-          <div id="root">{children}</div>
-          <div id="modal-root" />
+          <Suspense>
+            <div id="root">{children}</div>
+            <div id="modal-root" />
+          </Suspense>
         </div>
       </body>
     </html>

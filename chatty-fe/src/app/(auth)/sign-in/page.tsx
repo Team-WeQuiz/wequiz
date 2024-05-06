@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import * as styles from './page.css';
 import Image from 'next/image';
 import TextInputField from '@/app/_components/TextInputField';
@@ -46,7 +46,7 @@ export default function SignIn() {
     if (message) {
       alert(message);
     }
-  },[]);
+  }, []);
 
   return (
     <div className={styles.mainContainer}>
