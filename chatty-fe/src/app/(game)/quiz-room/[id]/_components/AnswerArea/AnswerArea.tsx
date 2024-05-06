@@ -1,13 +1,15 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as styles from './AnswerArea.css';
 import TextInputField from '@/app/_components/TextInputField';
 
 type AnswerAreaProps = {
   type: '단답형' | '객관식';
   options?: string[];
-  answer: string;
-  setAnswer: (answer: string) => void;
+  answer: string | null;
+  setAnswer: (answer: string | null) => void;
+  selectedOption: number | null;
+  handleOptionChange: (option: string, index: number) => void;
 };
 
 export default function AnswerArea({
@@ -15,21 +17,16 @@ export default function AnswerArea({
   options,
   answer,
   setAnswer,
+  selectedOption,
+  handleOptionChange,
 }: AnswerAreaProps) {
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-
-  const handleOptionChange = (value: string, index: number) => {
-    setAnswer(value);
-    setSelectedOption(index);
-  };
-
   return (
     <div className={styles.Container}>
       <h1 className={styles.Answer}>A.</h1>
       <div className={styles.Wrapper}>
         {type === '단답형' ? (
           <TextInputField
-            value={answer}
+            value={answer || ''}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder="답변을 작성해주세요."
             borderRadius={12}
