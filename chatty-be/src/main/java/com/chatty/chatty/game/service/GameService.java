@@ -152,6 +152,8 @@ public class GameService {
 
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
+            log.info("ScoreMap: {}", scoreData.getPlayersScore());
+            log.info("ScoreMap 1등: {}", buildScoreResponse(scoreData.getPlayersScore()).scores().getFirst());
 
             PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
             userSubmitStatusRepository.init(players, roomId);

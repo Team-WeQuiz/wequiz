@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Builder
 @Getter
+@Slf4j
 public class AnswerData {
     @Builder
     public record PlayerAnswerData(
@@ -35,10 +37,15 @@ public class AnswerData {
 
     private SubmitStatus checkSubmitStatus() {
         int submitCount = playerAnswers.size();
-
+        log.info("submitCount: {}", submitCount);
+        log.info("playerAnswers.size(): {}", playerAnswers.size());
+        log.info("playerNum: {}", playerNum);
+        log.info("majorityNum: {}", majorityNum);
         if (submitCount == playerNum) {
+            log.info("ALL_SUBMITTED");
             return SubmitStatus.ALL_SUBMITTED;
         } else if (submitCount == majorityNum) {
+            log.info("MAJORITY");
             return SubmitStatus.MAJORITY_SUBMITTED;
         }
         return SubmitStatus.PARTIAL_SUBMITTED;
