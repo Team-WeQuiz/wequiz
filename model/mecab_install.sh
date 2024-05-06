@@ -67,7 +67,7 @@ install_mecab_ko(){
     curl -LO https://bitbucket.org/eunjeon/mecab-ko/downloads/mecab-0.996-ko-0.9.2.tar.gz
     tar zxfv mecab-0.996-ko-0.9.2.tar.gz
     cd mecab-0.996-ko-0.9.2
-    ./configure --build=aarch64-unknown-linux
+    ./configure --build=aarch64-unknown-linux-gnu
     make
     make check
     $sudo make install
