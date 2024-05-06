@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxext6 \
     g++ \
-    openjdk-11-jdk
+    openjdk-17-jdk
 
 # Mecab 설치
 RUN python3.10 -m pip install konlpy JPype1-py3
