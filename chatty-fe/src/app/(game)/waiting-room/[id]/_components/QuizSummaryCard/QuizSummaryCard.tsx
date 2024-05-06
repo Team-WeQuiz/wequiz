@@ -24,9 +24,11 @@ const QuizSummaryCard = ({ summary }: { summary: string }) => {
       <h2 className={styles.header}>문서 요약</h2>
       <div className={styles.summaryTextContainer}>
         {summary ? (
-          <p>{text}</p>
+          <p className={styles.summaryText}>{text}</p>
         ) : (
-          <p className={styles.blinkingText}>문서 요약을 불러오는 중 입니다.</p>
+          <p className={`${styles.blinkingText} ${styles.summaryText}`}>
+            문서 요약을 불러오는 중 입니다.
+          </p>
         )}
       </div>
     </div>

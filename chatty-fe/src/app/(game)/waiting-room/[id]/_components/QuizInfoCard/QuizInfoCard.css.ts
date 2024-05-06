@@ -3,12 +3,17 @@ import { globals } from '@/app/globals.css';
 
 export const infoCard = style({
   width: '100%',
+  height: 280,
   padding: 12,
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
   '@media': {
     '(max-width: 768px)': {
       width: 'calc(50% - 5px)',
+      height: 'auto',
     },
   },
 });
@@ -50,7 +55,7 @@ export const name = style({
   '@media': {
     '(max-width: 768px)': {
       fontSize: 10,
-      padding: '6px 4px 6px 12px',
+      padding: '6px',
     },
   },
 });
@@ -58,6 +63,11 @@ export const name = style({
 export const nameText = style({
   position: 'relative',
   zIndex: 1,
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 12,
+    },
+  },
 });
 
 export const textEllipsis = style({
@@ -80,7 +90,15 @@ export const description = style({
       minHeight: 0,
       maxHeight: 120,
       overflowY: 'scroll',
-      fontSize: 8,
+    },
+  },
+});
+
+export const descriptionText = style({
+  '@media': {
+    '(max-width: 768px)': {
+      justifyContent: 'center',
+      fontSize: 12,
     },
   },
 });
