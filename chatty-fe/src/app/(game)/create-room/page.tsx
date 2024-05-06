@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import * as styles from './page.css';
 import ContentsBox from './_components/ContentsBox';
 import TextInputField from '@/app/_components/TextInputField';

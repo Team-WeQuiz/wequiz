@@ -3,6 +3,7 @@ import * as styles from './page.css';
 import Sparkles from './_components/Sparkles/Sparkles';
 import GradButton from './_components/GradButton';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function Home() {
   return (

@@ -22,5 +22,6 @@ export async function GET() {
     return NextResponse.json(keys);
   } catch (error) {
     console.error(error);
+    return NextResponse.json({ message: 'Error fetching secrets' });
   }
 }
