@@ -4,9 +4,6 @@ FROM python:3.10
 # Set the working directory in the container
 WORKDIR /
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
 # for our nltk data folder
 ENV NLTK_DATA /usr/share/nltk_data
 
@@ -36,8 +33,11 @@ RUN python3.10 -m pip install mecab-python3
 # Install AWS CLI
 RUN pip install awscli
 
+# Copy the current directory contents into the container at /app
+COPY app /app
+
 # Set the working directory in the container
-WORKDIR /app/app
+WORKDIR /app
 
 # Expose the port that uvicorn will run on
 EXPOSE 7999
