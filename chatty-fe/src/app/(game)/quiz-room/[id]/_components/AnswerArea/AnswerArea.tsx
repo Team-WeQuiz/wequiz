@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import * as styles from './AnswerArea.css';
 import TextInputField from '@/app/_components/TextInputField';
 
@@ -15,6 +16,13 @@ export default function AnswerArea({
   answer,
   setAnswer,
 }: AnswerAreaProps) {
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
+  const handleOptionChange = (value: string, index: number) => {
+    setAnswer(value);
+    setSelectedOption(index);
+  };
+
   return (
     <div className={styles.Container}>
       <h1 className={styles.Answer}>A.</h1>
@@ -29,16 +37,26 @@ export default function AnswerArea({
         ) : (
           <div className={styles.RadioButtonWrapper}>
             {options?.map((option, index) => {
+              const isSelected = index === selectedOption;
               return (
-                <label key={index}>
+                <div className={styles.LabelWrapper} key={index}>
                   <input
-                    type="radio"
-                    value={option}
-                    onChange={(e) => setAnswer(e.target.value)}
+                    className={
+                      isSelected ? styles.SelectedButton : styles.RadioButton
+                    }
+                    type="button"
+                    value={index + 1}
+                    onClick={() => handleOptionChange(option, index)}
                     name="option"
+                    id={option}
                   />
-                  {option}
-                </label>
+                  <label
+                    className={isSelected ? styles.SelectedLabel : styles.Label}
+                    htmlFor={option}
+                  >
+                    {option}
+                  </label>
+                </div>
               );
             })}
           </div>
