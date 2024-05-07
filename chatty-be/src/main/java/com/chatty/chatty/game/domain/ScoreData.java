@@ -13,29 +13,13 @@ import lombok.Getter;
 
 @Getter
 public class ScoreData {
-    @Getter
-    public static class PlayerScore {
-        private final String nickname;
-        private Integer score;
-
-        public PlayerScore(String nickname, Integer score) {
-            this.nickname = nickname;
-            this.score = score;
-        }
-
-        public void setScore(Integer score) {
-            this.score = score;
-        }
-    }
-
     private static final Integer SCORE_PER_PLAYER = 100;
-    private static final Integer ZERO = 0;
     private final Map<Long, PlayerScore> playersScore = new ConcurrentHashMap<>();
 
     public ScoreData(PlayersStatus playersStatus) {
         Set<PlayerStatus> statusSet = playersStatus.playerStatusSet();
         for (PlayerStatus status : statusSet) {
-            this.playersScore.put(status.userId(), new PlayerScore(status.nickname(), ZERO));
+            this.playersScore.put(status.userId(), new PlayerScore(status.nickname(), 0));
         }
     }
 
@@ -45,14 +29,13 @@ public class ScoreData {
         int defaultScore = (correctPlayersNum == 0) ? 0 : totalScore / correctPlayersNum;
 
         markList.forEach(mark -> {
-            int currentScore = 0;
             if (mark.marking()) {
                 LocalDateTime submittedTime = answerData.getPlayerAnswers().get(mark.user_id()).submittedTime();
                 int newScore = defaultScore - calculateSolvingTime(answerData.getStartedTime(), submittedTime);
                 newScore = Math.max(1, Math.min(totalScore / 2, newScore));
 
                 PlayerScore playerScore = playersScore.get(mark.user_id());
-                playerScore.setScore(currentScore + newScore);
+                playerScore.updateScore(newScore);
             }
         });
     }
