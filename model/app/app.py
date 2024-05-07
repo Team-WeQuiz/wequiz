@@ -12,6 +12,7 @@ from data.generator import QuizGenerator, Marker, Summarizer
 from data.keyword import *
 from utils.security import get_openai_api_key, get_aws_access_key
 from utils.logger import *
+from utils.exception import *
 # 로깅 설정
 setup_logging()
 
@@ -124,7 +125,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
     try:
         # Generate description
         summarizer = Summarizer()
-        summary, inters = await summarizer.summarize(summary_split_docs)
+        summary = await summarizer.summarize(summary_split_docs)
         dynamodb.update_item(
             TableName=QUIZ_TABLE,
             Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
@@ -165,7 +166,8 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 i += 1
                 success = True
                 break  # 성공적으로 생성되면 반복문 종료
-            except:
+            except Exception as e:
+                log('warning', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
                 i += 1
         if not success:
             log('error', "[app.py > quiz] Failed to generate question after {} attempts".format(max_attempts))
@@ -206,24 +208,28 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
 
 @app.post("/generate")
 async def generate(generate_request: GenerateRequest):
-    # Parsing and split file
-    parser = Parser()
-    keyword_split_docs, summary_split_docs, vector_split_docs = parser.parse(generate_request.user_id, generate_request.timestamp)
-    keywords = extract_keywords(keyword_split_docs, top_n=generate_request.numOfQuiz*2)  # 키워드는 개수를 여유롭게 생성합니다.
-    
-    if len(keywords) < generate_request.numOfQuiz:
-        raise Exception('키워드가 충분히 생성되지 않았습니다.')
-    else:
+    try:
+        # Parsing and split file
+        parser = Parser()
+        keyword_split_docs, summary_split_docs, vector_split_docs= parser.parse(generate_request.user_id, generate_request.timestamp)
+        res = create_id(generate_request)
+
+        # keyword 추출
+        keywords = extract_keywords(keyword_split_docs, top_n=generate_request.numOfQuiz*2)  # 키워드는 개수를 여유롭게 생성합니다.
         log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
 
-    try:
-        res = create_id(generate_request)
-        quiz_task = asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))  
-        return res
-    except Exception as e:
-        log('error', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
-        raise e
+        # quiz 생성 (비동기)
+        asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))
 
+        return res
+
+    except InsufficientException as e:
+        log('error', str(e))
+        raise QuizGenerationException(f"Quiz generation failed due to insufficient data: {str(e)}") from e
+
+    except Exception as e:
+        log('error', f'[app.py > quiz] Unexpected error occurred: {str(e)}')
+        raise QuizGenerationException(f"Quiz generation failed due to an unexpected error: {str(e)}") from e
 
 
 if __name__ == "__main__":

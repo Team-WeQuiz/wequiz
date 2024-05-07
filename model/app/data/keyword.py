@@ -5,6 +5,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords as en_stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from data.korean_stopwords import *
+from utils.exception import *
 
 def extract_keywords(split_doc_list, top_n):
     text_data = []
@@ -29,11 +30,17 @@ def extract_keywords(split_doc_list, top_n):
 
         cleaned_text_data.append(' '.join(cleaned_tokens))
 
+    if len(cleaned_text_data) == 0:
+        raise InsufficientException("No cleaned text data found for keyword extraction.")
+
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(cleaned_text_data)
     feature_names = vectorizer.get_feature_names_out()
-
     tfidf_scores = tfidf_matrix.sum(axis=0).A1
+
+    if len(feature_names) < top_n:
+        raise InsufficientException(f"Insufficient features for keyword extraction. Found {len(feature_names)}, required {top_n}.")
+    
     top_scores = tfidf_scores.argsort()[-top_n:][::-1]
     keywords = [feature_names[i] for i in top_scores]
 
