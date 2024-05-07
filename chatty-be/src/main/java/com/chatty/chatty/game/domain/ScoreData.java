@@ -13,6 +13,21 @@ import lombok.Getter;
 
 @Getter
 public class ScoreData {
+    @Getter
+    public static class PlayerScore {
+        private final String nickname;
+        private Integer score;
+
+        public PlayerScore(String nickname, Integer score) {
+            this.nickname = nickname;
+            this.score = score;
+        }
+
+        public void updateScore(Integer newScore) {
+            this.score += newScore;
+        }
+    }
+
     private static final Integer SCORE_PER_PLAYER = 100;
     private final Map<Long, PlayerScore> playersScore = new ConcurrentHashMap<>();
 
