@@ -5,19 +5,33 @@ import * as styles from './Header.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import DropdownMenu from '../DropDownMenu/DropdownMenu';
+import Cookies from 'js-cookie';
+import useAuthStore from '@/app/_store/useAuthStore';
+import useUserInfoStore from '@/app/_store/useUserInfoStore';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useRouter();
+  const { deleteTokens } = useAuthStore();
+  const { deleteUserInfo } = useUserInfoStore();
+
   const handleLogoClick = () => {
     navigate.push('/main-lobby');
   };
+
   const handleProfileClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.stopPropagation();
     console.log('profile clicked');
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    deleteUserInfo();
+    deleteTokens();
+    Cookies.remove('refreshToken');
+    navigate.push('/');
   };
   return (
     <header className={styles.container}>
@@ -44,7 +58,7 @@ export default function Header() {
               </button>
             </li>
             <li className={styles.dropdownMenuList}>
-              <button onClick={() => {}} className={styles.menuButton}>
+              <button onClick={handleLogout} className={styles.menuButton}>
                 로그아웃
               </button>
             </li>
