@@ -184,11 +184,4 @@ else
     install_mecab_ko_dic
 fi
 
-# if [[ $($python -c 'import pkgutil; print(1 if pkgutil.find_loader("MeCab") else 0)') == "1" ]]; then
-#     echo "mecab-python is already installed"
-# else
-#     echo "Install mecab-python"
-#     install_mecab_python
-# fi
-
 echo "Done."
