@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import exp from 'constants';
+import { globals } from '@/app/globals.css';
 
 export const profileWrapper = style({
   position: 'relative',
@@ -7,6 +7,8 @@ export const profileWrapper = style({
   width: 120,
   height: 120,
   borderRadius: '50%',
+  border: `1px solid ${globals.color.blue_5}`,
+  padding: 0,
 });
 
 export const editButton = style({
