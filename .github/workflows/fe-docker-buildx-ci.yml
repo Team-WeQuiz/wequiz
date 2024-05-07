@@ -38,8 +38,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          context: ./chatty-be
-          tags: leahpar0401/wequiz-be:latest
+          context: ./chatty-fe
+          tags: leahpar0401/wequiz-fe:latest
           platforms: linux/arm64
           build-args: |
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}
