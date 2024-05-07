@@ -1,9 +1,9 @@
 package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
-import com.chatty.chatty.game.controller.dto.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
+import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
@@ -12,7 +12,6 @@ import com.chatty.chatty.game.controller.dto.model.MarkRequest.AnswerDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkResponse;
 import com.chatty.chatty.game.domain.AnswerData;
 import com.chatty.chatty.game.domain.AnswerData.PlayerAnswerData;
-import com.chatty.chatty.game.domain.PlayerScore;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.ScoreData;
 import com.chatty.chatty.game.domain.SubmitStatus;
@@ -27,6 +26,8 @@ import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
+import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -44,6 +45,7 @@ public class GameService {
 
     private static final Integer QUIZ_SIZE = 5;
 
+    private final QuizRoomRepository quizRoomRepository;
     private final PlayersStatusRepository playersStatusRepository;
     private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final GameRepository gameRepository;
@@ -137,19 +139,24 @@ public class GameService {
         AnswerData answerData = answerRepository.getAnswerData(roomId);
         SubmitStatus status = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
-        UsersSubmitStatus submitStatus = userSubmitStatusRepository.submit(roomId, userId);
+        UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.submit(roomId, userId);
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
+            log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
             Quiz removedQuiz = removeQuiz(roomId);
 
-            String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
+            QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
             MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
-                    .id(quizDocId)
+                    .id(quizRoom.getQuizDocId())
                     .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
                     .correct(removedQuiz.correct())
                     .answers(getAnswers(answerData.getPlayerAnswers()))
                     .build());
+            if (quizRoom.getMarkDocId() == null) {
+                quizRoom.setMarkDocId(markResponse.id());
+                quizRoomRepository.save(quizRoom);
+            }
 
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
@@ -162,7 +169,7 @@ public class GameService {
         return SubmitAnswerResponse.builder()
                 .status(status)
                 .timestamp(LocalDateTime.now())
-                .submitStatuses(submitStatus.usersSubmitStatus())
+                .submitStatuses(usersSubmitStatus.usersSubmitStatus())
                 .build();
     }
 
@@ -176,8 +183,8 @@ public class GameService {
     }
 
     public ScoreResponse sendScore(Long roomId) {
-        Map<Long, PlayerScore> playersScore = scoreRepository.getScoreData(roomId).getPlayersScore();
-        List<PlayerScoreDTO> scores = playersScore.entrySet().stream()
+        ScoreData scoreData = scoreRepository.getScoreData(roomId);
+        List<PlayerScoreDTO> scores = scoreData.getPlayersScore().entrySet().stream()
                 .map(entry -> PlayerScoreDTO.builder()
                         .playerId(entry.getKey())
                         .nickname(entry.getValue().getNickname())
