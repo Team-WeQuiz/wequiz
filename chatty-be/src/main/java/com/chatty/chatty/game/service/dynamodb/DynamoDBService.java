@@ -22,7 +22,7 @@ public class DynamoDBService {
 
     private static final Long QUIZ_POLLING_SLEEP_TIME = 5000L;
     private static final Long DESCRIPTION_POLLING_SLEEP_TIME = 10000L;
-    private static final Long POLLING_MAX_ATTEMPTS = 120L;
+    private static final Long POLLING_MAX_ATTEMPTS = 36L;
     private final DynamoDBRepository dynamoDBRepository;
     private final ObjectMapper mapper = new ObjectMapper();
 
