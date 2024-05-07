@@ -7,10 +7,4 @@ import lombok.Builder;
 public record ScoreResponse(
         List<PlayerScoreDTO> scores
 ) {
-    @Builder
-    public record PlayerScoreDTO(
-            Long playerId,
-            Integer score
-    ) {
-    }
 }

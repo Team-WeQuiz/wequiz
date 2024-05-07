@@ -1,9 +1,9 @@
 package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
+import com.chatty.chatty.game.controller.dto.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
-import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
@@ -14,6 +14,7 @@ import com.chatty.chatty.game.domain.AnswerData;
 import com.chatty.chatty.game.domain.AnswerData.PlayerAnswerData;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.ScoreData;
+import com.chatty.chatty.game.domain.ScoreData.PlayerScore;
 import com.chatty.chatty.game.domain.SubmitStatus;
 import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
@@ -153,7 +154,6 @@ public class GameService {
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
             log.info("ScoreMap: {}", scoreData.getPlayersScore());
-            log.info("ScoreMap 1등: {}", buildScoreResponse(scoreData.getPlayersScore()).scores().getFirst());
 
             PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
             userSubmitStatusRepository.init(players, roomId);
@@ -176,15 +176,12 @@ public class GameService {
     }
 
     public ScoreResponse sendScore(Long roomId) {
-        ScoreData scoreData = scoreRepository.getScoreData(roomId);
-        return buildScoreResponse(scoreData.getPlayersScore());
-    }
-
-    private ScoreResponse buildScoreResponse(Map<Long, Integer> playersScore) {
+        Map<Long, PlayerScore> playersScore = scoreRepository.getScoreData(roomId).getPlayersScore();
         List<PlayerScoreDTO> scores = playersScore.entrySet().stream()
                 .map(entry -> PlayerScoreDTO.builder()
                         .playerId(entry.getKey())
-                        .score(entry.getValue())
+                        .nickname(entry.getValue().getNickname())
+                        .score(entry.getValue().getScore())
                         .build())
                 .sorted(Comparator.comparing(PlayerScoreDTO::score).reversed())
                 .toList();
