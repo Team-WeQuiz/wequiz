@@ -2,6 +2,7 @@ package com.chatty.chatty.game.service.dynamodb;
 
 import static com.chatty.chatty.common.util.ThreadSleep.sleep;
 import static com.chatty.chatty.game.exception.GameExceptionType.FAILED_TO_FETCH_DESCRIPTION;
+import static com.chatty.chatty.game.exception.GameExceptionType.FAILED_TO_FETCH_QUIZ;
 
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.exception.GameException;
@@ -28,7 +29,7 @@ public class DynamoDBService {
     public String pollDescription(String itemId, String timestamp) {
         int attempts = 0;
         String description = dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
-        while (description.isEmpty() && attempts < POLLING_MAX_ATTEMPTS) {
+        while (description.isEmpty() && attempts < POLLING_MAX_ATTEMPTS / 2) {
             sleep(DESCRIPTION_POLLING_SLEEP_TIME);
             attempts++;
             description = dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
@@ -39,12 +40,17 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<Quiz> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) {
+    public List<Quiz> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) throws GameException {
+        int attempts = 0;
         List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
-        while (rawQuizzes.size() < (currentRound + 1) * quizSize) {
+        while (rawQuizzes.size() < (currentRound + 1) * quizSize && attempts < POLLING_MAX_ATTEMPTS) {
             sleep(QUIZ_POLLING_SLEEP_TIME);
+            attempts++;
             rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
             log.info("polling...");
+        }
+        if (rawQuizzes.size() < (currentRound + 1) * quizSize) {
+            throw new GameException(FAILED_TO_FETCH_QUIZ);
         }
         log.info("polling done.");
         return convertToList(rawQuizzes);
