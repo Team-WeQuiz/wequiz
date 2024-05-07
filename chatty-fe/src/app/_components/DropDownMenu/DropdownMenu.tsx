@@ -17,7 +17,7 @@ const DropdownMenu = ({
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setIsOpen(!isOpen);
+        setIsOpen(false);
       }
     };
     if (isOpen) {
