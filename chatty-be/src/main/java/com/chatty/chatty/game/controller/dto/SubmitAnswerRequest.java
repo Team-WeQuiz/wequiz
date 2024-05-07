@@ -1,7 +1,7 @@
 package com.chatty.chatty.game.controller.dto;
 
 public record SubmitAnswerRequest(
-        Integer quizNum,
+        Integer quizNumber,
 
         String playerAnswer
 ) {
