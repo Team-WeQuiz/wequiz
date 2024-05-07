@@ -5,6 +5,7 @@ from langchain_community.document_loaders.blob_loaders import Blob
 from data.settings import PORT
 from utils.hash import string_to_hash
 from utils.logger import *
+from utils.exception import *
 # 로깅 설정
 setup_logging()
 
@@ -51,12 +52,11 @@ class MinioLoader:
             objects = self.client.list_objects(self.bucket_name, prefix=f'{prefix}/{type}', recursive=True)
             file_list = [obj.object_name for obj in objects if obj.object_name != user_id]
             if len(file_list) == 0:
-                raise Exception(f'There is no file in Minio: {prefix}/{type}')
+                raise FileNotFoundError(f'There are no files in Minio: {prefix}/{type}')
             else:
                 return file_list
-        except Exception as e:
-            log('error', f"[loader.py > minio] Error getting file list from Minio: {e}")
-            return None
+        except MinioException as e:
+            raise e
 
     # 파일 객체 읽기
     def load_file(self, key):        
@@ -64,6 +64,8 @@ class MinioLoader:
         try:
             file_obj = self.client.get_object(self.bucket_name, key)
             return Blob.from_data(file_obj.read())
-        except Exception as e:
-            log('error', f"[loader.py > minio] Error loading file from Minio: {e}")
-            return None
+        except MinioException as e:
+            if e.code == 'NoSuchKey':
+                raise FileNotFoundError(f'File not found in Minio: {key}') from e
+            else:
+                raise e

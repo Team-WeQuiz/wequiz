@@ -4,6 +4,7 @@ from langchain_openai import OpenAIEmbeddings
 from model.chain import QuizPipeline
 from data.settings import QUIZ_GENERATE_RETRY
 from utils.logger import *
+from utils.exception import *
 # 로깅 설정
 setup_logging()
 
@@ -54,11 +55,12 @@ class QuizGenerator():
             except KeyError:
                 log("warning", "[generator.py > quiz] retry generating quiz due to KeyError")
                 retry += 1
-                continue
             except Exception as e:
                 log("warning", f"[generator.py > quiz] An unexpected quiz generate error occurred: {e}")
                 retry += 1
-                continue
+
+        if retry == QUIZ_GENERATE_RETRY:
+            raise QuizGenerationException(f"Failed to generate quiz about [{keyword}] after {QUIZ_GENERATE_RETRY} retries.")
         return data
 
     
@@ -86,4 +88,4 @@ class Summarizer():
     
     async def summarize(self, split_docs):
         response = await self.summary_chain.summary(split_docs)
-        return response["output_text"], response["intermediate_steps"]
+        return response["output_text"]
