@@ -1,8 +1,8 @@
-.env*
+.env
 config.yaml
 dummyData
 __pycache__
 faiss_index
 index.*
 log
-requirements_unused.txt
+Makefile
