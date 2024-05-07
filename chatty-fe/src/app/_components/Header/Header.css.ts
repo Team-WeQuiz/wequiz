@@ -23,7 +23,7 @@ export const dropdownMenu = style({
   display: 'flex',
   padding: 0,
   width: 120,
-  zIndex: 1,
+  zIndex: 11,
   backgroundColor: '#fff',
   borderRadius: 8,
   boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
