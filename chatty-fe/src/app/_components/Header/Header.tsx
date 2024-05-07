@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import * as styles from './Header.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -12,8 +12,11 @@ export default function Header() {
   const handleLogoClick = () => {
     navigate.push('/main-lobby');
   };
-  const handleProfileClick = (e: MouseEvent) => {
+  const handleProfileClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
     e.stopPropagation();
+    console.log('profile clicked');
     setIsMenuOpen(!isMenuOpen);
   };
   return (
@@ -22,7 +25,7 @@ export default function Header() {
         <Image src="/images/logo.svg" height={52} width={112} alt="logo" />
       </button>
       <div className={styles.profileButton}>
-        <button onClick={(e) => handleProfileClick}>
+        <button onClick={(e) => handleProfileClick(e)}>
           <Image
             src="/images/person.svg"
             height={48}

@@ -33,7 +33,7 @@ const MainLobby = () => {
                       alt="search"
                       width={24}
                       height={24}
-                    />
+                    /> 
                   </SolidButton>
                 }
               />
