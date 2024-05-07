@@ -8,7 +8,17 @@ export const mypageContainer = style({
   height: '100%',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: '20px 0',
+  overflowY: 'scroll',
+  '::-webkit-scrollbar': {
+    display: 'none',
+  },
+  scrollbarWidth: 'none',
+  '@media': {
+    '(max-width: 768px)': {
+      height: 'calc(100% - 35px)',
+      padding: 8,
+    },
+  },
 });
 
 export const contentContainer = style({
@@ -17,7 +27,6 @@ export const contentContainer = style({
   gap: 30,
   flexDirection: 'column',
   alignItems: 'center',
-  marginTop: 30,
   marginBottom: 90,
 });
 
