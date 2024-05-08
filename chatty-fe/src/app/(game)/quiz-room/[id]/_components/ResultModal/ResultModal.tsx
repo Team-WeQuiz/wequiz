@@ -5,16 +5,21 @@ import Image from 'next/image';
 
 type ResultModalProps = {
   currentRound: number;
-  users: Users[];
+  users: PlayerScore[];
+  count: number;
 };
 
-type Users = {
-  id: number;
+type PlayerScore = {
+  playerId: number;
   nickname: string;
   score: number;
 };
 
-export default function ResultModal({ currentRound, users }: ResultModalProps) {
+export default function ResultModal({
+  currentRound,
+  users,
+  count,
+}: ResultModalProps) {
   const { id } = useUserInfoStore();
   const calcRanking = (users: ResultModalProps['users']) => {
     return users.sort((a, b) => b.score - a.score);
@@ -39,9 +44,9 @@ export default function ResultModal({ currentRound, users }: ResultModalProps) {
             <div key={groupIndex} className={styles.RankingBox}>
               {userGroup.map((user, index) => (
                 <div
-                  key={user.id}
+                  key={user.playerId}
                   className={
-                    user.id === id
+                    user.playerId === id
                       ? styles.MyRankingContents
                       : styles.RankingContents
                   }
@@ -111,7 +116,7 @@ export default function ResultModal({ currentRound, users }: ResultModalProps) {
         </div>
         <button className={styles.Button}>
           <span className={styles.ButtonText}>다음 라운드 까지 </span>
-          <span className={styles.CountText}>10초</span>
+          <span className={styles.CountText}>{count}초</span>
         </button>
       </div>
     </div>

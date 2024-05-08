@@ -19,8 +19,8 @@ export const Modal = style({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'space-around',
-  width: 744,
-  height: 400,
+  width: '80%',
+  height: '60%',
   borderRadius: 16,
   background: '#FFF',
 });
@@ -35,7 +35,7 @@ export const ResultBox = style({
   padding: '8px 0px',
   gap: 64,
   justifyContent: 'center',
-  width: 'inherit',
+  width: '100%',
   backgroundColor: globals.color.blue_7,
 });
 
@@ -43,7 +43,7 @@ export const RankingBox = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  maxHeight: 183,
+  maxHeight: 240,
   gap: 12,
 });
 
@@ -51,6 +51,7 @@ export const RankingContents = style({
   display: 'flex',
   padding: '2px 0px',
   alignItems: 'center',
+  width: '100%',
   gap: 24,
 });
 
