@@ -3,10 +3,10 @@ package com.chatty.chatty.user.controller.dto;
 import lombok.Builder;
 
 @Builder
-public record ParticipatedQuizRoomResponse(
+public record ParticipatedQuizRoomDTO(
         Long roomId,
-        String roomName,
-        String roomDescription
+        String name,
+        String description
 ) {
 
 }
