@@ -3,6 +3,7 @@ package com.chatty.chatty.auth.service;
 import static com.chatty.chatty.auth.exception.AuthExceptionType.*;
 import static com.chatty.chatty.user.exception.UserExceptionType.USER_NOT_FOUND;
 
+import com.chatty.chatty.auth.controller.dto.PasswordRequest;
 import com.chatty.chatty.auth.controller.dto.RefreshTokenRequest;
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
@@ -57,6 +58,16 @@ public class AuthService {
                 .accessToken(jwtUtil.createAccessToken(user))
                 .refreshToken(getRefreshToken(user.getId()))
                 .build();
+    }
+
+    @Transactional
+    public void changePassword(Long userId, PasswordRequest request) {
+        User user = findUserById(userId);
+        if (!isPasswordValid(userId, request.oldPassword())) {
+            throw new AuthException(INVALID_PASSWORD);
+        }
+        user.changePassword(encoded(request.newPassword()));
+        userRepository.save(user);
     }
 
     @Transactional
