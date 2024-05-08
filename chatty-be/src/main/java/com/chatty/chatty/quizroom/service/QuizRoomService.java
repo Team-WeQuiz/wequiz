@@ -12,6 +12,7 @@ import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
+import com.chatty.chatty.player.service.PlayerService;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
@@ -49,7 +50,7 @@ public class QuizRoomService {
     private final SimpMessagingTemplate template;
     private final PlayersStatusRepository playersStatusRepository;
     private final UserSubmitStatusRepository userSubmitStatusRepository;
-
+    private final PlayerService playerService;
 
     public RoomListResponse getRooms(Integer page) {
         PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
@@ -113,6 +114,7 @@ public class QuizRoomService {
                 .build();
     }
 
+    @Transactional
     public void startRoom(Long roomId) {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom
@@ -121,6 +123,8 @@ public class QuizRoomService {
                         return;
                     }
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+                    players.playerStatusSet()
+                            .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));
                     userSubmitStatusRepository.init(players, roomId);
                     validateRoomIfReady(quizRoom.getStatus());
                     updateRoomStatus(roomId, Status.STARTED);
@@ -130,6 +134,7 @@ public class QuizRoomService {
                 });
     }
 
+    @Transactional
     public void finishRoom(Long roomId) {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom

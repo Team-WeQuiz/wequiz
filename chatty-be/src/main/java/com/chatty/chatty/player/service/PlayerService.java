@@ -32,9 +32,4 @@ public class PlayerService {
                         .nickname(nickname)
                         .build());
     }
-
-    @Transactional
-    public void deletePlayer(Long userId, Long roomId) {
-        playerRepository.deleteByUserIdAndQuizRoomId(userId, roomId);
-    }
 }
