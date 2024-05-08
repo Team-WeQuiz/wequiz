@@ -12,6 +12,7 @@ import com.chatty.chatty.user.exception.UserException;
 import com.chatty.chatty.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.Page;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private static final Integer DEFAULT_PAGE_SIZE = 8;
 
     private final UserRepository userRepository;
     private final PlayerRepository playerRepository;
@@ -35,8 +38,9 @@ public class UserService {
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
-    public ParticipatedQuizRoomListResponse getParticipatedQuizRooms(Long userId, Pageable pageable) {
-        Page<Player> players = playerRepository.findByUserId(userId, pageable);
+    public ParticipatedQuizRoomListResponse getParticipatedQuizRooms(Long userId, Integer page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
+        Page<Player> players = playerRepository.findByUserIdOrderByCreatedAt(userId, pageRequest);
         List<ParticipatedQuizRoomDTO> roomDTOs = players.map(player -> ParticipatedQuizRoomDTO.builder()
                 .roomId(player.getQuizRoom().getId())
                 .name(player.getQuizRoom().getName())

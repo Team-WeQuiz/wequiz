@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
-    Page<Player> findByUserId(Long userId, Pageable pageable);
+    Page<Player> findByUserIdOrderByCreatedAt(Long userId, Pageable pageable);
 
     void deleteByUserIdAndQuizRoomId(Long userId, Long roomId);
 }
