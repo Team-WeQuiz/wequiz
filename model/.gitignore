@@ -1,4 +1,4 @@
-.env
+.env*
 config.yaml
 dummyData
 __pycache__
