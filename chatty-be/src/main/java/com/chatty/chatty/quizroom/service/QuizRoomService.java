@@ -106,7 +106,7 @@ public class QuizRoomService {
         List<MarkDTO> markDTOList = dynamoDBService.getMark(quizRoom.getMarkDocId());
 
         List<QuizResultDTO> quizResultDTOList = new ArrayList<>();
-        for (int quizIndex = 0; quizIndex < quizDTOList.size(); quizIndex++) {
+        for (int quizIndex = 0; quizIndex < markDTOList.size(); quizIndex++) {
             QuizDTO quizDTO = quizDTOList.get(quizIndex);
             MarkDTO markDTO = markDTOList.get(quizIndex);
 
