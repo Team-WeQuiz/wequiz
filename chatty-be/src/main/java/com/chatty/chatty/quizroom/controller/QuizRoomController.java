@@ -5,6 +5,7 @@ import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomResultResponse;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,14 @@ public class QuizRoomController {
     public ResponseEntity<Void> finishRoom(@PathVariable Long roomId) {
         quizRoomService.finishRoom(roomId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/{roomId}/result")
+    public ResponseEntity<RoomResultResponse> getTotalResult(
+            @PathVariable Long roomId,
+            @AuthUser Long userId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getTotalResult(roomId, userId));
     }
 
     @MessageMapping("/rooms?page={page}")
