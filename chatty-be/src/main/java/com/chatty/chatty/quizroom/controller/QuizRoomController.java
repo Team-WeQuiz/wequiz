@@ -62,11 +62,8 @@ public class QuizRoomController {
     }
 
     @GetMapping("/{roomId}/result")
-    public ResponseEntity<RoomResultResponse> getTotalResult(
-            @PathVariable Long roomId,
-            @AuthUser Long userId
-    ) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getTotalResult(roomId, userId));
+    public ResponseEntity<RoomResultResponse> getTotalResult(@PathVariable Long roomId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getTotalResult(roomId));
     }
 
     @MessageMapping("/rooms?page={page}")

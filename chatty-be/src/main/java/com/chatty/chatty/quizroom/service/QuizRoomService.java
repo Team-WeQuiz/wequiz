@@ -1,5 +1,6 @@
 package com.chatty.chatty.quizroom.service;
 
+import static com.chatty.chatty.player.exception.PlayerExceptionType.PLAYER_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.FileExceptionType.FILE_INPUT_STREAM_FAILED;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_READY;
@@ -13,6 +14,8 @@ import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
 import com.chatty.chatty.player.domain.PlayersStatus;
+import com.chatty.chatty.player.exception.PlayerException;
+import com.chatty.chatty.player.repository.PlayerRepository;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
@@ -51,6 +54,7 @@ public class QuizRoomService {
     private final GameService gameService;
     private final ModelService modelService;
     private final DynamoDBService dynamoDBService;
+    private final PlayerRepository playerRepository;
     private final MinioRepository minioRepository;
     private final PlayersStatusRepository playersStatusRepository;
     private final UserSubmitStatusRepository userSubmitStatusRepository;
@@ -92,7 +96,7 @@ public class QuizRoomService {
                 .build();
     }
 
-    public RoomResultResponse getTotalResult(Long roomId, Long userId) {
+    public RoomResultResponse getTotalResult(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId(), quizRoom.getCreatedAt().toString());
@@ -107,6 +111,11 @@ public class QuizRoomService {
             List<PlayerAnswer> playerAnswers = new ArrayList<>();
             for (int playerIndex = 0; playerIndex < markDTO.markeds().size(); playerIndex++) {
                 MarkDTO.Marked marked = markDTO.markeds().get(playerIndex);
+
+                // Player 엔티티에서 닉네임 가져오기
+                String nickname = playerRepository.findByUserIdAndQuizRoomId(marked.playerId(), roomId)
+                        .orElseThrow(() -> new PlayerException(PLAYER_NOT_FOUND))
+                        .getNickname();
                 playerAnswers.add(new PlayerAnswer(marked.playerId(), nickname, marked.playerAnswer(), marked.marking()));
             }
 

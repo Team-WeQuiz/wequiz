@@ -9,6 +9,7 @@ import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.exception.GameException;
 import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class DynamoDBService {
                     String id = (String) map.get("id");
                     String correct = (String) map.get("correct");
                     List<Map<String, Object>> markedsListMap = (List<Map<String, Object>>) map.get("markeds");
-                    Integer quizNumber = (Integer) map.get("question_number");
+                    Integer quizNumber = ((BigDecimal) map.get("question_number")).intValue();
 
                     List<Marked> markeds = new ArrayList<>();
                     for (Map<String, Object> value : markedsListMap) {
