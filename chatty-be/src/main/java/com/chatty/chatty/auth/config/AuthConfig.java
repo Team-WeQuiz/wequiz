@@ -30,7 +30,7 @@ public class AuthConfig implements WebMvcConfigurer {
     private HandlerInterceptor loginInterceptor() {
         return new PathMatcherInterceptor(loginInterceptor)
                 .excludePathPattern("/**", OPTIONS)
-                .addPathPattern("/user/**", GET)
+                .addPathPattern("/users/**", GET)
                 .addPathPattern("/rooms/**", GET, POST)
                 .addPathPattern("/auth/password", POST);
     }
