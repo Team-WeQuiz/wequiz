@@ -125,6 +125,7 @@ public class GameService {
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
         QuizDTO quiz = quizData.getQuiz();
+        log.info("currentRound: {}", quizData.getCurrentRound());
         return QuizResponse.builder()
                 .totalRound(quizData.getTotalRound())
                 .currentRound(quizData.getCurrentRound())
