@@ -13,7 +13,6 @@ spring:
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
 
-# TODO: 소셜 로그인 토큰 재발급 후 수정 필요
 social:
   client:
     kakao:
