@@ -14,7 +14,7 @@ const publicRoutes = ['/sign-in', '/sign-up'];
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('refreshToken');
   const currentPath = request.nextUrl.pathname;
-  console.log(token);
+  //console.log(token);
 
   const isProtectedRoute = protectedPatterns.some((pattern) =>
     pattern.test(request.nextUrl),

@@ -34,12 +34,21 @@ export default function SignIn() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const response = await postSignIn({ email: email, password: password });
-    const { accessToken, refreshToken } = response;
-    setAuth(accessToken);
-    setAuthTokenCookie(refreshToken);
+    if (!email || !password) {
+      alert('이메일과 비밀번호를 입력해주세요.');
+    } else {
+      try {
+        const response = await postSignIn({ email: email, password: password });
+        const { accessToken, refreshToken } = response;
 
-    router.push('/main-lobby');
+        setAuth(accessToken);
+        setAuthTokenCookie(refreshToken);
+
+        router.push('/main-lobby');
+      } catch (error: any) {
+        alert(error.message);
+      }
+    }
   };
 
   useEffect(() => {

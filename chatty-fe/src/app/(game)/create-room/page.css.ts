@@ -36,6 +36,18 @@ export const contentsWrapper = style({
   gap: 10,
 });
 
+export const radioButtonWrapper = style({
+  display: 'flex',
+  width: '100%',
+  height: 60,
+  gap: 10,
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 10,
+  border: `1px solid ${globals.color.black_6}`,
+});
+
 export const titleWrapper = style({
   width: 956,
 });
