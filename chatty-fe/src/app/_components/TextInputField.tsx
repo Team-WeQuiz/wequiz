@@ -83,6 +83,7 @@ export default function TextInputField({
           autoComplete={autoComplete}
           disabled={disabled}
           maxLength={maxLength}
+          min={1}
           className={`${styles.container}`}
           style={{
             borderRadius: `${borderRadius}px`,
