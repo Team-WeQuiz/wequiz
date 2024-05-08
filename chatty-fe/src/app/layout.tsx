@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description:
     'Wequiz is a service that allows you to create quizzes using ai and solve them like a game in real time with your friends.',
   icons: {
-    icon: '/favicon/ico',
+    icon: '/favicon.ico',
   },
 };
 
