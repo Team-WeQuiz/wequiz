@@ -26,6 +26,7 @@ import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -102,10 +103,10 @@ public class QuizRoomService {
         );
 
         // minio에 파일(들) 업로드
-        uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
+        List<String> fileNames = uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
 
         // QuizDocId 저장
-        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom);
+        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom, fileNames);
         savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
 
@@ -172,15 +173,18 @@ public class QuizRoomService {
         return String.format(BROADCAST_URL, page);
     }
 
-    private void uploadFilesToStorage(CreateRoomRequest request, LocalDateTime time, Long userId) {
+    private List<String> uploadFilesToStorage(CreateRoomRequest request, LocalDateTime time, Long userId) {
+        List<String> fileNames = new ArrayList<>();
         request.files()
                 .forEach(file -> {
                     try {
-                        minioRepository.saveFile(userId, time, file.getInputStream());
+                        String fileName = minioRepository.saveFile(userId, time, file.getInputStream());
+                        fileNames.add(fileName);
                     } catch (IOException e) {
                         throw new FileException(FILE_INPUT_STREAM_FAILED);
                     }
                 });
+        return fileNames;
     }
 
     private void validateRoomIfReady(Status status) {
