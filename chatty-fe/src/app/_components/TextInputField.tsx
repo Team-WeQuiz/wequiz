@@ -15,6 +15,7 @@ type TextInputFiledProps = {
   type?: string;
   autoComplete?: string;
   disabled?: boolean;
+  maxLength?: number;
 };
 
 export default function TextInputField({
@@ -29,6 +30,7 @@ export default function TextInputField({
   endAdornment,
   autoComplete,
   disabled,
+  maxLength,
 }: TextInputFiledProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleChatDivClick = () => {
@@ -54,6 +56,7 @@ export default function TextInputField({
           className={styles.chatInput}
           type={type}
           disabled={disabled}
+          maxLength={maxLength}
         />
         {endAdornment && (
           <>
@@ -79,6 +82,7 @@ export default function TextInputField({
           type={type}
           autoComplete={autoComplete}
           disabled={disabled}
+          maxLength={maxLength}
           className={`${styles.container}`}
           style={{
             borderRadius: `${borderRadius}px`,

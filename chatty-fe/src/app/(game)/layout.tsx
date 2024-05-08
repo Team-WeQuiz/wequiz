@@ -1,6 +1,6 @@
 import React from 'react';
 import AuthCheck from './_components/AuthCheck';
-import Header from '../_components/Header';
+import Header from '../_components/Header/Header';
 import { mainContainer } from './layout.css';
 
 export default function GameLayout({

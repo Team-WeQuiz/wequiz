@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import * as styles from './AnswerArea.css';
 import TextInputField from '@/app/_components/TextInputField';
 
-type AnswerAreaProps = {
+export type AnswerAreaProps = {
   type: '단답형' | '객관식';
   options?: string[];
   answer: string | null;

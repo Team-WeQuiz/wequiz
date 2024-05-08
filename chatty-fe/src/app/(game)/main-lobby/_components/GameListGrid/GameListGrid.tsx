@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import GameCard from '../GameCard/GameCard';
-import Paginator from '../Paginator/Paginator';
+import Paginator from '@/app/_components/Paginator/Paginator';
 import * as styles from './GameListGrid.css';
 import stompClient from '@/app/(game)/_utils/stomp';
 import useAuthStore from '@/app/_store/useAuthStore';

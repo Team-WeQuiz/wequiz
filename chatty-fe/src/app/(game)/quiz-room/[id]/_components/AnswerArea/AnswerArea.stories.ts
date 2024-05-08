@@ -1,10 +1,29 @@
 import { Meta, StoryObj } from '@storybook/react';
-import AnswerArea from './AnswerArea';
+import AnswerArea, { AnswerAreaProps } from './AnswerArea';
 
-const meta = {
+const meta: Meta<AnswerAreaProps> = {
   title: 'Components/AnswerArea',
   component: AnswerArea,
-} satisfies Meta<typeof AnswerArea>;
+  argTypes: {
+    type: {
+      control: {
+        type: 'select',
+        options: ['객관식', '단답형'],
+      },
+    },
+    options: {
+      control: {
+        type: 'array',
+        separator: ';', // 객관식 옵션을 입력할 때 구분자
+      },
+    },
+    answer: {
+      control: {
+        type: 'text',
+      },
+    },
+  },
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -20,6 +39,9 @@ export const MultipleChoice: Story = {
       'E',
     ],
     answer: 'A',
+    selectedOption: null,
+    setAnswer: (answer: string | null) => {}, // 예시로 빈 함수를 넣음
+    handleOptionChange: (option: string, index: number) => {}, // 예시로 빈 함수를 넣음
   },
 };
 
@@ -27,5 +49,8 @@ export const FreeText: Story = {
   args: {
     type: '단답형',
     answer: 'A',
+    selectedOption: null,
+    setAnswer: (answer: string | null) => {}, // 예시로 빈 함수를 넣음
+    handleOptionChange: (option: string, index: number) => {}, // 예시로 빈 함수를 넣음
   },
 };
