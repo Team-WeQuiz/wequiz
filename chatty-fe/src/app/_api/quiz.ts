@@ -10,17 +10,7 @@ export const getQuizInfo = async (id: number, accessToken: string) => {
     return response.data;
   } catch (error) {
     console.error('error: ', error);
-    throw new Error('Failed to get quiz info');
-  }
-};
-
-export const getQuiz = async (id: number) => {
-  try {
-    const response = await client.get(`rooms/${id}/quiz`);
-    return response.data;
-  } catch (error) {
-    console.error('error: ', error);
-    throw new Error('Failed to get quiz data');
+    throw new Error('퀴즈 정보를 가져오는데 실패했습니다.');
   }
 };
 
@@ -39,5 +29,22 @@ export const startQuiz = async (id: number, token: string) => {
   } catch (error) {
     console.error('error: ', error);
     throw new Error('Failed to start quiz');
+  }
+};
+
+export const getUsersQuiz = async (pageNum: number, token: string) => {
+  try {
+    const response = await client.get(
+      `users/participated-rooms?page=${pageNum}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('error: ', error);
+    throw new Error('Failed to get user quiz');
   }
 };

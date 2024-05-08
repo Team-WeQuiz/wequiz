@@ -9,6 +9,7 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
 import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
+import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
@@ -17,6 +18,7 @@ import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.exception.PlayerException;
 import com.chatty.chatty.player.repository.PlayerRepository;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
+import com.chatty.chatty.player.service.PlayerService;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
@@ -51,6 +53,7 @@ public class QuizRoomService {
     private static final String BROADCAST_URL = "/sub/rooms?page=%d";
 
     private final QuizRoomRepository quizRoomRepository;
+    private final GameRepository gameRepository;
     private final GameService gameService;
     private final ModelService modelService;
     private final DynamoDBService dynamoDBService;
@@ -59,7 +62,7 @@ public class QuizRoomService {
     private final PlayersStatusRepository playersStatusRepository;
     private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final SimpMessagingTemplate template;
-
+    private final PlayerService playerService;
 
     public RoomListResponse getRooms(Integer page) {
         PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
@@ -152,10 +155,10 @@ public class QuizRoomService {
         );
 
         // minio에 파일(들) 업로드
-        uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
+        List<String> fileNames = uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
 
         // QuizDocId 저장
-        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom);
+        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom, fileNames);
         savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
 
@@ -164,6 +167,7 @@ public class QuizRoomService {
                 .build();
     }
 
+    @Transactional
     public void startRoom(Long roomId) {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom
@@ -172,6 +176,8 @@ public class QuizRoomService {
                         return;
                     }
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+                    players.playerStatusSet()
+                            .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));
                     userSubmitStatusRepository.init(players, roomId);
                     validateRoomIfReady(quizRoom.getStatus());
                     updateRoomStatus(roomId, Status.STARTED);
@@ -181,6 +187,7 @@ public class QuizRoomService {
                 });
     }
 
+    @Transactional
     public void finishRoom(Long roomId) {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom
@@ -190,6 +197,7 @@ public class QuizRoomService {
                     }
                     validateRoomIfStarted(quizRoom.getStatus());
                     updateRoomStatus(roomId, Status.FINISHED);
+                    gameRepository.clearQuizData(roomId);
                     playersStatusRepository.clear(roomId);
                     userSubmitStatusRepository.clear(roomId);
                 }, () -> {
@@ -217,15 +225,18 @@ public class QuizRoomService {
         return String.format(BROADCAST_URL, page);
     }
 
-    private void uploadFilesToStorage(CreateRoomRequest request, LocalDateTime time, Long userId) {
+    private List<String> uploadFilesToStorage(CreateRoomRequest request, LocalDateTime time, Long userId) {
+        List<String> fileNames = new ArrayList<>();
         request.files()
                 .forEach(file -> {
                     try {
-                        minioRepository.saveFile(userId, time, file.getInputStream());
+                        String fileName = minioRepository.saveFile(userId, time, file.getInputStream());
+                        fileNames.add(fileName);
                     } catch (IOException e) {
                         throw new FileException(FILE_INPUT_STREAM_FAILED);
                     }
                 });
+        return fileNames;
     }
 
     private void validateRoomIfReady(Status status) {

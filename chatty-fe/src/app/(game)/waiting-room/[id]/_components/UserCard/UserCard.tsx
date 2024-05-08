@@ -26,18 +26,20 @@ const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
       className={`${styles.cardContainer} ${userStatus.isReady && styles.readyContainer}`}
     >
       <div className={styles.avatar}>
-        {userStatus.message && (
-          <div className={styles.chatContainer({ fadeOut: !showMessage })}>
-            <div className={styles.chatMessage}>{userStatus.message}</div>
-          </div>
-        )}
-        <Image
-          src="/images/Empty_profile.svg"
-          alt="avatar"
-          width={192}
-          height={192}
-          className={styles.profileImage}
-        />
+        <div className={styles.profileImage}>
+          {userStatus.message && (
+            <div className={styles.chatContainer({ fadeOut: !showMessage })}>
+              <div className={styles.chatMessage}>{userStatus.message}</div>
+            </div>
+          )}
+          <Image
+            src="/images/Empty_profile.svg"
+            alt="avatar"
+            layout="fill"
+            objectFit="contain"
+            className={styles.profileImage}
+          />
+        </div>
       </div>
       <div className={styles.userInfo}>
         <div className={styles.line}></div>

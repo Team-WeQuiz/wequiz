@@ -22,16 +22,27 @@ export const summaryCard = style({
   padding: 12,
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
-  maxHeight: 'calc(100% - 410px)',
+  height: 'calc(100% - 410px)',
+  '@media': {
+    '(max-width: 768px)': {
+      width: 'calc(50% - 5px)',
+      height: '100%',
+    },
+  },
 });
 
 export const header = style({
   padding: 14,
+  '@media': {
+    '(max-width: 768px)': {
+      padding: 8,
+      fontSize: 12,
+    },
+  },
 });
 
 export const summaryTextContainer = style({
   width: '100%',
-  minHeight: 100,
   display: 'flex',
   flexDirection: 'column',
   borderRadius: 16,
@@ -40,6 +51,25 @@ export const summaryTextContainer = style({
   alignItems: 'flex-start',
   lineHeight: 1.5,
   height: 'calc(100% - 47px)',
-  overflow: 'scroll',
+  overflowY: 'scroll',
   position: 'relative',
+  // hide scroll bar
+  '::-webkit-scrollbar': {
+    display: 'none',
+  },
+  scrollbarWidth: 'none',
+  '@media': {
+    '(max-width: 768px)': {
+      height: 'calc(100% - 35px)',
+      padding: 8,
+    },
+  },
+});
+
+export const summaryText = style({
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 12,
+    },
+  },
 });

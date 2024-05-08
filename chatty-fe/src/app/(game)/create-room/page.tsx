@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import * as styles from './page.css';
 import ContentsBox from './_components/ContentsBox';
 import TextInputField from '@/app/_components/TextInputField';
@@ -18,11 +18,21 @@ export default function CreateRoom() {
   const [numberOfParticipants, setNumberOfParticipants] = useState(0);
   const [password, setPassword] = useState('');
   const [numberOfProblems, setNumberOfProblems] = useState(0);
-  const [qustionType, setQuestionType] = useState<'list' | 'create'>('list');
+  const [qustionType, setQuestionType] = useState<'list' | 'create'>('create');
 
   const router = useRouter();
 
   const onSubmit = async () => {
+    if (
+      !title ||
+      !description ||
+      !numberOfParticipants ||
+      !numberOfProblems ||
+      !files.length
+    ) {
+      alert('방 제목, 설명, 인원 수, 문제 수는 필수 입력 항목입니다.');
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await postRoom(
@@ -37,8 +47,8 @@ export default function CreateRoom() {
       if (response) {
         router.push(`enter-room/${response.roomId}?create=true`);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      alert(error.message);
     }
     setIsLoading(false);
   };
@@ -56,8 +66,11 @@ export default function CreateRoom() {
               <TextInputField
                 type="text"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value.length <= 20) setTitle(e.target.value);
+                }}
                 borderRadius={12}
+                maxLength={20}
               />
             </div>
           </div>
@@ -69,8 +82,12 @@ export default function CreateRoom() {
               <TextInputField
                 type="text"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value.length <= 50)
+                    setDescription(e.target.value);
+                }}
                 borderRadius={12}
+                maxLength={50}
               />
             </div>
           </div>
@@ -82,9 +99,10 @@ export default function CreateRoom() {
               <TextInputField
                 type="number"
                 value={String(numberOfParticipants)}
-                onChange={(e) =>
-                  setNumberOfParticipants(Number(e.target.value))
-                }
+                onChange={(e) => {
+                  if (Number(e.target.value) > 10) setNumberOfParticipants(10);
+                  else setNumberOfParticipants(Number(e.target.value));
+                }}
                 borderRadius={12}
               />
             </div>
@@ -107,12 +125,38 @@ export default function CreateRoom() {
           <div className={styles.contentsWrapper}>
             <ContentsBox imgSrc="/images/Book_open_alt.svg" title="문제 수" />
             <div className={styles.defaultWrapper}>
-              <TextInputField
+              {/* <TextInputField
                 type="number"
                 value={String(numberOfProblems)}
                 onChange={(e) => setNumberOfProblems(Number(e.target.value))}
                 borderRadius={12}
-              />
+              /> */}
+              <div className={styles.radioButtonWrapper}>
+                <input
+                  type="radio"
+                  id="5"
+                  name="numberOfProblems"
+                  value={5}
+                  onChange={() => setNumberOfProblems(5)}
+                />
+                <label htmlFor="5">5개</label>
+                <input
+                  type="radio"
+                  id="10"
+                  name="numberOfProblems"
+                  value={10}
+                  onChange={() => setNumberOfProblems(10)}
+                />
+                <label htmlFor="10">10개</label>
+                <input
+                  type="radio"
+                  id="15"
+                  name="numberOfProblems"
+                  value={15}
+                  onChange={() => setNumberOfProblems(15)}
+                />
+                <label htmlFor="15">15개</label>
+              </div>
             </div>
           </div>
         </div>
@@ -124,10 +168,10 @@ export default function CreateRoom() {
             questionType={qustionType}
             setQuestionType={setQuestionType}
           />
-          {qustionType === 'create' ? (
-            <FileUploadBox setFiles={setFiles} />
-          ) : (
+          {qustionType === 'list' ? (
             <DropBox />
+          ) : (
+            <FileUploadBox setFiles={setFiles} />
           )}
         </div>
         <div className={styles.buttonContainer}>

@@ -11,6 +11,7 @@ from data.settings import *
 from utils.security import get_minio_access_key
 from data.loader import MinioLoader
 from utils.logger import *
+from utils.exception import *
 # 로깅 설정
 setup_logging()
 
@@ -71,50 +72,72 @@ class Parser():
 
 
     def get_parsed_docs(self, parser, loader, files):
-        keyword_docs_list = []
-        summary_docs_list = []
-        vector_docs_list = []
-
         page_num = 0
         total_token = 0
-        for file in files:
-            file_obj = loader.load_file(file)
-            documents = parser.lazy_parse(file_obj)
+        total_text = ''
+        try:
+            # files의 documents를 하나의 text로 병합
+            for file in files:
+                try:
+                    file_obj = loader.load_file(file)
+                    documents = parser.lazy_parse(file_obj)
+                except Exception as e:
+                    raise ParsingException(f"Error processing file {file}") from e
 
-            # documents를 하나의 text로 병합
-            total_text = ''
-            for document in documents:
-                total_text += document.page_content
-                page_num += 1
-            total_token += self.num_tokens_from_string(total_text)
+                for document in documents:
+                    total_text += document.page_content +'\n'
+                    page_num += 1
+                total_token += self.num_tokens_from_string(total_text)
             
-            keyword_docs_list += self.split_docs(total_text, KEYWORD_CHUNK_SIZE, KEYWORD_CHUNK_OVERLAP)
-            summary_docs_list += self.split_docs(total_text, SUMMARY_CHUNK_SIZE, SUMMARY_CHUNK_OVERLAP)
-            vector_docs_list += self.split_docs(total_text, VECTOR_CHUNK_SIZE, VECTOR_CHUNK_OVERLAP)
+            if total_token < MIN_TOKEN_LIMIT:
+                raise InsufficientException(f"Insufficient token count. Found {total_token}, required at least {MIN_TOKEN_LIMIT}.")
+            
+            keyword_docs_list = self.split_docs(total_text, KEYWORD_CHUNK_SIZE, KEYWORD_CHUNK_OVERLAP)
+            summary_docs_list = self.split_docs(total_text, SUMMARY_CHUNK_SIZE, SUMMARY_CHUNK_OVERLAP)
+            vector_docs_list = self.split_docs(total_text, VECTOR_CHUNK_SIZE, VECTOR_CHUNK_OVERLAP)
 
-        log('info', f'[preprocessor.py > Parser] 파일 수: {len(files)}')
-        log('info', f'[preprocessor.py > Parser] 페이지 수: {page_num}')
-        log('info', f'[preprocessor.py > Parser] 예상되는 토큰 수: {total_token}')
+            log('info', f'[preprocessor.py > Parser] 파일 수: {len(files)}')
+            log('info', f'[preprocessor.py > Parser] 페이지 수: {page_num}')
+            log('info', f'[preprocessor.py > Parser] 예상되는 토큰 수: {total_token}')
 
-        return keyword_docs_list, summary_docs_list, vector_docs_list
+            return keyword_docs_list, summary_docs_list, vector_docs_list
+
+        except InsufficientException as e:
+            raise e
+        
+        except Exception as e:
+            raise ParsingException(f"Unexpected error occurred during parsing") from e
 
 
     # parse files
     def parse(self, user_id, timestamp):
-        loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
-        minio_files = loader.get_list(user_id, timestamp, 'pdf')
+        try:
+            loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
+            minio_files = loader.get_list(user_id, timestamp, 'pdf')
+            if not minio_files:
+                raise FileNotFoundError(f"No files found in Minio for user_id: {user_id}, timestamp: {timestamp}")
+        except FileNotFoundError as e:
+            raise e
+        except MinioException as e:
+            raise e
+        except Exception as e:
+            raise e
+        
         retry = 0
-
         while retry < PARSING_RETRY:
             try:
                 # retry 횟수에 따라 파서 선정
                 parser = self.parsers[retry%3]
                 keyword_docs_list, summary_docs_list, vector_docs_list = self.get_parsed_docs(parser, loader, minio_files)
                 break
-            except Exception as e:
+            except ParsingException as e:
                 log('warning', f"[preprocessor.py > Parser] An unexpected parsing error occurred: {e}")
                 retry += 1
-                continue
+            except Exception as e:
+                raise e
+        
+        if retry == PARSING_RETRY:
+            raise ParsingException(f"Failed to parse documents after {PARSING_RETRY} retries.")
         
         log('info', f'[preprocessor.py > Parser] 키워드 추출을 위한 {len(keyword_docs_list)}개의 문서 조각이 준비되었습니다.')
         log('info', f'[preprocessor.py > Parser] 요약을 위한 {len(summary_docs_list)}개의 문서 조각이 준비되었습니다.')

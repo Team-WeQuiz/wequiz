@@ -10,10 +10,11 @@ export const mainContainer = style({
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
   overflowY: 'auto',
+  alignContent: 'flex-start',
 });
 
 export const cardArea = style({
   maxWidth: 300,
   maxHeight: 350,
-  padding: 3,
+  padding: 5,
 });

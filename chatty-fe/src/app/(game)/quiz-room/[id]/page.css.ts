@@ -76,5 +76,12 @@ export const StatusWrapper = style({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
+  alignItems: 'center',
   gap: 24,
+});
+
+export const Count = style({
+  fontSize: 40,
+  fontFamily: 'var(--bagel-font)',
+  color: '#ffb526',
 });

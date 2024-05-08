@@ -3,9 +3,12 @@
 import { postKakaoLogin } from '@/app/_api/auth';
 import { setAuthTokenCookie } from '@/app/_lib/auth';
 import useAuthStore from '@/app/_store/useAuthStore';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import React, { Suspense, useEffect } from 'react';
+
+import * as styles from './page.css';
 
 function KakaoLoginComponent() {
   const searchParams = useSearchParams();
@@ -31,7 +34,12 @@ function KakaoLoginComponent() {
     }
   }, []);
 
-  return <div>로그인 중입니다..</div>;
+  return (
+    <div className={styles.Container}>
+      <Image src="/images/logo.svg" width={400} height={400} alt="logo" />
+      <span className={styles.Description}>로그인 중입니다 !</span>
+    </div>
+  );
 }
 
 export default function KakaoLogin() {

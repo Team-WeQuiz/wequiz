@@ -36,12 +36,16 @@ export default function SignUp() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isEmailValid && isPasswordValid && !isPasswordMismatch) {
-      const response = await postSignUp({ email: email, password: password });
+      try {
+        const response = await postSignUp({ email: email, password: password });
 
-      const { accessToken, refreshToken } = response;
-      setAuth(accessToken);
-      setAuthTokenCookie(refreshToken);
-      router.push('/main-lobby');
+        const { accessToken, refreshToken } = response;
+        setAuth(accessToken);
+        setAuthTokenCookie(refreshToken);
+        router.push('/main-lobby');
+      } catch (error: any) {
+        alert(error.message);
+      }
     }
   };
 

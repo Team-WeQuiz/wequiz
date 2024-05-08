@@ -34,9 +34,11 @@ export const postSignUp = async (data: object) => {
     const response = await client.post('auth/signUp', data);
     console.log(response);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('error: ', error);
-    throw new Error('Signup failed');
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('오류가 발생했습니다.');
   }
 };
 
@@ -45,9 +47,11 @@ export const postSignIn = async (data: object) => {
     const response = await client.post('auth/signIn', data);
     console.log(response);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('error: ', error);
-    throw new Error('Signin failed');
+    if (error.response.data.exceptionCode > 1001)
+      throw new Error(error.response.data.message);
+    else throw new Error('오류가 발생했습니다.');
   }
 };
 
@@ -77,7 +81,7 @@ export const postRefreshToken = async (refreshToken: string) => {
 
 export const getUserInfo = async (accessToken: string) => {
   try {
-    const response = await client.get('/user', {
+    const response = await client.get('/users', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -92,11 +96,37 @@ export const getUserInfo = async (accessToken: string) => {
 export const getSecretKeys = async () => {
   try {
     const response = await axios.get(
-      'http://localhost:3000/api/s3-keys/getSecrets',
+      'https://wequiz.kr/api/s3-keys/getSecrets',
     );
     return response.data;
   } catch (error) {
     console.error('error: ', error);
     throw new Error('Get AWS keys failed');
+  }
+};
+
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+  accessToken: string,
+) => {
+  try {
+    const response = await client.post(
+      '/auth/password',
+      {
+        oldPassword,
+        newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('오류가 발생했습니다.');
   }
 };

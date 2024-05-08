@@ -14,7 +14,7 @@ const publicRoutes = ['/sign-in', '/sign-up'];
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('refreshToken');
   const currentPath = request.nextUrl.pathname;
-  console.log(token);
+  //console.log(token);
 
   const isProtectedRoute = protectedPatterns.some((pattern) =>
     pattern.test(request.nextUrl),
@@ -34,5 +34,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set('Content-Security-Policy', 'upgrade-insecure-requests');
+
+  return response;
 }

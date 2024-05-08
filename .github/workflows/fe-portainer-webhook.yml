@@ -1,0 +1,17 @@
+name: fe-portainer-webhook
+
+on:
+  workflow_run:
+    workflows: [ "fe-docker-buildx-ci" ]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Send Trigger
+        run: |
+          curl -X POST ${{ secrets.FE_PORTAINER_WEBHOOK_URL }}

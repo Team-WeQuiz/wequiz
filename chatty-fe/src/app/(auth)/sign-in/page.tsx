@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import * as styles from './page.css';
 import Image from 'next/image';
 import TextInputField from '@/app/_components/TextInputField';
@@ -25,28 +25,37 @@ export default function SignIn() {
   const message = searchParams.get('message');
 
   const handleKakaoLogin = () => {
-    kakaoLogin('http://localhost:3000/sign-in/kakao/callback');
+    kakaoLogin('https://wequiz.kr/sign-in/kakao/callback');
   };
 
   const handleGoogleLogin = () => {
-    googleLogin('http://localhost:3000/sign-in/google/callback');
+    googleLogin('https://wequiz.kr/sign-in/google/callback');
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const response = await postSignIn({ email: email, password: password });
-    const { accessToken, refreshToken } = response;
-    setAuth(accessToken);
-    setAuthTokenCookie(refreshToken);
+    if (!email || !password) {
+      alert('이메일과 비밀번호를 입력해주세요.');
+    } else {
+      try {
+        const response = await postSignIn({ email: email, password: password });
+        const { accessToken, refreshToken } = response;
 
-    router.push('/main-lobby');
+        setAuth(accessToken);
+        setAuthTokenCookie(refreshToken);
+
+        router.push('/main-lobby');
+      } catch (error: any) {
+        alert(error.message);
+      }
+    }
   };
 
   useEffect(() => {
     if (message) {
       alert(message);
     }
-  },[]);
+  }, []);
 
   return (
     <div className={styles.mainContainer}>

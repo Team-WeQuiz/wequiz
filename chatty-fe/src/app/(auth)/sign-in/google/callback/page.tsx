@@ -6,6 +6,8 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import React, { Suspense, useEffect } from 'react';
+import * as styles from './page.css';
+import Image from 'next/image';
 
 function GoogleLoginComponent() {
   const searchParams = useSearchParams();
@@ -26,7 +28,12 @@ function GoogleLoginComponent() {
     if (authCode) handleLogin(authCode);
   });
 
-  return <div>로그인 중입니다..</div>;
+  return (
+    <div className={styles.Container}>
+      <Image src="/images/logo.svg" width={400} height={400} alt="logo" />
+      <span className={styles.Description}>로그인 중입니다 !</span>
+    </div>
+  );
 }
 
 export default function GoogleLogin() {

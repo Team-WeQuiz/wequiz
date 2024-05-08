@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import * as styles from './page.css';
 import TextInputField from '@/app/_components/TextInputField';
 import SolidButton from '@/app/_components/SolidButton';
@@ -14,7 +14,7 @@ const MainLobby = () => {
   const [search, setSearch] = useState('');
 
   return (
-    <>
+    <Suspense>
       <div className={styles.lobbyContainer}>
         <div className={styles.centerContainer}>
           <div className={styles.toolBar}>
@@ -33,7 +33,7 @@ const MainLobby = () => {
                       alt="search"
                       width={24}
                       height={24}
-                    />
+                    /> 
                   </SolidButton>
                 }
               />
@@ -51,7 +51,7 @@ const MainLobby = () => {
           <GameListGrid />
         </div>
       </div>
-    </>
+    </Suspense>
   );
 };
 

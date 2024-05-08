@@ -5,6 +5,8 @@ import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
 import com.chatty.chatty.auth.controller.dto.TokenResponse;
 import com.chatty.chatty.auth.service.AuthService;
+import com.chatty.chatty.auth.support.AuthUser;
+import com.chatty.chatty.auth.controller.dto.PasswordRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,5 +37,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(request));
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<Void> changePassword(@AuthUser Long userId, @RequestBody PasswordRequest request) {
+        authService.changePassword(userId, request);
+        return ResponseEntity.ok().build();
     }
 }

@@ -24,23 +24,29 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
     numCards: number,
   ) => {
     const containerRatio = containerWidth / containerHeight;
-    const cardRatio = 6 / 7;
+    const targetRatio = 6 / 7;
     let numRows = 1;
     let numCols = numCards;
 
     // 가로 길이가 더 긴 경우
-    if (containerRatio > cardRatio) {
+    if (containerRatio > targetRatio) {
       numRows = Math.ceil(
-        Math.sqrt(numCards * (containerHeight / containerWidth)),
+        Math.sqrt(
+          numCards * (containerHeight / containerWidth) * targetRatio ** 2,
+        ),
       );
       numCols = Math.ceil(numCards / numRows);
     } else {
       // 세로 길이가 더 긴 경우
       numCols = Math.ceil(
-        Math.sqrt(numCards * (containerWidth / containerHeight)),
+        Math.sqrt(
+          (numCards * (containerWidth / containerHeight)) / targetRatio ** 2,
+        ),
       );
       numRows = Math.ceil(numCards / numCols);
     }
+
+    if (numCols < 3) numCols = 3;
 
     const cardWidth = containerWidth / numCols;
     const cardHeight = containerHeight / numRows;
@@ -68,8 +74,8 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
   useEffect(() => {
     if (containerSize.width > 0 && containerSize.height > 0) {
       const calculatedSize = calculateCardSize(
-        containerSize.width,
-        containerSize.height,
+        containerSize.width - 49,
+        containerSize.height - 49,
         userStatuses.length + 1,
       );
       setCardSize(calculatedSize);

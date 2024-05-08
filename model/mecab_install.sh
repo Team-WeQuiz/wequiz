@@ -67,7 +67,7 @@ install_mecab_ko(){
     curl -LO https://bitbucket.org/eunjeon/mecab-ko/downloads/mecab-0.996-ko-0.9.2.tar.gz
     tar zxfv mecab-0.996-ko-0.9.2.tar.gz
     cd mecab-0.996-ko-0.9.2
-    ./configure --build=aarch64-unknown-linux
+    ./configure --build=aarch64-unknown-linux-gnu
     make
     make check
     $sudo make install
@@ -182,13 +182,6 @@ if [[ -d $mecab_dicdir ]]; then
 else
     echo "Install mecab-ko-dic"
     install_mecab_ko_dic
-fi
-
-if [[ $($python -c 'import pkgutil; print(1 if pkgutil.find_loader("MeCab") else 0)') == "1" ]]; then
-    echo "mecab-python is already installed"
-else
-    echo "Install mecab-python"
-    install_mecab_python
 fi
 
 echo "Done."

@@ -41,3 +41,14 @@ minio:
 
 url:
   ml: ${ML_URL}
+
+social:
+  client:
+    kakao:
+      client-id: ${KAKAO_API_KEY}
+      client-secret: ${KAKAO_API_SECRET}
+      grant_type: authorization_code
+    google:
+      client-id: ${GOOGLE_API_KEY}
+      client-secret: ${GOOGLE_API_SECRET}
+      grant_type: authorization_code

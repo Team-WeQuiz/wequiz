@@ -6,4 +6,9 @@ export const mainContainer = style({
   width: '100%',
   height: 'calc(100% - 60px)',
   justifyContent: 'center',
+  '@media': {
+    '(max-width: 768px)': {
+      padding: 20,
+    },
+  },
 });
