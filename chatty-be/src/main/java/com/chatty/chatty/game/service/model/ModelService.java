@@ -1,16 +1,21 @@
 package com.chatty.chatty.game.service.model;
 
+import static com.chatty.chatty.game.exception.ModelExceptionType.LACK_OF_TOKEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.chatty.chatty.game.controller.dto.model.CreateQuizRequest;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
 import com.chatty.chatty.game.controller.dto.model.MarkResponse;
+import com.chatty.chatty.game.exception.ModelException;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,11 @@ public class ModelService {
                         .build()
                 )
                 .retrieve()
+                .onStatus(INTERNAL_SERVER_ERROR::equals,
+                        (req, res) -> {
+                            throw new ModelException(LACK_OF_TOKEN);
+                        }
+                )
                 .body(QuizDocIdMLResponse.class);
     }
 
