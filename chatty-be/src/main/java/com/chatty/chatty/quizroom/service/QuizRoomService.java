@@ -6,6 +6,7 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_STARTED;
 
 import com.chatty.chatty.config.minio.MinioRepository;
+import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.model.ModelService;
@@ -41,6 +42,7 @@ public class QuizRoomService {
     private static final String BROADCAST_URL = "/sub/rooms?page=%d";
 
     private final QuizRoomRepository quizRoomRepository;
+    private final GameRepository gameRepository;
     private final GameService gameService;
     private final ModelService modelService;
     private final MinioRepository minioRepository;
@@ -137,6 +139,7 @@ public class QuizRoomService {
                     }
                     validateRoomIfStarted(quizRoom.getStatus());
                     updateRoomStatus(roomId, Status.FINISHED);
+                    gameRepository.clearQuizData(roomId);
                     playersStatusRepository.clear(roomId);
                     userSubmitStatusRepository.clear(roomId);
                 }, () -> {

@@ -19,6 +19,11 @@ export const pageStatus = style({
   WebkitTextStrokeWidth: 1,
 });
 
+export const blueText = style({
+  color: globals.color.blue_4,
+  WebkitTextStrokeColor: globals.color.blue_3,
+});
+
 export const triangularButton = style({
   position: 'relative',
   backgroundColor: '#fff',
@@ -47,6 +52,10 @@ export const triangularButton = style({
     backgroundColor: 'inherit',
     transform: 'rotate(135deg) skewY(-45deg) scale(.707,1.414) translate(50%)',
   },
+});
+
+export const blueButton = style({
+  backgroundColor: globals.color.blue_4,
 });
 
 export const previousButton = style({

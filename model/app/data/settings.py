@@ -2,6 +2,7 @@
 BUCKET_NAME = 'wequiz-files'
 PORT = 9010
 PARSING_RETRY = 3
+MIN_TOKEN_LIMIT = 1500
 
 # keyword chunk
 KEYWORD_CHUNK_SIZE = 500
