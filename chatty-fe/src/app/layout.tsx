@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   title: 'WeQuiz',
   description:
     'Wequiz is a service that allows you to create quizzes using ai and solve them like a game in real time with your friends.',
+
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
