@@ -7,6 +7,9 @@ from langchain_community.document_loaders.parsers.pdf import (
     PyMuPDFParser,
     PyPDFium2Parser,
 )
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+
 from data.settings import *
 from utils.security import get_minio_access_key
 from data.loader import MinioLoader
@@ -69,48 +72,49 @@ class Parser():
         splitted_text = text_splitter.split_text(total_text)
         splitted_docs = text_splitter.create_documents(splitted_text)
         return preprocess(splitted_docs)
-
-
-    def get_parsed_docs(self, parser, loader, files):
+    
+    def load_and_parse_files(self, parser, loader, files):
+        # 파일 로딩 및 파싱 작업
         page_num = 0
         total_token = 0
         total_text = ''
-        try:
-            # files의 documents를 하나의 text로 병합
-            for file in files:
-                try:
-                    file_obj = loader.load_file(file)
-                    documents = parser.lazy_parse(file_obj)
-                except Exception as e:
-                    raise ParsingException(f"Error processing file {file}") from e
-
-                for document in documents:
-                    total_text += document.page_content +'\n'
-                    page_num += 1
-                total_token += self.num_tokens_from_string(total_text)
-            
+        for file in files:
+            try:
+                file_obj = loader.load_file(file)
+                documents = parser.lazy_parse(file_obj)
+            except Exception as e:
+                raise ParsingException(f"Error processing file {file}") from e
+            for document in documents:
+                total_text += document.page_content + '\\n'
+                page_num += 1
+            total_token += self.num_tokens_from_string(total_text)
             if total_token < MIN_TOKEN_LIMIT:
                 raise InsufficientException(f"Insufficient token count. Found {total_token}, required at least {MIN_TOKEN_LIMIT}.")
-            
-            keyword_docs_list = self.split_docs(total_text, KEYWORD_CHUNK_SIZE, KEYWORD_CHUNK_OVERLAP)
-            summary_docs_list = self.split_docs(total_text, SUMMARY_CHUNK_SIZE, SUMMARY_CHUNK_OVERLAP)
-            vector_docs_list = self.split_docs(total_text, VECTOR_CHUNK_SIZE, VECTOR_CHUNK_OVERLAP)
+        # 결과 반환
+        return total_text, page_num, total_token
 
-            log('info', f'[preprocessor.py > Parser] 파일 수: {len(files)}')
-            log('info', f'[preprocessor.py > Parser] 페이지 수: {page_num}')
-            log('info', f'[preprocessor.py > Parser] 예상되는 토큰 수: {total_token}')
 
-            return keyword_docs_list, summary_docs_list, vector_docs_list
+    async def get_parsed_docs_async(self, parser, loader, files):
+        loop = asyncio.get_running_loop()
+        with ThreadPoolExecutor() as pool:
+            try:
+                total_text, page_num, total_token = await loop.run_in_executor(
+                    pool, self.load_and_parse_files, parser, loader, files
+                )
+            except Exception as e:
+                raise ParsingException(f"Unexpected error occurred during parsing") from e
 
-        except InsufficientException as e:
-            raise e
-        
-        except Exception as e:
-            raise ParsingException(f"Unexpected error occurred during parsing") from e
+        keyword_docs_list = self.split_docs(total_text, KEYWORD_CHUNK_SIZE, KEYWORD_CHUNK_OVERLAP)
+        summary_docs_list = self.split_docs(total_text, SUMMARY_CHUNK_SIZE, SUMMARY_CHUNK_OVERLAP)
+        vector_docs_list = self.split_docs(total_text, VECTOR_CHUNK_SIZE, VECTOR_CHUNK_OVERLAP)
+        log('info', f'[preprocessor.py > Parser] 파일 수: {len(files)}')
+        log('info', f'[preprocessor.py > Parser] 페이지 수: {page_num}')
+        log('info', f'[preprocessor.py > Parser] 예상되는 토큰 수: {total_token}')
+        return keyword_docs_list, summary_docs_list, vector_docs_list
 
 
     # parse files
-    def parse(self, user_id, timestamp):
+    async def parse(self, user_id, timestamp):
         try:
             loader = MinioLoader(MINIO_ACCESS, BUCKET_NAME)
             minio_files = loader.get_list(user_id, timestamp, 'pdf')
@@ -128,7 +132,7 @@ class Parser():
             try:
                 # retry 횟수에 따라 파서 선정
                 parser = self.parsers[retry%3]
-                keyword_docs_list, summary_docs_list, vector_docs_list = self.get_parsed_docs(parser, loader, minio_files)
+                keyword_docs_list, summary_docs_list, vector_docs_list = await self.get_parsed_docs_async(parser, loader, minio_files)
                 break
             except ParsingException as e:
                 log('warning', f"[preprocessor.py > Parser] An unexpected parsing error occurred: {e}")
