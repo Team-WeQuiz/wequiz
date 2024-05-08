@@ -13,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     const token = Cookies.get('refreshToken');
-    console.log(token);
+    //console.log(token);
     if (token) setIsLogin(true);
   }, []);
   return (

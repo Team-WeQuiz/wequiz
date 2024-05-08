@@ -32,7 +32,9 @@ export const postRoom = async (
 
     console.log(response.data);
     return response.data;
-  } catch (error) {
-    console.error('error: ', error);
+  } catch (error: any) {
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('오류가 발생했습니다.');
   }
 };
