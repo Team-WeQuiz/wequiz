@@ -11,6 +11,10 @@ export const container = style({
   backgroundColor: globals.color.blue_6,
 });
 
+export const mainButton = style({
+  cursor: 'pointer',
+});
+
 export const profileButton = style({
   position: 'relative',
   display: 'inline-block',

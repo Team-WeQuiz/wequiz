@@ -81,7 +81,7 @@ export const postRefreshToken = async (refreshToken: string) => {
 
 export const getUserInfo = async (accessToken: string) => {
   try {
-    const response = await client.get('/user', {
+    const response = await client.get('/users', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -102,5 +102,31 @@ export const getSecretKeys = async () => {
   } catch (error) {
     console.error('error: ', error);
     throw new Error('Get AWS keys failed');
+  }
+};
+
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+  accessToken: string,
+) => {
+  try {
+    const response = await client.post(
+      '/auth/password',
+      {
+        oldPassword,
+        newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('오류가 발생했습니다.');
   }
 };

@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as styles from './UserQuizList.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import Paginator from '@/app/_components/Paginator/Paginator';
+import useAuthStore from '@/app/_store/useAuthStore';
+import { getUsersQuiz } from '@/app/_api/quiz';
 
 const dummyData = [
   {
@@ -57,9 +59,36 @@ const dummyData = [
   },
 ];
 
+type MyQuiz = {
+  roomId: number;
+  name: string;
+  description: string;
+};
+
 const UserQuizList = () => {
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [quizList, setQuizList] = useState<MyQuiz[]>([]);
+  const { accessToken } = useAuthStore();
+  const [stateMessage, setStateMessage] =
+    useState('데이터를 불러오는 중 입니다');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getUsersQuiz(pageNum, accessToken);
+        setTotalPages(response.totalPages);
+        if (response.rooms.length === 0) {
+          setStateMessage('아직 참여한 퀴즈가 없습니다.');
+        }
+        setQuizList(response.rooms);
+      } catch (error) {
+        console.error('error: ', error);
+        setStateMessage('데이터를 불러오지 못했습니다.');
+      }
+    };
+    if (accessToken) fetchData();
+  }, [pageNum]);
 
   const handlePagePrev = () => {
     if (pageNum > 1) {
@@ -73,34 +102,28 @@ const UserQuizList = () => {
 
   return (
     <div className={styles.quizListContainer}>
-      <div className={styles.quizListGrid}>
-        {dummyData &&
-          dummyData.map((quiz, index) => (
-            <Link key={index} href="" className={styles.quizCard}>
-              <div className={styles.quizTitle}>
-                {quiz.isMine && (
-                  <Image
-                    src={'/images/leader.svg'}
-                    alt={'owner'}
-                    width={19}
-                    height={19}
-                  />
-                )}
-                {quiz.title}
-              </div>
-              <div className={styles.quizDescription}>{quiz.description}</div>
-            </Link>
-          ))}
-      </div>
-      <div className={styles.paginatorWrapper}>
-        <Paginator
-          currentPage={pageNum}
-          totalPages={totalPages}
-          handlePagePrev={handlePagePrev}
-          handlePageNext={handlePageNext}
-          color="blue"
-        />
-      </div>
+      <p>{stateMessage}</p>
+      {quizList.length !== 0 && (
+        <>
+          <div className={styles.quizListGrid}>
+            {quizList.map((quiz, index) => (
+              <Link key={index} href="" className={styles.quizCard}>
+                <div className={styles.quizTitle}>{quiz.name}</div>
+                <div className={styles.quizDescription}>{quiz.description}</div>
+              </Link>
+            ))}
+          </div>
+          <div className={styles.paginatorWrapper}>
+            <Paginator
+              currentPage={pageNum}
+              totalPages={totalPages}
+              handlePagePrev={handlePagePrev}
+              handlePageNext={handlePageNext}
+              color="blue"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };

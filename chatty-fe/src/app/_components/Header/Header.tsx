@@ -23,7 +23,6 @@ export default function Header() {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.stopPropagation();
-    console.log('profile clicked');
     setIsMenuOpen(!isMenuOpen);
   };
 
@@ -35,11 +34,14 @@ export default function Header() {
   };
   return (
     <header className={styles.container}>
-      <button onClick={handleLogoClick}>
+      <button onClick={handleLogoClick} className={styles.mainButton}>
         <Image src="/images/logo.svg" height={52} width={112} alt="logo" />
       </button>
       <div className={styles.profileButton}>
-        <button onClick={(e) => handleProfileClick(e)}>
+        <button
+          onClick={(e) => handleProfileClick(e)}
+          className={styles.mainButton}
+        >
           <Image
             src="/images/person.svg"
             height={48}
