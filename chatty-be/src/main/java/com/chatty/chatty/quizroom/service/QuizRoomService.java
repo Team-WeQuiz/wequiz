@@ -179,9 +179,9 @@ public class QuizRoomService {
                     players.playerStatusSet()
                             .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));
                     userSubmitStatusRepository.init(players, roomId);
+                    savePlayersCount(quizRoom);
                     validateRoomIfReady(quizRoom.getStatus());
                     updateRoomStatus(roomId, Status.STARTED);
-                    savePlayersCount(quizRoom);
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
