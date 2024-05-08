@@ -8,21 +8,14 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://mysql:3306/wequiz
+    url: ${DATASOURCE_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: wequizadmin
-    password: wequizadmin
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
 
-# TODO: 소셜 로그인 토큰 재발급 후 수정 필요
 social:
   client:
     kakao:
-      client-id: 948b0f6cb65248afcd53e046c4e61145
-      client-secret: KtXGlrkvmLgT8KbvgVzmbvXt15bXXdp6
-      redirect-uri: http://localhost:3000/sign-in/kakao/callback
-      grant_type: authorization_code
+      redirect-uri: ${KAKAO_REDIRECT_URI}
     google:
-      client-id: 98146529486-md3ri8vfvupsgokf1bup6smaeuj1bbuo.apps.googleusercontent.com
-      client-secret: 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
-      redirect-uri: http://localhost:3000/sign-in/google/callback
-      grant_type: authorization_code
+      redirect-uri: ${GOOGLE_REDIRECT_URI}
