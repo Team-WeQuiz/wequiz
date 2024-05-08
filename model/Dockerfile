@@ -8,10 +8,10 @@ WORKDIR /
 ENV NLTK_DATA /usr/share/nltk_data
 
 # Install dependencies
-COPY requirements.txt .
+COPY requirements_compact.txt .
 COPY mecab_install.sh .
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements_compact.txt
 
 # download punkt
 RUN python3 -m nltk.downloader punkt -d /usr/share/nltk_data

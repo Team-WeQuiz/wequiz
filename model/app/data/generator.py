@@ -42,6 +42,11 @@ class QuizGenerator():
                 type = self.get_type(response["text"]["type"])
                 options = self.set_options(type, response["text"]["choices"])
                 if type == "OX퀴즈": type = "객관식"    # ox퀴즈도 객관식으로 설정
+                if type is None:   # type이 None인 경우 예외처리
+                    if len(options) == 0:
+                        type = "단답형"
+                    else:
+                        type = "객관식"
 
                 data = {
                     "id": f'quiz-{uuid.uuid4()}',

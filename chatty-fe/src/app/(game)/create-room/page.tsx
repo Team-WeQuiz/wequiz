@@ -17,7 +17,11 @@ export default function CreateRoom() {
   const [description, setDescription] = useState('');
   const [numberOfParticipants, setNumberOfParticipants] = useState(1);
   const [password, setPassword] = useState('');
+<<<<<<< HEAD
   const [numberOfProblems, setNumberOfProblems] = useState(5);
+=======
+  const [numberOfProblems, setNumberOfProblems] = useState(0);
+>>>>>>> main
   const [qustionType, setQuestionType] = useState<'list' | 'create'>('create');
 
   const router = useRouter();
@@ -163,10 +167,10 @@ export default function CreateRoom() {
             questionType={qustionType}
             setQuestionType={setQuestionType}
           />
-          {qustionType === 'create' ? (
-            <FileUploadBox setFiles={setFiles} />
-          ) : (
+          {qustionType === 'list' ? (
             <DropBox />
+          ) : (
+            <FileUploadBox setFiles={setFiles} />
           )}
         </div>
         <div className={styles.buttonContainer}>

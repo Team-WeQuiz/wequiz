@@ -27,15 +27,12 @@ public class AuthConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor());
     }
 
-    /*
-    @AuthUser 어노테이션 사용 시 addPathPattern에 추가해야 함
-     */
     private HandlerInterceptor loginInterceptor() {
         return new PathMatcherInterceptor(loginInterceptor)
                 .excludePathPattern("/**", OPTIONS)
-                .addPathPattern("/user/**", GET)
-                .addPathPattern("/rooms/**", GET, POST);
-//  예시            .addPathPattern("/test", GET, POST);
+                .addPathPattern("/users/**", GET)
+                .addPathPattern("/rooms/**", GET, POST)
+                .addPathPattern("/auth/password", POST);
     }
 
     @Override

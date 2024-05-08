@@ -1,4 +1,3 @@
-import boto3
 from urllib.parse import urlparse
 from minio import Minio
 from langchain_community.document_loaders.blob_loaders import Blob
@@ -10,26 +9,26 @@ from utils.exception import *
 setup_logging()
 
 
-class S3Loader:
-    def __init__(self, access_credential, bucket_name):
-        self.client = boto3.client(
-            's3',
-            aws_access_key_id=access_credential["AWS_ACCESS_KEY_ID"],
-            aws_secret_access_key=access_credential["AWS_SECRET_ACCESS_KEY"]
-        )
-        self.bucket_name = bucket_name
+# class S3Loader:
+#     def __init__(self, access_credential, bucket_name):
+#         self.client = boto3.client(
+#             's3',
+#             aws_access_key_id=access_credential["AWS_ACCESS_KEY_ID"],
+#             aws_secret_access_key=access_credential["AWS_SECRET_ACCESS_KEY"]
+#         )
+#         self.bucket_name = bucket_name
 
-    def load_file(self, key):        
-        # 파일 로드
-        try:
-            file_obj = self.client.get_object(Bucket=self.bucket_name, Key=key)
-            return Blob.from_data(file_obj.read())
-        except Exception as e:
-            log('error', f"[loader.py > s3] Error loading file from S3: {e}")
-            return None
+#     def load_file(self, key):        
+#         # 파일 로드
+#         try:
+#             file_obj = self.client.get_object(Bucket=self.bucket_name, Key=key)
+#             return Blob.from_data(file_obj.read())
+#         except Exception as e:
+#             log('error', f"[loader.py > s3] Error loading file from S3: {e}")
+#             return None
 
 
-#############################################################################################
+# #############################################################################################
 
 
 class MinioLoader:
