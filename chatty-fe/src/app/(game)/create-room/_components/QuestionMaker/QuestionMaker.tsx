@@ -26,25 +26,26 @@ export default function QuestionMaker({
             name="questionType"
             value="create"
             onChange={() => setQuestionType('create')}
+            checked={questionType === 'create'}
           />
           <label htmlFor="create">직접 제작</label>
-          <div
-            className={
-              questionType === 'list'
-                ? styles.RadioContainerChecked
-                : styles.RadioContainer
-            }
-          >
-            <input
-              type="radio"
-              id="list"
-              name="questionType"
-              value="list"
-              onChange={() => setQuestionType('list')}
-              checked={questionType === 'list'}
-            />
-            <label htmlFor="list">리스트 선택</label>
-          </div>
+        </div>
+        <div
+          className={
+            questionType === 'list'
+              ? styles.RadioContainerChecked
+              : styles.RadioContainer
+          }
+        >
+          <input
+            type="radio"
+            id="list"
+            name="questionType"
+            value="list"
+            onChange={() => setQuestionType('list')}
+            checked={questionType === 'list'}
+          />
+          <label htmlFor="list">리스트 선택</label>
         </div>
       </div>
     </div>
