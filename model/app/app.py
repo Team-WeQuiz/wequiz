@@ -1,7 +1,5 @@
 from fastapi import FastAPI
-import json, random
-import time
-import boto3
+import json
 import aioboto3
 import uuid
 import asyncio
@@ -26,7 +24,6 @@ AWS_ACCESS_KEY = json.loads(get_aws_access_key())
 REGION_NAME = 'ap-northeast-2'
 QUIZ_TABLE = 'wequiz-quiz'
 MARK_TABLE = 'wequiz-mark'
-dynamodb_client = aioboto3.client('dynamodb', region_name=REGION_NAME)
 
 
 @app.get("/ping")
@@ -66,7 +63,7 @@ async def mark(mark_request: MarkRequest):
     }
 
     try:
-        async with dynamodb_client as dynamodb:
+        async with aioboto3.Session().client('dynamodb', region_name=REGION_NAME) as dynamodb:
             # mark_request.id가 있는지 확인
             table = await dynamodb.get_item(
                 TableName=MARK_TABLE,
@@ -115,7 +112,7 @@ async def create_id(generate_request):
             "description": {"S": ''}
         }
         
-        async with dynamodb_client as dynamodb:
+        async with aioboto3.Session().client('dynamodb', region_name=REGION_NAME) as dynamodb:
             await dynamodb.put_item(TableName=QUIZ_TABLE, Item=data)
         
         res = {"id": id}
@@ -133,7 +130,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
         summarizer = Summarizer()
         summary = await summarizer.summarize(summary_split_docs)
         
-        async with dynamodb_client as dynamodb:
+        async with aioboto3.Session().client('dynamodb', region_name=REGION_NAME) as dynamodb:
             await dynamodb.update_item(
                 TableName=QUIZ_TABLE,
                 Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
@@ -141,74 +138,77 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 ExpressionAttributeValues={':val': {'S': summary}, ':zero': {'N': '0'}}
             )
         
-        # Generate quiz
-        quiz_generator = QuizGenerator(vector_split_docs)
+            # Generate quiz
+            quiz_generator = QuizGenerator(vector_split_docs)
 
-        idx = 0
-        i = 0
-        questions = []
-        while idx < generate_request.numOfQuiz:
-            max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
-            success = False
-            for _ in range(max_attempts):
-                try:
-                    keyword = keywords[i % len(keywords)]
-                    question = quiz_generator.generate(keyword, idx + 1)
-                    new_question = {
-                        "M": {
-                            "id": {"S": str(question["id"])},
-                            "question_number": {"N": str(question["question_number"])},
-                            "type": {"S": question["type"]},
-                            "question": {"S": question["question"]},
-                            "options": {"L": [{"S": option} for option in question["options"]]},
-                            "correct": {"S": question["correct"]}
+            idx = 0
+            i = 0
+            questions = []
+            while idx < generate_request.numOfQuiz:
+                max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
+                success = False
+                for _ in range(max_attempts):
+                    try:
+                        keyword = keywords[i % len(keywords)]
+                        question = quiz_generator.generate(keyword, idx + 1)
+                        new_question = {
+                            "M": {
+                                "id": {"S": str(question["id"])},
+                                "question_number": {"N": str(question["question_number"])},
+                                "type": {"S": question["type"]},
+                                "question": {"S": question["question"]},
+                                "options": {"L": [{"S": option} for option in question["options"]]},
+                                "correct": {"S": question["correct"]}
+                            }
                         }
-                    }
-                    questions.append(new_question)
-                    log('info', f'[app.py > quiz] new quiz is ready. {new_question}')
-                    
-                    idx += 1
-                    i += 1
-                    success = True
-                    break  # 성공적으로 생성되면 반복문 종료
-                except Exception as e:
-                    log('warning', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
-                    i += 1
-            if not success:
-                log('error', "[app.py > quiz] Failed to generate question after {} attempts".format(max_attempts))
-                raise Exception("Failed to generate question after {} attempts".format(max_attempts))
-            
-            # 5문제가 생성되었거나 마지막 문제인 경우 DynamoDB에 업데이트
-            if idx % 5 == 0 or idx == generate_request.numOfQuiz:
-                log('info', f'[app.py > quiz] cur idx: {idx} - quiz batch is ready to push. {questions}')
-                response = await dynamodb.get_item(
-                    TableName=QUIZ_TABLE,
-                    Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
-                )
-                item = response.get('Item', {})
-                existing_questions = item.get('questions', {'L': []})['L']
-                version = int(item.get('version', {'N': '0'})['N'])
+                        questions.append(new_question)
+                        log('info', f'[app.py > quiz] new quiz is ready. {new_question}')
+                        
+                        idx += 1
+                        i += 1
+                        success = True
+                        break  # 성공적으로 생성되면 반복문 종료
+                    except Exception as e:
+                        log('warning', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
+                        i += 1
+                if not success:
+                    log('error', "[app.py > quiz] Failed to generate question after {} attempts".format(max_attempts))
+                    raise Exception("Failed to generate question after {} attempts".format(max_attempts))
                 
-                updated_questions = existing_questions + questions
-                
-                try:
-                    # Update item in DynamoDB with optimistic locking
-                    await dynamodb.update_item(
-                        TableName=QUIZ_TABLE,
-                        Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
-                        UpdateExpression='SET questions = :val, version = :new_version',
-                        ConditionExpression='version = :current_version',
-                        ExpressionAttributeValues={
-                            ':val': {'L': updated_questions},
-                            ':new_version': {'N': str(version + 1)},
-                            ':current_version': {'N': str(version)}
-                        }
-                    )
-                    log('info', f'[app.py > quiz] quiz push to dynamodb successed.')
-                    questions = []  # 새로운 5문제를 위해 questions 리스트 초기화
-                except dynamodb.exceptions.ConditionalCheckFailedException:
-                    log('error', "[app.py > quiz] Failed to push questions to dynamo due to version conflict.")
-                    raise Exception("Failed to push questions to dynamo due to version conflict.")
+                # 5문제가 생성되었거나 마지막 문제인 경우 DynamoDB에 업데이트
+                if idx % 5 == 0 or idx == generate_request.numOfQuiz:
+                    log('info', f'[app.py > quiz] cur idx: {idx} - quiz batch is ready to push. {questions}')
+                    while True:
+                        try:
+                            response = await dynamodb.get_item(
+                                TableName=QUIZ_TABLE,
+                                Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
+                            )
+                            item = response.get('Item', {})
+                            existing_questions = item.get('questions', {'L': []})['L']
+                            version = int(item.get('version', {'N': '0'})['N'])
+                            updated_questions = existing_questions + questions
+                            
+                            # Update item in DynamoDB with optimistic locking
+                            await dynamodb.update_item(
+                                TableName=QUIZ_TABLE,
+                                Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+                                UpdateExpression='SET questions = :val, version = :new_version',
+                                ConditionExpression='version = :current_version',
+                                ExpressionAttributeValues={
+                                    ':val': {'L': updated_questions},
+                                    ':new_version': {'N': str(version + 1)},
+                                    ':current_version': {'N': str(version)}
+                                }
+                            )
+                            log('info', f'[app.py > quiz] quiz push to dynamodb successed.')
+                            questions = []  # 새로운 5문제를 위해 questions 리스트 초기화
+                            break
+                        except dynamodb.exceptions.ConditionalCheckFailedException:
+                            log('warning', "[app.py > quiz] Failed to push questions to dynamo due to version conflict. Retrying...")
+                        except Exception as e:
+                            log('error', f"[app.py > quiz] Unexpected error occurred: {str(e)}")
+                            raise Exception("Failed to push questions to dynamo due to an unexpected error.") from e
 
     except Exception as e:
         log('error', f'[app.py > quiz] Failed to generate quiz: {str(e)}')
@@ -226,7 +226,9 @@ async def generate(generate_request: GenerateRequest):
         create_id_task = asyncio.create_task(create_id(generate_request))
 
         # parse와 create_id를 병렬로 실행하고 결과 기다리기
-        keyword_split_docs, summary_split_docs, vector_split_docs, res = await asyncio.gather(parse_task, create_id_task)
+        results = await asyncio.gather(parse_task, create_id_task)
+        keyword_split_docs, summary_split_docs, vector_split_docs = results[0]
+        res = results[1]
 
         # keyword 추출
         keywords = extract_keywords(keyword_split_docs, top_n=generate_request.numOfQuiz * 2)  # 키워드는 개수를 여유롭게 생성합니다.
