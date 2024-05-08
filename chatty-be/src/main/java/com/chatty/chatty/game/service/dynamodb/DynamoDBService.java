@@ -3,6 +3,8 @@ package com.chatty.chatty.game.service.dynamodb;
 import static com.chatty.chatty.common.util.ThreadSleep.sleep;
 import static com.chatty.chatty.game.exception.GameExceptionType.FAILED_TO_FETCH_DESCRIPTION;
 
+import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
+import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO.Marked;
 import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
 import com.chatty.chatty.game.exception.GameException;
 import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
@@ -47,15 +49,37 @@ public class DynamoDBService {
             log.info("polling...");
         }
         log.info("polling done.");
-        return convertToList(rawQuizzes);
+        return convertToQuizDTO(rawQuizzes);
     }
 
-    private List<Quiz> convertToList(List<Map<String, Object>> listMap) {
+    public List<MarkDTO> getMark(String itemId) {
+        return convertToMarkDTO(dynamoDBRepository.getMarkFromDB(itemId));
+    }
+
+    private List<Quiz> convertToQuizDTO(List<Map<String, Object>> listMap) {
         List<Quiz> quizzes = new ArrayList<>();
         for (Map<String, Object> value : listMap) {
             Quiz quiz = mapper.convertValue(value, Quiz.class);
             quizzes.add(quiz);
         }
         return quizzes;
+    }
+
+    public List<MarkDTO> convertToMarkDTO(List<Map<String, Object>> listMap) {
+        return listMap.stream()
+                .map(map -> {
+                    String id = (String) map.get("id");
+                    String correct = (String) map.get("correct");
+                    List<Map<String, Object>> markedsListMap = (List<Map<String, Object>>) map.get("markeds");
+                    Integer quizNumber = (Integer) map.get("question_number");
+
+                    List<Marked> markeds = new ArrayList<>();
+                    for (Map<String, Object> value : markedsListMap) {
+                        Marked marked = mapper.convertValue(value, Marked.class);
+                        markeds.add(marked);
+                    }
+                    return new MarkDTO(id, correct, markeds, quizNumber);
+                })
+                .toList();
     }
 }
