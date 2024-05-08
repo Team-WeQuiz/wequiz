@@ -9,6 +9,7 @@ import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
+import com.chatty.chatty.player.service.PlayerService;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -28,6 +29,7 @@ public class GameController {
 
     private final GameService gameService;
     private final QuizRoomService quizRoomService;
+    private final PlayerService playerService;
     private final SimpMessagingTemplate template;
 
     @MessageMapping("/rooms/{roomId}/chat")
@@ -49,8 +51,9 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor,
-                                     NicknameRequest request) {
+            NicknameRequest request) {
         quizRoomService.broadcastUpdatedRoomList();
+        playerService.savePlayer(getUserIdFromHeader(headerAccessor), roomId, request.nickname());
         return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
     }
 
@@ -58,6 +61,7 @@ public class GameController {
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO leaveRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         quizRoomService.broadcastUpdatedRoomList();
+        playerService.deletePlayer(getUserIdFromHeader(headerAccessor), roomId);
         return gameService.leaveRoom(roomId, getUserIdFromHeader(headerAccessor));
     }
 
@@ -84,7 +88,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/submit")
     @SendTo("/sub/rooms/{roomId}/submit")
     public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
-                                             SimpMessageHeaderAccessor headerAccessor) {
+            SimpMessageHeaderAccessor headerAccessor) {
         return gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
     }
 
