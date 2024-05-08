@@ -1,6 +1,6 @@
 package com.chatty.chatty.game.domain;
 
-import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,22 +13,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class QuizData {
 
-    private final Queue<Quiz> quizQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<QuizDTO> quizDTOQueue = new ConcurrentLinkedQueue<>();
     private final String quizDocId;
     private final String timestamp;
     private final Integer totalRound;
     private Integer currentRound;
 
-    public Quiz getQuiz() {
-        return quizQueue.peek();
+    public QuizDTO getQuiz() {
+        return quizDTOQueue.peek();
     }
 
-    public void fillQuiz(List<Quiz> quizzes) {
-        quizQueue.addAll(quizzes);
+    public void fillQuiz(List<QuizDTO> quizDTOList) {
+        quizDTOQueue.addAll(quizDTOList);
         this.currentRound++;
     }
 
-    public Quiz removeQuiz() {
-        return quizQueue.poll();
+    public QuizDTO removeQuiz() {
+        return quizDTOQueue.poll();
     }
 }

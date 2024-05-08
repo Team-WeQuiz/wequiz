@@ -5,7 +5,7 @@ import static com.chatty.chatty.game.exception.GameExceptionType.FAILED_TO_FETCH
 
 import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
 import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO.Marked;
-import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.exception.GameException;
 import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +41,7 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<Quiz> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) {
+    public List<QuizDTO> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) {
         List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
         while (rawQuizzes.size() < (currentRound + 1) * quizSize) {
             sleep(QUIZ_POLLING_SLEEP_TIME);
@@ -52,17 +52,22 @@ public class DynamoDBService {
         return convertToQuizDTO(rawQuizzes);
     }
 
+    public List<QuizDTO> getAllQuiz(String itemId, String timestamp) {
+        List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
+        return convertToQuizDTO(rawQuizzes);
+    }
+
     public List<MarkDTO> getMark(String itemId) {
         return convertToMarkDTO(dynamoDBRepository.getMarkFromDB(itemId));
     }
 
-    private List<Quiz> convertToQuizDTO(List<Map<String, Object>> listMap) {
-        List<Quiz> quizzes = new ArrayList<>();
+    private List<QuizDTO> convertToQuizDTO(List<Map<String, Object>> listMap) {
+        List<QuizDTO> quizDTOList = new ArrayList<>();
         for (Map<String, Object> value : listMap) {
-            Quiz quiz = mapper.convertValue(value, Quiz.class);
-            quizzes.add(quiz);
+            QuizDTO quiz = mapper.convertValue(value, QuizDTO.class);
+            quizDTOList.add(quiz);
         }
-        return quizzes;
+        return quizDTOList;
     }
 
     public List<MarkDTO> convertToMarkDTO(List<Map<String, Object>> listMap) {

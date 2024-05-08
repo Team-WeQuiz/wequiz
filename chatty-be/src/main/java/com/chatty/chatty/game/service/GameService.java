@@ -6,7 +6,7 @@ import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
-import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest.AnswerDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkResponse;
@@ -80,9 +80,9 @@ public class GameService {
 
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
+        if (quizData.getQuizDTOQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
             fillQuiz(quizData);
-            log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
+            log.info("Fill: QuizQueue: {}", quizData.getQuizDTOQueue());
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
         answerRepository.getAnswerData(roomId);
@@ -92,16 +92,16 @@ public class GameService {
     @Async
     protected void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
-        List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
+        List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
                 currentRound, QUIZ_SIZE);
-        List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
+        List<QuizDTO> currentQuizzes = quizDTOList.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.fillQuiz(currentQuizzes);
-        log.info("filled queue: {}", quizData.getQuizQueue());
+        log.info("filled queue: {}", quizData.getQuizDTOQueue());
     }
 
-    public Quiz removeQuiz(Long roomId) {
+    public QuizDTO removeQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        log.info("Remove: QuizQueue: {}", quizData.getQuizQueue());
+        log.info("Remove: QuizQueue: {}", quizData.getQuizDTOQueue());
         return quizData.removeQuiz();
     }
 
@@ -124,7 +124,7 @@ public class GameService {
     }
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
-        Quiz quiz = quizData.getQuiz();
+        QuizDTO quiz = quizData.getQuiz();
         return QuizResponse.builder()
                 .totalRound(quizData.getTotalRound())
                 .currentRound(quizData.getCurrentRound())
@@ -143,7 +143,7 @@ public class GameService {
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
             log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
-            Quiz removedQuiz = removeQuiz(roomId);
+            QuizDTO removedQuiz = removeQuiz(roomId);
 
             QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
             MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
