@@ -25,11 +25,11 @@ export default function SignIn() {
   const message = searchParams.get('message');
 
   const handleKakaoLogin = () => {
-    kakaoLogin('https://wequiz.kr/sign-in/kakao/callback');
+    kakaoLogin(`${process.env.NEXT_PUBLIC_URL}/sign-in/kakao/callback`);
   };
 
   const handleGoogleLogin = () => {
-    googleLogin('https://wequiz.kr/sign-in/google/callback');
+    googleLogin(`${process.env.NEXT_PUBLIC_URL}/sign-in/google/callback`);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
