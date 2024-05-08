@@ -121,7 +121,7 @@ export default function SignIn() {
         integrity="sha384-l+xbElFSnPZ2rOaPrU//2FF5B4LB8FiX5q4fXYTlfcG4PGpMkE1vcL7kNXI6Cci0"
         crossOrigin="anonymous"
         onLoad={() => kakaoInit()}
-        strategy="beforeInteractive"
+        strategy="lazyOnload"
       />
     </div>
   );
