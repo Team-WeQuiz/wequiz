@@ -51,4 +51,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Provider loginType = Provider.NORMAL;
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }
