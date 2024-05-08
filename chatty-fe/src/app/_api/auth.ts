@@ -91,9 +91,7 @@ export const getUserInfo = async (accessToken: string) => {
 
 export const getSecretKeys = async () => {
   try {
-    const response = await axios.get(
-      'http://localhost:3000/api/s3-keys/getSecrets',
-    );
+    const response = await axios.get('https://wequiz/api/s3-keys/getSecrets');
     return response.data;
   } catch (error) {
     console.error('error: ', error);
