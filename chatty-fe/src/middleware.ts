@@ -34,5 +34,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set('Content-Security-Policy', 'upgrade-insecure-requests');
+
+  return response;
 }
