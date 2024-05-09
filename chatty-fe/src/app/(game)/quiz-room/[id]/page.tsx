@@ -101,10 +101,10 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
             openModal();
             endRoundCountDown();
           }
-          getQuiz(params.id);
           if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
             endRoom();
           }
+          getQuiz(params.id);
           return 4;
         }
         return currentCount - 1;
@@ -244,9 +244,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
                 Round {quizSet?.currentRound || 0}
               </div>
               <QuestionProgess
-                questionNumber={
-                  quizSet?.quizNumber === 5 ? 5 : (quizSet?.quizNumber || 0) % 5
-                }
+  questionNumber={
+    ((quizSet?.quizNumber || 0) % 5 === 0 ? (quizSet?.quizNumber || 0) : (quizSet?.quizNumber || 0) % 5)
+  }
                 totalQuestions={5}
               />
             </div>
