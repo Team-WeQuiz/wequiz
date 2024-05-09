@@ -244,9 +244,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
                 Round {quizSet?.currentRound || 0}
               </div>
               <QuestionProgess
-  questionNumber={
-    ((quizSet?.quizNumber || 0) % 5 === 0 ? (quizSet?.quizNumber || 0) : (quizSet?.quizNumber || 0) % 5)
-  }
+                questionNumber={
+                  ((quizSet?.quizNumber || 0) % 5 === 0 ? (quizSet?.quizNumber || 0) : (quizSet?.quizNumber || 0) % 5)
+                }
                 totalQuestions={5}
               />
             </div>
