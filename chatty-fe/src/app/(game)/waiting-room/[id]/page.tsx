@@ -12,11 +12,13 @@ import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
 import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
 import { usePathname, useSearchParams } from 'next/navigation';
+import useModal from '@/app/_hooks/useModal';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const searchParams = useSearchParams();
   const nickname = searchParams.get('nickname');
+  const { isOpen } = useModal();
 
   const [isConnected, setIsConnected] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -66,16 +68,19 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
 
   // 연결 해제
   const disconnect = () => {
-    console.log('Disconnecting from WebSocket');
-    stompClient.publish({
-      destination: `/pub/rooms/${params.id}/leave`,
-    });
-    if (userStatuses.length === 1) {
+    if (isConnected) {
+      console.log('Disconnecting from WebSocket!!!!!');
       stompClient.publish({
-        destination: `/pub/rooms/${params.id}/end`,
+        destination: `/pub/rooms/${params.id}/leave`,
       });
+      if (userStatuses.length === 1) {
+        alert('방이 종료됩니다.');
+        stompClient.publish({
+          destination: `/pub/rooms/${params.id}/end`,
+        });
+      }
+      stompClient.deactivate();
     }
-    stompClient.deactivate();
   };
 
   const pathname = usePathname();

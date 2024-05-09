@@ -8,9 +8,13 @@ export const getQuizInfo = async (id: number, accessToken: string) => {
       },
     });
     return response.data;
-  } catch (error) {
-    console.error('error: ', error);
-    throw new Error('퀴즈 정보를 가져오는데 실패했습니다.');
+  } catch (error: any) {
+    if (error.response && error.response.status) {
+      throw error.response.status;
+    } else {
+      console.error('error: ', error);
+      throw new Error(error);
+    }
   }
 };
 
