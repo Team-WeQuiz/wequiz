@@ -1,6 +1,9 @@
-import uuid, random
+import uuid
+
+import asyncio
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
+
 from model.chain import QuizPipeline
 from data.settings import QUIZ_GENERATE_RETRY
 from utils.logger import *
@@ -67,6 +70,11 @@ class QuizGenerator():
         if retry == QUIZ_GENERATE_RETRY:
             raise QuizGenerationException(f"Failed to generate quiz about [{keyword}] after {QUIZ_GENERATE_RETRY} retries.")
         return data
+    
+    async def generate_async(self, keyword, question_number):
+        # 비동기 작업을 수행하는 별도의 메서드
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.generate, keyword, question_number)
 
     
 #######################################################################################
