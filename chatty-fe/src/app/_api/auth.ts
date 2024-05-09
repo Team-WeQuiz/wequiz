@@ -49,7 +49,7 @@ export const postSignIn = async (data: object) => {
     return response.data;
   } catch (error: any) {
     console.error('error: ', error);
-    if (error.response.data.exceptionCode > 1001)
+    if (error.response.data.exceptionCode > 1000)
       throw new Error(error.response.data.message);
     else throw new Error('오류가 발생했습니다.');
   }
