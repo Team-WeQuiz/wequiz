@@ -54,8 +54,15 @@ public class QuizRoom extends BaseEntity {
     @Column
     private String quizDocId;
 
+    @Column
+    private String markDocId;
+
     public void setQuizDocId(String id) {
         this.quizDocId = id;
+    }
+
+    public void setMarkDocId(String id) {
+        this.markDocId = id;
     }
 
     public void setStatus(Status status) {

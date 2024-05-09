@@ -6,7 +6,7 @@ import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
-import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest;
 import com.chatty.chatty.game.controller.dto.model.MarkRequest.AnswerDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkResponse;
@@ -26,6 +26,8 @@ import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
+import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -43,6 +45,7 @@ public class GameService {
 
     private static final Integer QUIZ_SIZE = 5;
 
+    private final QuizRoomRepository quizRoomRepository;
     private final PlayersStatusRepository playersStatusRepository;
     private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final GameRepository gameRepository;
@@ -77,9 +80,9 @@ public class GameService {
 
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        if (quizData.getQuizQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
+        if (quizData.getQuizDTOQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
             fillQuiz(quizData);
-            log.info("Fill: QuizQueue: {}", quizData.getQuizQueue());
+            log.info("Fill: QuizQueue: {}", quizData.getQuizDTOQueue());
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
         answerRepository.getAnswerData(roomId);
@@ -89,16 +92,16 @@ public class GameService {
     @Async
     protected void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
-        List<Quiz> quizzes = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
+        List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
                 currentRound, QUIZ_SIZE);
-        List<Quiz> currentQuizzes = quizzes.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
+        List<QuizDTO> currentQuizzes = quizDTOList.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.fillQuiz(currentQuizzes);
-        log.info("filled queue: {}", quizData.getQuizQueue());
+        log.info("filled queue: {}", quizData.getQuizDTOQueue());
     }
 
-    public Quiz removeQuiz(Long roomId) {
+    public QuizDTO removeQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        log.info("Remove: QuizQueue: {}", quizData.getQuizQueue());
+        log.info("Remove: QuizQueue: {}", quizData.getQuizDTOQueue());
         return quizData.removeQuiz();
     }
 
@@ -121,7 +124,8 @@ public class GameService {
     }
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
-        Quiz quiz = quizData.getQuiz();
+        QuizDTO quiz = quizData.getQuiz();
+        log.info("currentRound: {}", quizData.getCurrentRound());
         return QuizResponse.builder()
                 .totalRound(quizData.getTotalRound())
                 .currentRound(quizData.getCurrentRound())
@@ -136,24 +140,28 @@ public class GameService {
         AnswerData answerData = answerRepository.getAnswerData(roomId);
         SubmitStatus status = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
-        UsersSubmitStatus submitStatus = userSubmitStatusRepository.submit(roomId, userId);
+        UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.submit(roomId, userId);
 
         if (status == SubmitStatus.ALL_SUBMITTED) {
-            Quiz removedQuiz = removeQuiz(roomId);
+            log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
+            QuizDTO removedQuiz = removeQuiz(roomId);
 
-            String quizDocId = gameRepository.getQuizData(roomId).getQuizDocId();
+            QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
             MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
-                    .id(quizDocId)
+                    .id(quizRoom.getQuizDocId())
                     .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
                     .correct(removedQuiz.correct())
                     .answers(getAnswers(answerData.getPlayerAnswers()))
                     .build());
+            if (quizRoom.getMarkDocId() == null) {
+                quizRoom.setMarkDocId(markResponse.id());
+                quizRoomRepository.save(quizRoom);
+            }
 
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
             log.info("ScoreMap: {}", scoreData.getPlayersScore());
-            log.info("ScoreMap 1등: {}", buildScoreResponse(scoreData.getPlayersScore()).scores().getFirst());
 
             PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
             userSubmitStatusRepository.init(players, roomId);
@@ -162,7 +170,7 @@ public class GameService {
         return SubmitAnswerResponse.builder()
                 .status(status)
                 .timestamp(LocalDateTime.now())
-                .submitStatuses(submitStatus.usersSubmitStatus())
+                .submitStatuses(usersSubmitStatus.usersSubmitStatus())
                 .build();
     }
 
@@ -177,14 +185,11 @@ public class GameService {
 
     public ScoreResponse sendScore(Long roomId) {
         ScoreData scoreData = scoreRepository.getScoreData(roomId);
-        return buildScoreResponse(scoreData.getPlayersScore());
-    }
-
-    private ScoreResponse buildScoreResponse(Map<Long, Integer> playersScore) {
-        List<PlayerScoreDTO> scores = playersScore.entrySet().stream()
+        List<PlayerScoreDTO> scores = scoreData.getPlayersScore().entrySet().stream()
                 .map(entry -> PlayerScoreDTO.builder()
                         .playerId(entry.getKey())
-                        .score(entry.getValue())
+                        .nickname(entry.getValue().getNickname())
+                        .score(entry.getValue().getScore())
                         .build())
                 .sorted(Comparator.comparing(PlayerScoreDTO::score).reversed())
                 .toList();

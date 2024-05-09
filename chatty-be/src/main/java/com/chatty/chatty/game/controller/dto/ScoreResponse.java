@@ -10,6 +10,7 @@ public record ScoreResponse(
     @Builder
     public record PlayerScoreDTO(
             Long playerId,
+            String nickname,
             Integer score
     ) {
     }

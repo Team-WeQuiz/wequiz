@@ -42,8 +42,4 @@ public class Player extends BaseEntity {
 
     @Column(length = 10, nullable = false)
     private String nickname;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private Integer timeTaken = -1;
 }

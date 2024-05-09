@@ -4,10 +4,13 @@ import static com.chatty.chatty.common.util.ThreadSleep.sleep;
 import static com.chatty.chatty.game.exception.GameExceptionType.FAILED_TO_FETCH_DESCRIPTION;
 import static com.chatty.chatty.game.exception.GameExceptionType.FAILED_TO_FETCH_QUIZ;
 
-import com.chatty.chatty.game.controller.dto.dynamodb.Quiz;
+import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
+import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO.Marked;
+import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.exception.GameException;
 import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +43,7 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<Quiz> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) throws GameException {
+    public List<QuizDTO> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) throws GameException {
         int attempts = 0;
         List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
         while (rawQuizzes.size() < (currentRound + 1) * quizSize && attempts < POLLING_MAX_ATTEMPTS) {
@@ -53,15 +56,42 @@ public class DynamoDBService {
             throw new GameException(FAILED_TO_FETCH_QUIZ);
         }
         log.info("polling done.");
-        return convertToList(rawQuizzes);
+        return convertToQuizDTO(rawQuizzes);
     }
 
-    private List<Quiz> convertToList(List<Map<String, Object>> listMap) {
-        List<Quiz> quizzes = new ArrayList<>();
+    public List<QuizDTO> getAllQuiz(String itemId, String timestamp) {
+        List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
+        return convertToQuizDTO(rawQuizzes);
+    }
+
+    public List<MarkDTO> getMark(String itemId) {
+        return convertToMarkDTO(dynamoDBRepository.getMarkFromDB(itemId));
+    }
+
+    private List<QuizDTO> convertToQuizDTO(List<Map<String, Object>> listMap) {
+        List<QuizDTO> quizDTOList = new ArrayList<>();
         for (Map<String, Object> value : listMap) {
-            Quiz quiz = mapper.convertValue(value, Quiz.class);
-            quizzes.add(quiz);
+            QuizDTO quiz = mapper.convertValue(value, QuizDTO.class);
+            quizDTOList.add(quiz);
         }
-        return quizzes;
+        return quizDTOList;
+    }
+
+    public List<MarkDTO> convertToMarkDTO(List<Map<String, Object>> listMap) {
+        return listMap.stream()
+                .map(map -> {
+                    String id = (String) map.get("id");
+                    String correct = (String) map.get("correct");
+                    List<Map<String, Object>> markedsListMap = (List<Map<String, Object>>) map.get("markeds");
+                    Integer quizNumber = ((BigDecimal) map.get("question_number")).intValue();
+
+                    List<Marked> markeds = new ArrayList<>();
+                    for (Map<String, Object> value : markedsListMap) {
+                        Marked marked = mapper.convertValue(value, Marked.class);
+                        markeds.add(marked);
+                    }
+                    return new MarkDTO(id, correct, markeds, quizNumber);
+                })
+                .toList();
     }
 }

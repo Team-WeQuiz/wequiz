@@ -30,6 +30,7 @@ public class GameRepository {
     private QuizData initQuizData(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        log.info("Init Quiz Data: roomId: {}", roomId);
         return QuizData.builder()
                 .quizDocId(quizRoom.getQuizDocId())
                 .timestamp(quizRoom.getCreatedAt().toString())
