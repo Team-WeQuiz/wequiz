@@ -5,14 +5,18 @@ import * as styles from './QuestionProgress.css';
 type QuestionProgressProps = {
   questionNumber: number;
   totalQuestions: number;
+  direction?: string;
 };
 
 export default function QuestionProgess({
   questionNumber,
   totalQuestions,
+  direction,
 }: QuestionProgressProps) {
   return (
-    <div className={styles.Wrapper}>
+    <div
+      className={direction === 'column' ? styles.WrapperColumn : styles.Wrapper}
+    >
       {Array.from({ length: totalQuestions }, (_, index) => (
         <div className={styles.Container} key={index}>
           {index + 1 <= questionNumber ? (
