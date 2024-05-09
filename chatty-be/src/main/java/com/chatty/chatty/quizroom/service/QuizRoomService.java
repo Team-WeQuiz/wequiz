@@ -253,12 +253,7 @@ public class QuizRoomService {
 
     private int calculateCorrectRate(List<PlayerAnswer> playerAnswers) {
         int totalAnswers = playerAnswers.size();
-        int correctCount = 0;
-        for (PlayerAnswer answer : playerAnswers) {
-            if (answer.marking()) {
-                correctCount++;
-            }
-        }
+        int correctCount = (int) playerAnswers.stream().filter(PlayerAnswer::marking).count();
         return totalAnswers > 0 ? (correctCount * 100) / totalAnswers : 0;
     }
 }
