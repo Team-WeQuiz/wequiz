@@ -26,8 +26,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 public class User extends BaseEntity {
 
-    private static final String DEFAULT_PROFILE_IMAGE = "bit.ly/wequiz_profile_image";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -42,10 +40,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean isValid = false;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private String profileImage = DEFAULT_PROFILE_IMAGE;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
