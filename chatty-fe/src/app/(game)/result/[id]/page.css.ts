@@ -123,4 +123,8 @@ export const ModalButton = style({
   backgroundColor: globals.color.blue_7,
   boxShadow: '0px 0px 4px 2px rgba(23, 96, 171, 0.25)',
   cursor: 'pointer',
+  color: globals.color.blue_main,
+  ':active': {
+    transform: 'scale(0.99)',
+  },
 });

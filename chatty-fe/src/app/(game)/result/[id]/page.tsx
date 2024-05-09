@@ -7,12 +7,15 @@ import QuestionProgess from '../../quiz-room/[id]/_components/QuestionProgress/Q
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import PercentageCircle from './_components/PercentageCircle/PercentageCircle';
 import Image from 'next/image';
+import useModal from '@/app/_hooks/useModal';
+import ResultPageModal from './_components/ResultPageModal/ResultPageModal';
 
 type PlayerAnswers = {
   playerId: number;
   nickname: string;
   playerAnswer: string;
   marking: boolean;
+  correction: false;
 };
 
 type Results = {
@@ -25,9 +28,14 @@ type Results = {
 };
 
 export default function ResultPage({ params }: { params: { id: number } }) {
+  const { isOpen, openModal, closeModal } = useModal();
   const [results, setResults] = useState<Results[]>([]);
+  const [currentQuizNumber, setCurrentQuizNumber] = useState<number | null>(
+    null,
+  );
   const { accessToken } = useAuthStore();
   const { id } = useUserInfoStore();
+
   const fetchResultData = async () => {
     try {
       const result = await client.get(`/rooms/${params.id}/result`, {
@@ -46,6 +54,12 @@ export default function ResultPage({ params }: { params: { id: number } }) {
   useEffect(() => {
     fetchResultData();
   }, [accessToken]);
+
+  const handleOpenModal = (quizNumber: number) => {
+    setCurrentQuizNumber(quizNumber);
+    openModal();
+  };
+
   return (
     <div className={styles.Container}>
       <div className={styles.SideBarWrapper}>
@@ -91,7 +105,10 @@ export default function ResultPage({ params }: { params: { id: number } }) {
                     </div>
                   ))}
                 <PercentageCircle percentage={result.correctRate} />
-                <button className={styles.ModalButton}>
+                <button
+                  className={styles.ModalButton}
+                  onClick={() => handleOpenModal(result.quizNumber)}
+                >
                   <span>상세보기</span>
                   <Image
                     src="/images/arrow_right.svg"
@@ -105,6 +122,13 @@ export default function ResultPage({ params }: { params: { id: number } }) {
           </div>
         </div>
       </div>
+      {isOpen && currentQuizNumber != null ? (
+        <ResultPageModal
+          results={results}
+          currentQuizNumber={currentQuizNumber}
+          closeModal={closeModal}
+        />
+      ) : null}
     </div>
   );
 }
