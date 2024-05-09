@@ -12,7 +12,6 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import stompClient from '../../_utils/stomp';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
-import axios from 'axios';
 import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
 import { useRouter } from 'next/navigation';
@@ -112,9 +111,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           setIsAnswered(false);
           setSubmitStatus(null);
           if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
+            getScore(params.id);
             endRoom();
-          }
-          if (quizSet?.quizNumber === 5) {
+          } else if (quizSet?.quizNumber === 5) {
             getScore(params.id);
             openModal();
             endRoundCountDown();
