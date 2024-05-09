@@ -15,6 +15,8 @@ import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
 import axios from 'axios';
 import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
+import { useRouter } from 'next/navigation';
+import client from '@/app/_api/client';
 
 type QuizSet = {
   totalRound: number;
@@ -49,6 +51,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const { isOpen, openModal, closeModal } = useModal();
 
+  const router = useRouter();
+
   const handleOptionChange = (option: string, index: number) => {
     setUserAnswer(option);
     setSelectedOption(index);
@@ -64,12 +68,23 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     });
   };
 
-  const endRoom = () => {
-    axios.delete(`/rooms/${params.id}/end`, {
+  const endRoom = async () => {
+    await client.delete(`/rooms/${params.id}/end`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+    openModal();
+    const interval = setInterval(() => {
+      setModalCount((currentCount) => {
+        if (currentCount === 0) {
+          closeModal();
+          clearInterval(interval);
+          router.push(`/result/${params.id}`);
+        }
+        return currentCount - 1;
+      });
+    }, 1000);
   };
 
   const endRoundCountDown = () => {
@@ -96,13 +111,13 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           clearInterval(interval);
           setIsAnswered(false);
           setSubmitStatus(null);
+          if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
+            endRoom();
+          }
           if (quizSet?.quizNumber === 5) {
             getScore(params.id);
             openModal();
             endRoundCountDown();
-          }
-          if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
-            endRoom();
           }
           getQuiz(params.id);
           return 4;
@@ -245,7 +260,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
               </div>
               <QuestionProgess
                 questionNumber={
-                  ((quizSet?.quizNumber || 0) % 5 === 0 ? (quizSet?.quizNumber || 0) : (quizSet?.quizNumber || 0) % 5)
+                  (quizSet?.quizNumber || 0) % 5 === 0
+                    ? quizSet?.quizNumber || 0
+                    : (quizSet?.quizNumber || 0) % 5
                 }
                 totalQuestions={5}
               />
