@@ -15,9 +15,13 @@ export default function CreateRoom() {
   const [files, setFiles] = useState<File[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [numberOfParticipants, setNumberOfParticipants] = useState(0);
+  const [numberOfParticipants, setNumberOfParticipants] = useState(1);
   const [password, setPassword] = useState('');
+<<<<<<< HEAD
+  const [numberOfProblems, setNumberOfProblems] = useState(5);
+=======
   const [numberOfProblems, setNumberOfProblems] = useState(0);
+>>>>>>> main
   const [qustionType, setQuestionType] = useState<'list' | 'create'>('create');
 
   const router = useRouter();
@@ -125,12 +129,6 @@ export default function CreateRoom() {
           <div className={styles.contentsWrapper}>
             <ContentsBox imgSrc="/images/Book_open_alt.svg" title="문제 수" />
             <div className={styles.defaultWrapper}>
-              {/* <TextInputField
-                type="number"
-                value={String(numberOfProblems)}
-                onChange={(e) => setNumberOfProblems(Number(e.target.value))}
-                borderRadius={12}
-              /> */}
               <div className={styles.radioButtonWrapper}>
                 <input
                   type="radio"
@@ -138,6 +136,7 @@ export default function CreateRoom() {
                   name="numberOfProblems"
                   value={5}
                   onChange={() => setNumberOfProblems(5)}
+                  checked={numberOfProblems === 5}
                 />
                 <label htmlFor="5">5개</label>
                 <input

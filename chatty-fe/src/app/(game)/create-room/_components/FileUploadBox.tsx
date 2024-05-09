@@ -1,7 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as styles from './FileUploadBox.css';
-//import { handleUpload } from '@/app/_lib/uploader';
 import Image from 'next/image';
 
 type FileUploadBoxProps = {
@@ -9,30 +8,33 @@ type FileUploadBoxProps = {
 };
 
 export default function FileUploadBox({ setFiles }: FileUploadBoxProps) {
-  //const [uploadProgress, setUploadProgress] = useState(0);
-  //const [isUploading, setIsUploading] = useState(false);
-  //const [fileNumber, setFileNumber] = useState(0);
-  //const [uploadedFileNumber, setUploadedFileNumber] = useState(1);
   const [isUploaded, setIsUploaded] = useState(false);
   const [uploadedFileNames, setFileNames] = useState<string[]>([]);
+  const [files, setLocalFiles] = useState<File[]>([]);
 
-  // const onFileUpload = async (files: FileList) => {
-  //   await handleUpload(
-  //     files,
-  //     setUploadProgress,
-  //     setFileNumber,
-  //     setUploadedFileNumber,
-  //     setIsUploading,
-  //     setIsUploaded,
-  //     setFileNames,
-  //   );
-  // };
+  const deleteFile = (fileName: string) => {
+    const newFileNames = uploadedFileNames.filter((name) => name !== fileName);
+    const newFiles = files.filter((file) => file.name !== fileName);
+    setFileNames(newFileNames);
+    setLocalFiles(newFiles);
+  };
 
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (e.target.files) {
-  //     setFiles(Array.from(e.target.files));
-  //   }
-  // };
+  const checkDuplicate = (fileNames: string[]) => {
+    return fileNames.some((name, index) => fileNames.indexOf(name) !== index);
+  };
+
+  useEffect(() => {
+    setFiles(files);
+  }, [files, setFiles]);
+
+  useEffect(() => {
+    if (uploadedFileNames.length !== 0) {
+      setIsUploaded(true);
+    } else {
+      setIsUploaded(false);
+    }
+    console.log(uploadedFileNames);
+  }, [uploadedFileNames]);
 
   return (
     <div
@@ -42,20 +44,37 @@ export default function FileUploadBox({ setFiles }: FileUploadBoxProps) {
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          setFiles(Array.from(e.dataTransfer.files));
+        const newFiles = Array.from(e.dataTransfer.files);
+        const newFileNames = newFiles.map((file) => file.name);
+        if (checkDuplicate(newFileNames)) {
+          alert('중복된 파일 이름이 있습니다.');
+          return;
         }
-        setFileNames(Array.from(e.dataTransfer.files).map((file) => file.name));
+        setFiles(newFiles);
+        setLocalFiles(newFiles);
+        setFileNames(newFiles.map((file) => file.name));
         setIsUploaded(true);
       }}
     >
       {isUploaded ? (
-        <div className={styles.uploadedFiles}>
-          <div>업로드 완료!</div>
-          {uploadedFileNames.map((name) => (
-            <div key={name}>{name}</div>
-          ))}
-        </div>
+        <>
+          <div style={{ fontSize: '20px', marginBottom: '10px' }}>
+            업로드 완료!
+          </div>
+          <div className={styles.FileListContainer}>
+            {uploadedFileNames.map((name) => (
+              <div className={styles.FileListWrapper} key={name}>
+                <span className={styles.FileName}>{name}</span>
+                <button
+                  className={styles.FileDeleteButton}
+                  onClick={() => deleteFile(name)}
+                >
+                  X
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
         <>
           <div className={styles.wrapper}>

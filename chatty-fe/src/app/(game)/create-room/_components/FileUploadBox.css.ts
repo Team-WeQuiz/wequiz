@@ -38,13 +38,6 @@ export const container = recipe({
   },
 });
 
-export const uploadedFiles = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 10,
-  alignItems: 'center',
-});
-
 export const wrapper = style({
   display: 'flex',
   flexDirection: 'column',
@@ -68,4 +61,31 @@ export const title = style({
   color: globals.color.black_3,
   fontSize: 16,
   fontWeight: 400,
+});
+
+export const FileListContainer = style({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  gap: 4,
+});
+
+export const FileListWrapper = style({
+  display: 'flex',
+  borderRadius: 12,
+  gap: 6,
+});
+
+export const FileName = style({
+  fontSize: 16,
+});
+
+export const FileDeleteButton = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 16,
+  height: 16,
+  backgroundColor: globals.color.black_6,
+  cursor: 'pointer',
 });
