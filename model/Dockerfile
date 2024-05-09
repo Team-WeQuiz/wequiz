@@ -9,23 +9,24 @@ ENV NLTK_DATA /usr/share/nltk_data
 
 # Install dependencies
 COPY requirements_compact.txt .
-COPY mecab_install.sh .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements_compact.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements_compact.txt
 
 # download punkt
 RUN python3 -m nltk.downloader punkt -d /usr/share/nltk_data
 # download stopwords
 RUN python3 -m nltk.downloader stopwords -d /usr/share/nltk_data
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libsm6 \
     libxext6 \
     g++ \
-    openjdk-17-jdk
+    openjdk-17-jdk && \
+    rm -rf /var/lib/apt/lists/*
 
 # Mecab 설치
+COPY mecab_install.sh .
 RUN python3.10 -m pip install konlpy JPype1-py3
 RUN bash mecab_install.sh
 RUN python3.10 -m pip install mecab-python3
