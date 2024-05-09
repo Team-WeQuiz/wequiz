@@ -80,9 +80,11 @@ public class GameService {
 
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        if (quizData.getQuizDTOQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
-            fillQuiz(quizData);
-            log.info("Fill: QuizQueue: {}", quizData.getQuizDTOQueue());
+        synchronized (this) {
+            if (quizData.getQuizDTOQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
+                fillQuiz(quizData);
+                log.info("Fill: QuizQueue: {}", quizData.getQuizDTOQueue());
+            }
         }
         log.info("Send: Quiz: {}", quizData.getQuiz());
         answerRepository.getAnswerData(roomId);
