@@ -27,7 +27,8 @@ type QuizSet = {
 };
 
 type SubmitStatus = {
-  status: 'ALL_SUBMITTED' | 'MAJORITY_SUBMITTED' | 'PARTIAL_SUBMITTED';
+  // status: 'ALL_SUBMITTED' | 'MAJORITY_SUBMITTED' | 'PARTIAL_SUBMITTED';
+  isMajority: boolean;
   time: string;
 };
 
@@ -193,15 +194,19 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
 
   const getSubmitMessage = () => {
     if (!isAnswered) return '';
-    switch (submitStatus?.status) {
-      case 'PARTIAL_SUBMITTED':
-        return '다른 참여자가 답변을 제출할 때 까지 기다려주세요 :)';
-      case 'MAJORITY_SUBMITTED':
-      case 'ALL_SUBMITTED':
-        return '과반수의 답안이 제출되어 다음 퀴즈로 넘어갑니다.';
-      default:
-        return '';
+    // switch (submitStatus?.status) {
+    //   case 'PARTIAL_SUBMITTED':
+    //     return '다른 참여자가 답변을 제출할 때 까지 기다려주세요 :)';
+    //   case 'MAJORITY_SUBMITTED':
+    //   case 'ALL_SUBMITTED':
+    //     return '과반수의 답안이 제출되어 다음 퀴즈로 넘어갑니다.';
+    //   default:
+    //     return '';
+    // }
+    if (submitStatus?.isMajority) {
+      return '과반수의 답안이 제출되어 다음 퀴즈로 넘어갑니다.';
     }
+    return '다른 참여자가 답변을 제출할 때 까지 기다려주세요 :)';
   };
 
   useEffect(() => {
@@ -235,10 +240,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   }, [params.id]);
 
   useEffect(() => {
-    if (
-      submitStatus?.status === 'MAJORITY_SUBMITTED' ||
-      submitStatus?.status === 'ALL_SUBMITTED'
-    ) {
+    if (submitStatus?.isMajority) {
       countDown();
     }
   }, [submitStatus, isAnswered]);
@@ -280,10 +282,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
             </div>
           </div>
           <div className={styles.StatusWrapper}>
-            {(isAnswered && submitStatus?.status === 'MAJORITY_SUBMITTED') ||
-            (isAnswered && submitStatus?.status === 'ALL_SUBMITTED') ? (
+            {isAnswered && submitStatus?.isMajority ? (
               <h1 className={styles.Count}>{count - 1}</h1>
-            ) : isAnswered && submitStatus?.status === 'PARTIAL_SUBMITTED' ? (
+            ) : isAnswered && !submitStatus?.isMajority ? (
               <BarSpinner />
             ) : (
               ''
