@@ -41,3 +41,6 @@ jobs:
           context: ./model
           tags: leahpar0401/wequiz-ml:latest
           platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha, mode=max
+    
