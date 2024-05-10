@@ -102,8 +102,7 @@ const UserQuizList = () => {
 
   return (
     <div className={styles.quizListContainer}>
-      <p>{stateMessage}</p>
-      {quizList.length !== 0 && (
+      {quizList.length !== 0 ? (
         <>
           <div className={styles.quizListGrid}>
             {quizList.map((quiz, index) => (
@@ -123,6 +122,8 @@ const UserQuizList = () => {
             />
           </div>
         </>
+      ) : (
+        <p>{stateMessage}</p>
       )}
     </div>
   );
