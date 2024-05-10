@@ -37,6 +37,7 @@ minio:
     secret: ${MINIO_SECRET_KEY}
   bucket:
     pdf: ${MINIO_BUCKET_PDF}
+    profileImage: ${MINIO_BUCKET_PROFILE_IMAGE}
   endpoint: ${MINIO_ENDPOINT}
 
 url:

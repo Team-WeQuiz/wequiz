@@ -103,7 +103,8 @@ public class QuizRoomService {
     public RoomResultResponse getTotalResult(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
-        List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId(), quizRoom.getCreatedAt().toString());
+        List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId(),
+                quizRoom.getCreatedAt().toString());
         List<MarkDTO> markDTOList = dynamoDBService.getMark(quizRoom.getMarkDocId());
 
         List<QuizResultDTO> quizResultDTOList = new ArrayList<>();
@@ -120,7 +121,8 @@ public class QuizRoomService {
                 String nickname = playerRepository.findByUserIdAndQuizRoomId(marked.playerId(), roomId)
                         .orElseThrow(() -> new PlayerException(PLAYER_NOT_FOUND))
                         .getNickname();
-                playerAnswers.add(new PlayerAnswer(marked.playerId(), nickname, marked.playerAnswer(), marked.marking()));
+                playerAnswers.add(
+                        new PlayerAnswer(marked.playerId(), nickname, marked.playerAnswer(), marked.marking()));
             }
 
             // 정답률 계산
@@ -232,7 +234,7 @@ public class QuizRoomService {
         request.files()
                 .forEach(file -> {
                     try {
-                        String fileName = minioRepository.saveFile(userId, time, file.getInputStream());
+                        String fileName = minioRepository.savePdf(userId, time, file.getInputStream());
                         fileNames.add(fileName);
                     } catch (IOException e) {
                         throw new FileException(FILE_INPUT_STREAM_FAILED);
