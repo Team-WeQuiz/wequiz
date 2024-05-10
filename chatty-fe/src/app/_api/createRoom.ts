@@ -25,7 +25,7 @@ export const postRoom = async (
 
     // formData.append(`files`, fs.createReadStream(files[0].name));
 
-    const response = await client.post('/rooms', formData.getBuffer(), {
+    const response = await client.post('/rooms', formData, {
       headers: {
         // ...formData.getHeaders(),
         Authorization: `Bearer ${useAuthStore.getState().accessToken}`,
