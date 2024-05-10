@@ -6,6 +6,7 @@ import static com.chatty.chatty.config.minio.exception.MinioExceptionType.FAILED
 
 import com.chatty.chatty.common.util.Sha256Encrypt;
 import com.chatty.chatty.config.minio.exception.MinioException;
+import com.chatty.chatty.user.entity.User;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -54,27 +55,31 @@ public class MinioRepository {
         return pdfFileName;
     }
 
-    public void saveProfileImage(Long userId, InputStream stream) {
+    public String saveProfileImage(Long userId, InputStream stream, String contentType) {
+        String fileName = userId + "." + contentType.split("/")[1];
         try {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(profileImageBucketName)
-                    .object(String.valueOf(userId))
+                    .object(fileName)
                     .stream(stream, stream.available(), -1)
                     .build()
             );
         } catch (Exception e) {
             throw new MinioException(FAILED_TO_SAVE_FILE);
         }
+        return fileName;
     }
 
-    public String getProfileImageUrl(String profileImageBucketName) {
+    public String getProfileImageUrl(String fileName) {
         Map<String, String> reqParams = new HashMap<>();
-        reqParams.put("response-content-type", "application/json");
+        String contentType = "image/" + fileName.split("\\.")[1];
+        log.info(contentType);
+        reqParams.put("response-content-type", contentType);
         try {
             return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-                    .method(Method.PUT)
+                    .method(Method.GET)
                     .bucket(profileImageBucketName)
-                    .object(profileImageBucketName)
+                    .object(fileName)
                     .expiry(60 * 60 * 24)
                     .extraQueryParams(reqParams)
                     .build());
