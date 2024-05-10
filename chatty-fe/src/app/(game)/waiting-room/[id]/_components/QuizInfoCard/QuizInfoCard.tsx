@@ -4,6 +4,7 @@ import { QuizInfo } from '@/app/_types/QuizInfoType';
 import { getQuizInfo } from '@/app/_api/quiz';
 import { useState, useEffect } from 'react';
 import useAuthStore from '@/app/_store/useAuthStore';
+import { useRouter } from 'next/navigation';
 
 const initialData: QuizInfo = {
   roomId: 0,
@@ -22,14 +23,20 @@ const QuizInfoCard = ({
 }) => {
   const [data, setData] = useState<QuizInfo>(initialData);
   const { accessToken } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getQuizInfo(roomId, accessToken);
         setData(response);
-      } catch (error) {
+      } catch (error: any) {
         console.error('error: ', error);
+        if (error === 404) {
+          alert('방이 존재하지 않습니다.');
+          router.push('/main-lobby');
+          return;
+        }
         setData({
           roomId: 0,
           name: '정보를 불러오지 못했습니다.',

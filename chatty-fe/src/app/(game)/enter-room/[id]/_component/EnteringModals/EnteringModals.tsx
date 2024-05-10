@@ -8,6 +8,7 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import BlockingModal from '../BlockingModal/BlockingModal';
 import PasswordModal from '../PasswordModal/PasswordModal';
 import NicknameModal from '../NicknameModal/NicknameModal';
+import { useRouter } from 'next/navigation';
 
 const EnteringModals = ({
   id,
@@ -30,6 +31,8 @@ const EnteringModals = ({
   const [isLocked] = useState(false);
   const { accessToken } = useAuthStore();
 
+  const router = useRouter();
+
   const fetchData = async () => {
     if (accessToken && id > 0) {
       try {
@@ -42,6 +45,8 @@ const EnteringModals = ({
         openModal();
       } catch (error) {
         console.error('error: ', error);
+        alert('방 정보를 불러오는 중 오류가 발생했습니다.');
+        router.push('/main-lobby');
       } finally {
         setRequestState((prev) => ({
           ...prev,

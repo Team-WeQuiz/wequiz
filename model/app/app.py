@@ -141,16 +141,12 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
             # Generate quiz
             quiz_generator = QuizGenerator(vector_split_docs)
 
-            idx = 0
-            i = 0
-            questions = []
-            while idx < generate_request.numOfQuiz:
-                max_attempts = generate_request.numOfQuiz  # 최대 시도 횟수
-                success = False
+            async def generate_question(idx, i):
+                max_attempts = generate_request.numOfQuiz
                 for _ in range(max_attempts):
                     try:
                         keyword = keywords[i % len(keywords)]
-                        question = quiz_generator.generate(keyword, idx + 1)
+                        question = await quiz_generator.generate_async(keyword, idx + 1)
                         new_question = {
                             "M": {
                                 "id": {"S": str(question["id"])},
@@ -161,20 +157,21 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                                 "correct": {"S": question["correct"]}
                             }
                         }
-                        questions.append(new_question)
                         log('info', f'[app.py > quiz] new quiz is ready. {new_question}')
-                        
-                        idx += 1
-                        i += 1
-                        success = True
-                        break  # 성공적으로 생성되면 반복문 종료
+                        return new_question, i + 1
                     except Exception as e:
                         log('warning', f'[app.py > quiz] Failed to Generate Quiz: {str(e)}')
                         i += 1
-                if not success:
-                    log('error', "[app.py > quiz] Failed to generate question after {} attempts".format(max_attempts))
-                    raise Exception("Failed to generate question after {} attempts".format(max_attempts))
-                
+                raise Exception(f"Failed to generate question after {max_attempts} attempts")
+
+            questions = []
+            idx = 0
+            i = 0
+            while idx < generate_request.numOfQuiz:
+                question, i = await generate_question(idx, i)
+                questions.append(question)
+                idx += 1
+
                 # 5문제가 생성되었거나 마지막 문제인 경우 DynamoDB에 업데이트
                 if idx % 5 == 0 or idx == generate_request.numOfQuiz:
                     log('info', f'[app.py > quiz] cur idx: {idx} - quiz batch is ready to push. {questions}')
