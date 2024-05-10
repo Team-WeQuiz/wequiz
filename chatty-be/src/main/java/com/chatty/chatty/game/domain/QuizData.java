@@ -18,6 +18,7 @@ public class QuizData {
     private final String timestamp;
     private final Integer totalRound;
     private Integer currentRound;
+    private Integer nextQuizNumber;
 
     public QuizDTO getQuiz() {
         return quizDTOQueue.peek();
@@ -28,7 +29,11 @@ public class QuizData {
         this.currentRound++;
     }
 
-    public QuizDTO removeQuiz() {
-        return quizDTOQueue.poll();
+    public void removeQuiz() {
+        quizDTOQueue.poll();
+    }
+
+    public void increaseNextQuizNumber() {
+        this.nextQuizNumber++;
     }
 }
