@@ -33,7 +33,7 @@ const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
             </div>
           )}
           <Image
-            src="/images/Empty_profile.svg"
+            src={`/images/Empty_profile.svg`}
             alt="avatar"
             layout="fill"
             objectFit="contain"

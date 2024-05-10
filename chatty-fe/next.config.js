@@ -12,6 +12,13 @@ const nextConfig = {
     });
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: '3.35.178.237',
+        port: '9010',
+      },
+    ],
   serverRuntimeConfig: {
     httpServerOptions: {
       maxRequestBodySize: 50 * 1024 * 1024,
