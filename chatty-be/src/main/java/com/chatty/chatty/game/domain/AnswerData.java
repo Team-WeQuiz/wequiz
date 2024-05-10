@@ -2,8 +2,8 @@ package com.chatty.chatty.game.domain;
 
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ public class AnswerData {
     ) {
     }
 
-    private final Map<Long, PlayerAnswerData> playerAnswers = new ConcurrentHashMap<>();
+    private final Map<Long, PlayerAnswerData> playerAnswers = new HashMap<>();
     private final Integer playerNum;
     private final Integer majorityNum;
     private final String quizId;
@@ -35,7 +35,7 @@ public class AnswerData {
         return checkSubmitStatus();
     }
 
-    private SubmitStatus checkSubmitStatus() {
+    private synchronized SubmitStatus checkSubmitStatus() {
         int submitCount = playerAnswers.size();
         log.info("submitCount: {}", submitCount);
         log.info("playerAnswers.size(): {}", playerAnswers.size());
