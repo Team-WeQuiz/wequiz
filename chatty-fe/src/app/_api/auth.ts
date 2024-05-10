@@ -130,3 +130,21 @@ export const changePassword = async (
     else throw new Error('오류가 발생했습니다.');
   }
 };
+
+export const uploadProfile = async (file: File, accessToken: string) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await client.post('/users/profile-image', formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('오류가 발생했습니다.');
+  }
+};

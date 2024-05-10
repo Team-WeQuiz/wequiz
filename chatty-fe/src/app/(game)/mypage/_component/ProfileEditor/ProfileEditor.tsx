@@ -8,6 +8,9 @@ import Modal from '@/app/_components/Modal/Modal';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import SolidButton from '@/app/_components/SolidButton';
+import { uploadProfile } from '@/app/_api/auth';
+import useAuthStore from '@/app/_store/useAuthStore';
+import { revalidatePath } from 'next/cache';
 
 const ProfileEditor = ({ profile }: { profile: string }) => {
   const { isOpen, openModal, closeModal } = useModal();
@@ -15,6 +18,7 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const [cropper, setCropper] = useState<Cropper | null>(null);
   const [croppedImageFile, setCroppedImageFile] = useState<File[] | null>(null);
+  const { accessToken } = useAuthStore();
 
   const handleEditButtonClick = () => {
     document.getElementById('profileImageInput')?.click();
@@ -70,10 +74,16 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
               });
 
               setCroppedImageFile([newImage]);
-              
+
               const reader = new FileReader();
 
               reader.readAsDataURL(newImage);
+              try {
+                uploadProfile(newImage, accessToken);
+                revalidatePath('/mypage');
+              } catch (error) {
+                console.error('error: ', error);
+              }
             }
             setSelectedFile(null);
             closeModal();
@@ -86,11 +96,9 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
     <div className={styles.profileWrapper}>
       <Image
         src={
-          croppedImageFile
-            ? URL.createObjectURL(croppedImageFile[0])
-            : profile && profile !== 'bit.ly/wequiz_profile_image'
-              ? profile
-              : '/images/Empty_profile.svg'
+          profile && profile !== 'bit.ly/wequiz_profile_image'
+            ? profile
+            : '/images/Empty_profile.svg'
         }
         alt="user_profile"
         width={120}

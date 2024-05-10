@@ -28,41 +28,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   // 퀴즈 생성 완료 체크
   const [isQuizReady, setIsQuizReady] = useState(false);
 
-  // quiz 생성 확인
-  const getQuiz = (roomId: number, accessToken: string) => {
-    if (isConnected) {
-      stompClient.publish({
-        destination: `/pub/rooms/${roomId}/quiz`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-    }
-  };
-
   // polling
-  const startQuizPolling = (roomId: number, accessToken: string) => {
-    return setInterval(() => {
-      getQuiz(roomId, accessToken);
-    }, 3000);
-  };
-
-  useEffect(() => {
-    console.log('allUsersReady:', allUsersReady);
-    if (!accessToken) return;
-    let interval: NodeJS.Timeout | null = null;
-    if (allUsersReady && !isQuizReady) {
-      interval = startQuizPolling(params.id, accessToken);
-    } else {
-      if (interval) clearInterval(interval);
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [allUsersReady, accessToken, isQuizReady]);
 
   // 연결 해제
   const disconnect = () => {
@@ -102,6 +68,13 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         console.log('Received status message:', chatMessage);
         // join 신호
         updateUsers(chatMessage.playerStatuses);
+        chatMessage.playerStatuses.forEach((player: any) => {
+          if (player.userId === userId) {
+            if (player.nickname !== nickname) {
+              joinRoom(params.id);
+            }
+          }
+        });
       });
     };
 
@@ -150,6 +123,19 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       });
     };
 
+    // quiz 생성 확인
+    const getQuiz = (userId: number | undefined, roomId: number) => {
+      stompClient.subscribe(
+        `/user/${userId}/queue/rooms/${roomId}/quizReady`,
+        (message) => {
+          const quizReady = JSON.parse(message.body);
+          if (quizReady.isReady) {
+            setIsQuizReady(true);
+          }
+        },
+      );
+    };
+
     stompClient.beforeConnect = () => {
       console.log('Connecting to WebSocket token: ', accessToken);
       stompClient.configure({
@@ -170,6 +156,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       subscribeToChat(params.id);
       joinRoom(params.id);
       subscribeToDescription(userId, params.id);
+      getQuiz(userId, params.id);
       setIsSubscribed(true);
       subscribeQuiz(params.id);
     };
