@@ -73,7 +73,6 @@ public class MinioRepository {
     public String getProfileImageUrl(String fileName) {
         Map<String, String> reqParams = new HashMap<>();
         String contentType = "image/" + fileName.split("\\.")[1];
-        log.info(contentType);
         reqParams.put("response-content-type", contentType);
         try {
             return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
