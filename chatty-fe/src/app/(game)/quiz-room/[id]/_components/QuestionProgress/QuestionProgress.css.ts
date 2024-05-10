@@ -7,6 +7,13 @@ export const Wrapper = style({
   alignItems: 'center',
 });
 
+export const WrapperColumn = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 36,
+  alignItems: 'center',
+});
+
 export const Container = style({
   position: 'relative',
   display: 'inline-block',

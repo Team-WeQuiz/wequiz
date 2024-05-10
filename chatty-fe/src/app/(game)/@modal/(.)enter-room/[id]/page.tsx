@@ -14,7 +14,7 @@ const EnterRoomModal = ({
 
   const creation = Boolean(searchParams.get('create')) || false;
 
-  console.log('creation', creation);
+
   const handleBack = () => {
     if (creation) return;
     router.back();

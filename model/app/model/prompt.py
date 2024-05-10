@@ -14,7 +14,7 @@ CORRECT ANSWER:
 JSON_FORMAT_TEMPLATE = """
 Convert the below exam question to match the OUTPUT format.
 If you don't match the format correctly, I'm in danger.
-Be sure to write in Korean.
+Be sure to write in polite Korean.
 
 
 EXAM QUESTION:
@@ -68,7 +68,7 @@ Here is a set of summaries:
 {docs}
 
 Please summarize these into 3 lines or less by integrating them.
-Please answer in Korean.
+Please answer in polite Korean.
 
 YOUR ANSWER:"""
 

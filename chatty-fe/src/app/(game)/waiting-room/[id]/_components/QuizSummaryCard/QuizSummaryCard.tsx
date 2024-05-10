@@ -3,19 +3,22 @@ import { useEffect, useState } from 'react';
 
 const QuizSummaryCard = ({ summary }: { summary: string }) => {
   const [text, setText] = useState<string>('');
+  const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
     if (!summary) return;
     let i = 0;
     const interval = setInterval(() => {
-      if (summary[i] !== undefined) {
-        setText((prev: string) => prev + summary[i]);
+      setText((prevText) => {
+        let newText = '';
+        newText = prevText + summary[i];
         i++;
-      }
+        return newText;
+      });
       if (i === summary.length - 1) {
         clearInterval(interval);
       }
-    }, 50);
+    }, 150);
     return () => clearInterval(interval);
   }, [summary]);
 

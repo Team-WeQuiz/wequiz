@@ -1,6 +1,7 @@
 package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
+import com.chatty.chatty.game.controller.dto.QuizReadyResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
@@ -70,7 +71,6 @@ public class GameService {
         return buildDTO(roomId, playersStatus);
     }
 
-
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()
                 .roomId(roomId)
@@ -78,19 +78,22 @@ public class GameService {
                 .build();
     }
 
-    public QuizResponse sendQuiz(Long roomId) {
-        QuizData quizData = gameRepository.getQuizData(roomId);
+    private synchronized void initQuiz(QuizData quizData) {
         if (quizData.getQuizDTOQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
             fillQuiz(quizData);
             log.info("Fill: QuizQueue: {}", quizData.getQuizDTOQueue());
         }
-        log.info("Send: Quiz: {}", quizData.getQuiz());
+    }
+
+    public QuizResponse sendQuiz(Long roomId) {
+        QuizData quizData = gameRepository.getQuizData(roomId);
+        initQuiz(quizData);
+        log.info("Send: Quiz: {}", gameRepository.getQuizData(roomId).getQuiz());
         answerRepository.getAnswerData(roomId);
         return buildQuizResponse(quizData);
     }
 
-    @Async
-    protected void fillQuiz(QuizData quizData) {
+    private void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
         List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
                 currentRound, QUIZ_SIZE);
@@ -106,7 +109,23 @@ public class GameService {
     }
 
     /*
-        subscription URL : /user/{userId}/queue/rooms/{roodId}/description
+        subscription URL : /user/{userId}/queue/rooms/{roomId}/quizReady
+    */
+    @Async
+    public void sendQuizReady(Long roomId, Long userId) {
+        QuizData quizData = gameRepository.getQuizData(roomId);
+        initQuiz(quizData);
+        template.convertAndSendToUser(
+                userId.toString(),
+                "/queue/rooms/" + roomId + "/quizReady",
+                QuizReadyResponse.builder()
+                        .isReady(true)
+                        .build()
+        );
+    }
+
+    /*
+        subscription URL : /user/{userId}/queue/rooms/{roomId}/description
      */
     @Async
     public void sendDescription(Long roomId, Long userId) {

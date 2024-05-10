@@ -90,12 +90,12 @@ class JSONFormatterChain(Chain):
 class QuizPipeline:
     def __init__(self, indices: object):
         self.indices = indices
-        self.retriever = self.indices.as_retriever(search_kwargs=dict(k=1))  # 인덱스 객체로부터 retriever 초기화
+        self.retriever = self.indices.as_retriever(search_kwargs=dict(k=2))  # 인덱스 객체로부터 retriever 초기화
         self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
         self.question_templates = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
         # self.output_schemas = [ChoiceOutput, ShortOutput]
         self.output_schemas = QuizOutput
-        self.types = ['1. Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
+        self.types = ['1. 5-Choice Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
         # (0: multiple choice, 1: short answer, 2: OX quiz)
 
     def generate_quiz(self, message: str) -> dict:

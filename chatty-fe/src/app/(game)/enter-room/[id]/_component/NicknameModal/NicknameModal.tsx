@@ -71,7 +71,13 @@ const NicknameModal = ({
             </div>
           </div>
           <div className={styles.buttonContainer}>
-            <GradButton type="submit" color="primary" fullWidth rounded>
+            <GradButton
+              type="submit"
+              color="primary"
+              fullWidth
+              rounded
+              disabled={!nickname}
+            >
               <span className={styles.buttonText}>다음</span>
             </GradButton>
           </div>
