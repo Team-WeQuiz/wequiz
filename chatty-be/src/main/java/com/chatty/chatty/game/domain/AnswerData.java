@@ -44,7 +44,7 @@ public class AnswerData {
         if (submitCount == playerNum) {
             log.info("ALL_SUBMITTED");
             return SubmitStatus.ALL_SUBMITTED;
-        } else if (submitCount == majorityNum) {
+        } else if (submitCount >= majorityNum) {
             log.info("MAJORITY");
             return SubmitStatus.MAJORITY_SUBMITTED;
         }
