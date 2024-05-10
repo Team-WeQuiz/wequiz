@@ -38,10 +38,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
         String profileImage;
-        if (user.getLoginType() != Provider.NORMAL && user.getProfileImage().startsWith("http")) {
-            profileImage = user.getProfileImage();
-        } else if (user.getProfileImage() == null) {
+        if (user.getProfileImage() == null) {
             profileImage = null;
+        } else if (user.getLoginType() != Provider.NORMAL && user.getProfileImage().startsWith("http")) {
+            profileImage = user.getProfileImage();
         } else {
             profileImage = minioRepository.getProfileImageUrl(user.getProfileImage());
         }
