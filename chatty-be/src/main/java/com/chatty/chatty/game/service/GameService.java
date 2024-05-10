@@ -89,6 +89,7 @@ public class GameService {
         QuizData quizData = gameRepository.getQuizData(roomId);
         initQuiz(quizData);
         log.info("Send: Quiz: {}", gameRepository.getQuizData(roomId).getQuiz());
+        answerRepository.getAnswerData(roomId);
         return buildQuizResponse(quizData);
     }
 
