@@ -91,8 +91,7 @@ public class GameService {
         return buildQuizResponse(quizData);
     }
 
-    @Async
-    protected void fillQuiz(QuizData quizData) {
+    private void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
         List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
                 currentRound, QUIZ_SIZE);
