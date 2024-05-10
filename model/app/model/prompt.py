@@ -68,7 +68,7 @@ Here is a set of summaries:
 {docs}
 
 Please summarize these into 3 lines or less by integrating them.
-Please answer in Korean.
+Please answer in polite Korean.
 
 YOUR ANSWER:"""
 
