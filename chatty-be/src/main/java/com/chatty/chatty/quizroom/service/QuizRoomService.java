@@ -89,6 +89,7 @@ public class QuizRoomService {
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         validateRoomIfReady(quizRoom.getStatus());
         gameService.sendDescription(quizRoom.getId(), userId);
+        gameService.sendQuizReady(quizRoom.getId(), userId);
 
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
@@ -175,13 +176,13 @@ public class QuizRoomService {
                     if (quizRoom.getStatus() == Status.STARTED) {
                         return;
                     }
+                    validateRoomIfReady(quizRoom.getStatus());
+                    updateRoomStatus(quizRoom, Status.STARTED);
+                    savePlayersCount(quizRoom);
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
                     players.playerStatusSet()
                             .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));
                     userSubmitStatusRepository.init(players, roomId);
-                    savePlayersCount(quizRoom);
-                    validateRoomIfReady(quizRoom.getStatus());
-                    updateRoomStatus(roomId, Status.STARTED);
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
@@ -196,7 +197,7 @@ public class QuizRoomService {
                         return;
                     }
                     validateRoomIfStarted(quizRoom.getStatus());
-                    updateRoomStatus(roomId, Status.FINISHED);
+                    updateRoomStatus(quizRoom, Status.FINISHED);
                     gameRepository.clearQuizData(roomId);
                     playersStatusRepository.clear(roomId);
                     userSubmitStatusRepository.clear(roomId);
@@ -210,8 +211,9 @@ public class QuizRoomService {
         quizRoomRepository.save(quizRoom);
     }
 
-    private void updateRoomStatus(Long roomId, Status status) {
-        quizRoomRepository.updateStatusById(roomId, status);
+    private void updateRoomStatus(QuizRoom quizRoom, Status status) {
+        quizRoom.setStatus(status);
+        quizRoomRepository.save(quizRoom);
     }
 
     public void broadcastUpdatedRoomList() {
