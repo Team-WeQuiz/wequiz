@@ -1,5 +1,5 @@
 # WeQuiz ML Server
-.
+
 ## Overview
 1. 문서 요약
 2. 문제 생성

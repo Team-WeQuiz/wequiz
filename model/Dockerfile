@@ -1,5 +1,5 @@
 # Use the official Python image as a base
-FROM python:3.10
+FROM python:3.10 AS builder
 
 # Set the working directory in the container
 WORKDIR /
@@ -33,6 +33,8 @@ RUN python3.10 -m pip install mecab-python3
 
 # Install AWS CLI
 RUN pip install awscli
+
+FROM builder AS app
 
 # Copy the current directory contents into the container at /app
 COPY app /app
