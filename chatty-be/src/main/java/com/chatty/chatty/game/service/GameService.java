@@ -88,12 +88,8 @@ public class GameService {
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         initQuiz(quizData);
-        QuizDTO peekedQuiz = quizData.getQuiz();
-        while (!peekedQuiz.questionNumber().equals(quizData.getNextQuizNumber())) {
-            peekedQuiz = quizData.getQuiz();
-        }
-        log.info("Send: Quiz: {}", peekedQuiz);
-        answerRepository.initAnswerDataIfAbsent(roomId);
+        log.info("Send: Quiz: {}", gameRepository.getQuizData(roomId).getQuiz());
+        answerRepository.getAnswerData(roomId);
         return buildQuizResponse(quizData);
     }
 
@@ -106,9 +102,10 @@ public class GameService {
         log.info("filled queue: {}", quizData.getQuizDTOQueue());
     }
 
-    public void removeQuiz(QuizData quizData) {
-        log.info("Remove: removedQuiz: {}", quizData.getQuizDTOQueue().peek());
-        quizData.removeQuiz();
+    public QuizDTO removeQuiz(Long roomId) {
+        QuizData quizData = gameRepository.getQuizData(roomId);
+        log.info("Remove: QuizQueue: {}", quizData.getQuizDTOQueue());
+        return quizData.removeQuiz();
     }
 
     /*
@@ -159,32 +156,24 @@ public class GameService {
     }
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
-        QuizData quizData = gameRepository.getQuizData(roomId);
-        // 플레이어 답안 맵에 답안 추가
         AnswerData answerData = answerRepository.getAnswerData(roomId);
-        if (!request.quizNumber().equals(quizData.getNextQuizNumber() - 1)) {
-            request = new SubmitAnswerRequest(request.quizNumber(), "");
-        }
         Boolean submitStatus = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
-
-        // 플레이어 제출 현황 갱신
         UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.submit(roomId, userId);
-
         long submitCount = usersSubmitStatus.usersSubmitStatus().stream()
                 .filter(UserSubmitStatus::isSolved)
                 .count();
-        // 전체 제출일 때 처리
+
         if (submitCount == usersSubmitStatus.usersSubmitStatus().size()) {
             log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
-            // ML에 플레이어들 답안 넘겨서 채점 요청 후 채점 문서 id 저장
-            QuizDTO solvedQuiz = quizData.getQuiz();
+            QuizDTO removedQuiz = removeQuiz(roomId);
+
             QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
             MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
                     .id(quizRoom.getQuizDocId())
-                    .quiz_id(solvedQuiz.id())
+                    .quiz_id(removedQuiz.id())
                     .question_number(answerData.getQuizNum())
-                    .correct(solvedQuiz.correct())
+                    .correct(removedQuiz.correct())
                     .answers(getAnswers(answerData.getPlayerAnswers()))
                     .build());
             if (quizRoom.getMarkDocId() == null) {
@@ -192,18 +181,13 @@ public class GameService {
                 quizRoomRepository.save(quizRoom);
             }
 
-            // 점수 갱신
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
             log.info("ScoreMap: {}", scoreData.getPlayersScore());
 
-            // 플레이어 제출 상태, 답안 맵 초기화
             PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
             userSubmitStatusRepository.init(players, roomId);
             answerRepository.clearAnswerData(roomId);
-
-            // 퀴즈 큐에서 직전 문제 삭제
-            removeQuiz(quizData);
         }
         return SubmitAnswerResponse.builder()
                 .isMajority(submitStatus)
