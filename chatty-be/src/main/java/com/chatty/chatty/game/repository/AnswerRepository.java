@@ -11,10 +11,12 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class AnswerRepository {
 
     private static final Map<Long, AnswerData> answerDataMap = new ConcurrentHashMap<>();
@@ -43,5 +45,6 @@ public class AnswerRepository {
 
     public void clearAnswerData(Long roomId) {
         answerDataMap.remove(roomId);
+        log.info("Clear Answer Map: answerDataMap.get(roomId): {}", answerDataMap.get(roomId));
     }
 }

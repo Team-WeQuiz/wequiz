@@ -15,7 +15,7 @@ import com.chatty.chatty.game.domain.AnswerData;
 import com.chatty.chatty.game.domain.AnswerData.PlayerAnswerData;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.ScoreData;
-import com.chatty.chatty.game.domain.SubmitStatus;
+import com.chatty.chatty.game.domain.UserSubmitStatus;
 import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
@@ -157,11 +157,14 @@ public class GameService {
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
         AnswerData answerData = answerRepository.getAnswerData(roomId);
-        SubmitStatus status = answerData.addAnswer(userId, request);
+        Boolean submitStatus = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
         UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.submit(roomId, userId);
+        long submitCount = usersSubmitStatus.usersSubmitStatus().stream()
+                .filter(UserSubmitStatus::isSolved)
+                .count();
 
-        if (status == SubmitStatus.ALL_SUBMITTED) {
+        if (submitCount == usersSubmitStatus.usersSubmitStatus().size()) {
             log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
             QuizDTO removedQuiz = removeQuiz(roomId);
 
@@ -187,7 +190,7 @@ public class GameService {
             answerRepository.clearAnswerData(roomId);
         }
         return SubmitAnswerResponse.builder()
-                .status(status)
+                .isMajority(submitStatus)
                 .timestamp(LocalDateTime.now())
                 .submitStatuses(usersSubmitStatus.usersSubmitStatus())
                 .build();
