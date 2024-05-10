@@ -36,6 +36,7 @@ public class GameRepository {
                 .timestamp(quizRoom.getCreatedAt().toString())
                 .totalRound(quizRoom.getNumOfQuiz() / QUIZ_PER_ROUND)
                 .currentRound(DEFAULT_ROUND)
+                .nextQuizNumber(1)
                 .build();
     }
 
