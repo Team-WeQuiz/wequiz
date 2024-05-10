@@ -40,6 +40,8 @@ public class UserService {
         String profileImage;
         if (user.getLoginType() != Provider.NORMAL && user.getProfileImage().startsWith("http")) {
             profileImage = user.getProfileImage();
+        } else if (user.getProfileImage() == null) {
+            profileImage = null;
         } else {
             profileImage = minioRepository.getProfileImageUrl(user.getProfileImage());
         }
