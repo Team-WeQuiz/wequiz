@@ -95,7 +95,7 @@ class QuizPipeline:
         self.question_templates = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
         # self.output_schemas = [ChoiceOutput, ShortOutput]
         self.output_schemas = QuizOutput
-        self.types = ['1. Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
+        self.types = ['1. 5-Choice Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
         # (0: multiple choice, 1: short answer, 2: OX quiz)
 
     def generate_quiz(self, message: str) -> dict:
