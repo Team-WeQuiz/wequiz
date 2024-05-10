@@ -41,6 +41,9 @@ public class User extends BaseEntity {
     @Builder.Default
     private Boolean isValid = false;
 
+    @Column
+    private String profileImage;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -48,5 +51,9 @@ public class User extends BaseEntity {
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    public void changeProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }
