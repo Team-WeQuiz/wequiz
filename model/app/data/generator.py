@@ -5,7 +5,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 from model.chain import QuizPipeline
-from data.settings import QUIZ_GENERATE_RETRY
+from data.settings import QUIZ_GENERATE_RETRY, QUIZ_LENGTH_MIN_LIMIT
 from utils.logger import *
 from utils.exception import *
 # 로깅 설정
@@ -42,6 +42,10 @@ class QuizGenerator():
                 response = self.chain.generate_quiz(keyword)["quiz"]
                 log("info", f'[generator.py > quiz] quiz generated. {response}')
 
+                question = response["text"]["question"]
+                if len(question) <= QUIZ_LENGTH_MIN_LIMIT:
+                    raise QuizGenerationException(f"Generated quiz is shorter than threshold({QUIZ_LENGTH_MIN_LIMIT}). length: {len(question)}")
+
                 type = self.get_type(response["text"]["type"])
                 options = self.set_options(type, response["text"]["choices"])
                 if type == "OX퀴즈": type = "객관식"    # ox퀴즈도 객관식으로 설정
@@ -55,7 +59,7 @@ class QuizGenerator():
                     "id": f'quiz-{uuid.uuid4()}',
                     "question_number": question_number,
                     "type": type,
-                    "question": response["text"]["question"],
+                    "question": question,
                     "options": options,
                     "correct": response["text"]["correct"]
                 }
