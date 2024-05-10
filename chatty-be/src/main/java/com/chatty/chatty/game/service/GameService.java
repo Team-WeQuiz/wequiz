@@ -1,6 +1,7 @@
 package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
+import com.chatty.chatty.game.controller.dto.QuizReadyResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse.PlayerScoreDTO;
@@ -70,7 +71,6 @@ public class GameService {
         return buildDTO(roomId, playersStatus);
     }
 
-
     private PlayersStatusDTO buildDTO(Long roomId, PlayersStatus playersStatus) {
         return PlayersStatusDTO.builder()
                 .roomId(roomId)
@@ -78,16 +78,17 @@ public class GameService {
                 .build();
     }
 
+    private synchronized void initQuiz(QuizData quizData) {
+        if (quizData.getQuizDTOQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
+            fillQuiz(quizData);
+            log.info("Fill: QuizQueue: {}", quizData.getQuizDTOQueue());
+        }
+    }
+
     public QuizResponse sendQuiz(Long roomId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        synchronized (this) {
-            if (quizData.getQuizDTOQueue().isEmpty() && quizData.getCurrentRound() < quizData.getTotalRound()) {
-                fillQuiz(quizData);
-                log.info("Fill: QuizQueue: {}", quizData.getQuizDTOQueue());
-            }
-        }
-        log.info("Send: Quiz: {}", quizData.getQuiz());
-        answerRepository.getAnswerData(roomId);
+        initQuiz(quizData);
+        log.info("Send: Quiz: {}", gameRepository.getQuizData(roomId).getQuiz());
         return buildQuizResponse(quizData);
     }
 
@@ -107,7 +108,23 @@ public class GameService {
     }
 
     /*
-        subscription URL : /user/{userId}/queue/rooms/{roodId}/description
+        subscription URL : /user/{userId}/queue/rooms/{roomId}/quizReady
+    */
+    @Async
+    public void sendQuizReady(Long roomId, Long userId) {
+        QuizData quizData = gameRepository.getQuizData(roomId);
+        initQuiz(quizData);
+        template.convertAndSendToUser(
+                userId.toString(),
+                "/queue/rooms/" + roomId + "/quizReady",
+                QuizReadyResponse.builder()
+                        .isReady(true)
+                        .build()
+        );
+    }
+
+    /*
+        subscription URL : /user/{userId}/queue/rooms/{roomId}/description
      */
     @Async
     public void sendDescription(Long roomId, Long userId) {
