@@ -62,7 +62,7 @@ export default function ResultPage({ params }: { params: { id: number } }) {
 
   return (
     <div className={styles.Container}>
-      <div className={styles.SideBarWrapper}>
+      {/* <div className={styles.SideBarWrapper}>
         <div className={styles.SideBar}>
           <QuestionProgess
             questionNumber={results.length}
@@ -70,7 +70,7 @@ export default function ResultPage({ params }: { params: { id: number } }) {
             direction="column"
           />
         </div>
-      </div>
+      </div> */}
       <div className={styles.ContentsContainer}>
         <div className={styles.ContentsBox}>
           <div className={styles.ContentsWrapper}>

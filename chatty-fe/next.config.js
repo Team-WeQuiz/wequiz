@@ -12,6 +12,11 @@ const nextConfig = {
     });
     return config;
   },
+  serverRuntimeConfig: {
+    httpServerOptions: {
+      maxRequestBodySize: 50 * 1024 * 1024,
+    },
+  },
 };
 
 module.exports = withVanillaExtract(nextConfig);

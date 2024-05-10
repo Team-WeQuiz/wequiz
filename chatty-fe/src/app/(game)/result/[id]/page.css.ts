@@ -10,7 +10,7 @@ export const SideBarWrapper = style({
   width: 80,
   height: '100%',
   flexShrink: 0,
-  boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+  //   boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
 });
 
 export const SideBar = style({
@@ -23,9 +23,7 @@ export const SideBar = style({
 
 export const ContentsContainer = style({
   display: 'flex',
-  flex: 1,
   justifyContent: 'center',
-  height: '100%',
   padding: 20,
   paddingTop: 0,
 });
@@ -34,7 +32,6 @@ export const ContentsBox = style({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
   gap: 60,
   borderRadius: 20,
@@ -45,7 +42,6 @@ export const ContentsWrapper = style({
   display: 'flex',
   width: '100%',
   flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
   gap: 24,
 });
