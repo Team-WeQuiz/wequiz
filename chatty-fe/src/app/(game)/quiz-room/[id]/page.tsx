@@ -187,7 +187,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       },
       body: JSON.stringify({
         quizNum: quizSet?.quizNumber,
-        playerAnswer: userAnswer,
+        playerAnswer: userAnswer === null ? '' : userAnswer,
       }),
     });
   };
