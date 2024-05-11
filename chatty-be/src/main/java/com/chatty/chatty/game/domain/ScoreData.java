@@ -13,13 +13,17 @@ import lombok.Getter;
 
 @Getter
 public class ScoreData {
+
     @Getter
     public static class PlayerScore {
+
         private final String nickname;
+        private final String profileImage;
         private Integer score;
 
-        public PlayerScore(String nickname, Integer score) {
+        public PlayerScore(String nickname, String profileImage, Integer score) {
             this.nickname = nickname;
+            this.profileImage = profileImage;
             this.score = score;
         }
 
@@ -34,7 +38,7 @@ public class ScoreData {
     public ScoreData(PlayersStatus playersStatus) {
         Set<PlayerStatus> statusSet = playersStatus.playerStatusSet();
         for (PlayerStatus status : statusSet) {
-            this.playersScore.put(status.userId(), new PlayerScore(status.nickname(), 0));
+            this.playersScore.put(status.userId(), new PlayerScore(status.nickname(), status.profileImage(), 0));
         }
     }
 

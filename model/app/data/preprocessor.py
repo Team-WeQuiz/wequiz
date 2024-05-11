@@ -1,14 +1,15 @@
-import tiktoken
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
+
+import tiktoken
+import asyncio
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.parsers.pdf import (
     PDFMinerParser,
     PyMuPDFParser,
     PyPDFium2Parser,
 )
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 
 from data.settings import *
 from utils.security import get_minio_access_key

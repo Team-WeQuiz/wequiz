@@ -88,20 +88,20 @@ public class MinioRepository {
     }
 
     public void deleteFiles(List<String> fileNames) {
-        try {
-            for (String fileName : fileNames) {
-                deleteFile(fileName);
-            }
-        } catch (Exception e) {
-            throw new MinioException(FAILED_TO_DELETE_FILE);
+        for (String fileName : fileNames) {
+            deleteFile(fileName);
         }
     }
 
-    private void deleteFile(String fileName) throws Exception {
-        minioClient.removeObject(RemoveObjectArgs.builder()
-                .bucket(pdfBucketName)
-                .object(fileName)
-                .build());
+    public void deleteFile(String fileName) {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(pdfBucketName)
+                    .object(fileName)
+                    .build());
+        } catch (Exception e) {
+            throw new MinioException(FAILED_TO_DELETE_FILE);
+        }
     }
 
     private String filePathBuilder(Long userId, LocalDateTime time) {

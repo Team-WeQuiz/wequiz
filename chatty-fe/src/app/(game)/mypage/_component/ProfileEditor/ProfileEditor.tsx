@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import * as styles from './ProfileEditor.css';
 import useModal from '@/app/_hooks/useModal';
@@ -8,9 +8,10 @@ import Modal from '@/app/_components/Modal/Modal';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import SolidButton from '@/app/_components/SolidButton';
-import { uploadProfile } from '@/app/_api/auth';
+import { getUserInfo, uploadProfile } from '@/app/_api/auth';
 import useAuthStore from '@/app/_store/useAuthStore';
 import { revalidatePath } from 'next/cache';
+import useUserInfoStore from '@/app/_store/useUserInfoStore';
 
 const ProfileEditor = ({ profile }: { profile: string }) => {
   const { isOpen, openModal, closeModal } = useModal();
@@ -19,6 +20,9 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
   const [cropper, setCropper] = useState<Cropper | null>(null);
   const [croppedImageFile, setCroppedImageFile] = useState<File[] | null>(null);
   const { accessToken } = useAuthStore();
+  const { setUserInfo } = useUserInfoStore();
+
+  useEffect(() => {}, [profile]);
 
   const handleEditButtonClick = () => {
     document.getElementById('profileImageInput')?.click();
@@ -64,7 +68,7 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
       // Get the cropped data as a Blob
       cropper
         .getCroppedCanvas({ width: 128, height: 128 })
-        .toBlob((blob: Blob | null) => {
+        .toBlob(async (blob: Blob | null) => {
           if (blob) {
             // Create a FormData object and append the original file
             const image = selectedFile;
@@ -80,7 +84,8 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
               reader.readAsDataURL(newImage);
               try {
                 uploadProfile(newImage, accessToken);
-                revalidatePath('/mypage');
+                const response = await getUserInfo(accessToken);
+                setUserInfo(response);
               } catch (error) {
                 console.error('error: ', error);
               }
@@ -115,7 +120,7 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
       </button>
       <input
         type="file"
-        accept="image/*"
+        accept="image/jpg, image/jpeg, image/png"
         onChange={handleFileInputChange}
         style={{ display: 'none' }}
         id="profileImageInput"

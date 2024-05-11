@@ -4,14 +4,18 @@ import { style } from '@vanilla-extract/css';
 export const mainContainer = style({
   display: 'flex',
   flexDirection: 'column',
+  width: '100%',
+  height: '100%',
+  flexWrap: 'unset',
+  alignItems: 'center',
 });
 
 export const container = style({
-  margin: 'auto',
   display: 'flex',
   flexDirection: 'column',
   gap: 30,
   maxWidth: 1128,
+  width: '100%',
 });
 
 export const title = style({
@@ -30,9 +34,8 @@ export const contentsContainer = style({
 });
 
 export const contentsWrapper = style({
-  margin: 'auto',
-  display: 'inline-flex',
-  alignItems: 'center',
+  display: 'flex',
+  width: '100%',
   gap: 10,
 });
 
@@ -48,12 +51,19 @@ export const radioButtonWrapper = style({
   border: `1px solid ${globals.color.black_6}`,
 });
 
-export const titleWrapper = style({
-  width: 956,
+export const defaultWrapper = style({
+  flexGrow: 1,
 });
 
-export const defaultWrapper = style({
-  width: 404,
+export const dividedWrapper = style({
+  display: 'flex',
+  gap: 10,
+  width: '100%',
+  '@media': {
+    '(max-width: 768px)': {
+      flexDirection: 'column',
+    },
+  },
 });
 
 export const buttonContainer = style({
@@ -61,6 +71,7 @@ export const buttonContainer = style({
   justifyContent: 'center',
   width: '100%',
   height: 60,
+  marginBottom: 40,
 });
 
 export const buttonWrapper = style({

@@ -41,3 +41,5 @@ jobs:
           context: ./chatty-be
           tags: leahpar0401/wequiz-be:latest
           platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha, mode=max

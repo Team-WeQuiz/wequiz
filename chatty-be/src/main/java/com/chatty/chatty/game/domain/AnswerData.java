@@ -12,11 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Slf4j
 public class AnswerData {
+
     @Builder
     public record PlayerAnswerData(
             String playerAnswer,
             LocalDateTime submittedTime
     ) {
+
     }
 
     private final Map<Long, PlayerAnswerData> playerAnswers = new ConcurrentHashMap<>();
@@ -27,7 +29,7 @@ public class AnswerData {
     private final String correct;
     private final LocalDateTime startedTime;
 
-    public synchronized SubmitStatus addAnswer(Long userId, SubmitAnswerRequest request) {
+    public Boolean addAnswer(Long userId, SubmitAnswerRequest request) {
         playerAnswers.put(userId, PlayerAnswerData.builder()
                 .playerAnswer(request.playerAnswer())
                 .submittedTime(LocalDateTime.now())
@@ -35,19 +37,16 @@ public class AnswerData {
         return checkSubmitStatus();
     }
 
-    private SubmitStatus checkSubmitStatus() {
+    public Boolean checkSubmitStatus() {
         int submitCount = playerAnswers.size();
         log.info("submitCount: {}", submitCount);
         log.info("playerAnswers.size(): {}", playerAnswers.size());
         log.info("playerNum: {}", playerNum);
         log.info("majorityNum: {}", majorityNum);
-        if (submitCount == playerNum) {
-            log.info("ALL_SUBMITTED");
-            return SubmitStatus.ALL_SUBMITTED;
-        } else if (submitCount == majorityNum) {
-            log.info("MAJORITY");
-            return SubmitStatus.MAJORITY_SUBMITTED;
+        if (submitCount >= majorityNum) {
+            log.info("MAJORITY Submitted");
+            return true;
         }
-        return SubmitStatus.PARTIAL_SUBMITTED;
+        return false;
     }
 }

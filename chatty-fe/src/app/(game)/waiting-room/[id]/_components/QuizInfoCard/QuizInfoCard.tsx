@@ -31,12 +31,6 @@ const QuizInfoCard = ({
         const response = await getQuizInfo(roomId, accessToken);
         setData(response);
       } catch (error: any) {
-        console.error('error: ', error);
-        if (error === 404) {
-          alert('방이 존재하지 않습니다.');
-          router.push('/main-lobby');
-          return;
-        }
         setData({
           roomId: 0,
           name: '정보를 불러오지 못했습니다.',
@@ -44,6 +38,8 @@ const QuizInfoCard = ({
           description: '',
           numOfQuiz: 0,
         });
+        alert(error.message);
+        router.push('/main-lobby');
       }
     };
     if (accessToken && isSubscribed) {

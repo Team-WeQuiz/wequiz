@@ -20,7 +20,8 @@ public record UsersSubmitStatus(
     public UsersSubmitStatus addUsersInRoom(PlayersStatus players) {
         players.playerStatusSet().forEach(
                 playerStatus -> usersSubmitStatus.add(
-                        UserSubmitStatus.init(playerStatus.userId(), playerStatus.nickname())
+                        UserSubmitStatus.init(playerStatus.userId(), playerStatus.nickname(),
+                                playerStatus.profileImage())
                 ));
         return new UsersSubmitStatus(usersSubmitStatus);
     }

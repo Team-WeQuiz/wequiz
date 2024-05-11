@@ -74,6 +74,7 @@ const UserQuizList = () => {
     useState('데이터를 불러오는 중 입니다');
 
   useEffect(() => {
+    console.log('accessToken: ', accessToken);
     const fetchData = async () => {
       try {
         const response = await getUsersQuiz(pageNum, accessToken);
@@ -88,7 +89,7 @@ const UserQuizList = () => {
       }
     };
     if (accessToken) fetchData();
-  }, [pageNum]);
+  }, [pageNum, accessToken]);
 
   const handlePagePrev = () => {
     if (pageNum > 1) {
@@ -102,12 +103,15 @@ const UserQuizList = () => {
 
   return (
     <div className={styles.quizListContainer}>
-      <p>{stateMessage}</p>
-      {quizList.length !== 0 && (
+      {quizList.length !== 0 ? (
         <>
           <div className={styles.quizListGrid}>
             {quizList.map((quiz, index) => (
-              <Link key={index} href="" className={styles.quizCard}>
+              <Link
+                key={index}
+                href={`/result/${quiz.roomId}`}
+                className={styles.quizCard}
+              >
                 <div className={styles.quizTitle}>{quiz.name}</div>
                 <div className={styles.quizDescription}>{quiz.description}</div>
               </Link>
@@ -123,6 +127,8 @@ const UserQuizList = () => {
             />
           </div>
         </>
+      ) : (
+        <p>{stateMessage}</p>
       )}
     </div>
   );

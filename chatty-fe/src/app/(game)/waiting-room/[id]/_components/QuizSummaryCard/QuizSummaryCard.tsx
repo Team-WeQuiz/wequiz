@@ -18,7 +18,7 @@ const QuizSummaryCard = ({ summary }: { summary: string }) => {
       if (i === summary.length - 1) {
         clearInterval(interval);
       }
-    }, 150);
+    }, 70);
     return () => clearInterval(interval);
   }, [summary]);
 
