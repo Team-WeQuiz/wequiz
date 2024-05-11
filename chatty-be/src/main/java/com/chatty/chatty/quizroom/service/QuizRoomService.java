@@ -138,6 +138,8 @@ public class QuizRoomService {
             List<PlayerAnswer> playerAnswers = new ArrayList<>();
             for (int playerIndex = 0; playerIndex < markDTO.markeds().size(); playerIndex++) {
                 MarkDTO.Marked marked = markDTO.markeds().get(playerIndex);
+                log.info("playerId: {}", marked.playerId());
+                log.info("playerAnswer: {}", marked.playerAnswer());
 
                 // Player 엔티티에서 닉네임 가져오기
                 String nickname = playerRepository.findByUserIdAndQuizRoomId(marked.playerId(), roomId)
@@ -146,9 +148,11 @@ public class QuizRoomService {
                 playerAnswers.add(
                         new PlayerAnswer(marked.playerId(), nickname, marked.playerAnswer(), marked.marking()));
             }
+            log.info("playerAnswers: {}", playerAnswers);
 
             // 정답률 계산
             int correctRate = calculateCorrectRate(playerAnswers);
+            log.info("correctRate: {}", correctRate);
 
             quizResultDTOList.add(QuizResultDTO.builder()
                     .quizNumber(quizDTO.questionNumber())
