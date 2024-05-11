@@ -43,7 +43,7 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
           <span>
             {submitStatus.find((status) => status.userId === userId)?.isSolved
               ? '🟢'
-              : '🟢'}
+              : '제출안함'}
           </span>
         </div>
         <div className={styles.EmojiContainer}>
@@ -78,7 +78,7 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
                 />
               </div>
               <div>{status.nickname}</div>
-              <span>{status.isSolved ? '🟢' : '🟢'}</span>
+              <span>{status.isSolved ? '🟢' : '제출안함'}</span>
             </div>
           ))}
       </div>
