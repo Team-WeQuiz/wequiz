@@ -9,8 +9,8 @@ export const getQuizInfo = async (id: number, accessToken: string) => {
     });
     return response.data;
   } catch (error: any) {
-    if (error.response && error.response.status) {
-      throw error.response.status;
+    if (error.response.data.exceptionCode > 1000) {
+      throw new Error(error.response.data.message);
     } else {
       console.error('error: ', error);
       throw new Error(error);
