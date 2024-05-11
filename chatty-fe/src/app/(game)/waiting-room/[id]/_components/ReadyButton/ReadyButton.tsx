@@ -48,8 +48,11 @@ const ReadyButton = ({
           const nextCount = prevCount - 1;
           if (nextCount === 0) {
             setToggleBlock(true);
-            // userStatuses에서 userId가 index 0 이면
-            if (userStatuses[0].userId === userId) {
+            // userStatuses에서 내 userId가 min값이면 퀴즈 시작
+            const minUserId = userStatuses.reduce((prev, curr) =>
+              prev.userId < curr.userId ? prev : curr,
+            ).userId;
+            if (minUserId === userId) {
               startQuiz(roomId, accessToken);
             }
           }
