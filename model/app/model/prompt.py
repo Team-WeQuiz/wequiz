@@ -67,7 +67,7 @@ REDUCE_TEMPLATE = """
 Here is a set of summaries:
 {docs}
 
-Please summarize these into 3 lines or less by integrating them.
+Please summarize these into 3 sentences by integrating them.
 Please answer in polite Korean.
 
 YOUR ANSWER:"""
