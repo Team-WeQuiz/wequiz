@@ -13,11 +13,19 @@ export const container = style({
 
 export const mainButton = style({
   cursor: 'pointer',
+  padding: 0,
+});
+
+export const buttonsWrapper = style({
+  display: 'flex',
+  gap: 12,
+  alignItems: 'center',
 });
 
 export const profileButton = style({
   position: 'relative',
   display: 'inline-block',
+  padding: 0,
 });
 
 export const dropdownMenu = style({
@@ -50,4 +58,16 @@ export const menuButton = style({
   ':hover': {
     backgroundColor: globals.color.black_7,
   },
+});
+
+export const musicPlayButton = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 48,
+  height: 48,
+  borderRadius: '50%',
+  padding: 0,
+  cursor: 'pointer',
+  backgroundColor: globals.color.blue_7,
 });

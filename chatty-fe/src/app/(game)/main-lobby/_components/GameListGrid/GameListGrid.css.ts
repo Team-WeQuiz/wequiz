@@ -14,6 +14,24 @@ export const gameListContainer = style({
   position: 'relative',
 });
 
+export const gameEmpty = style({
+  position: 'absolute',
+  top: '50%',
+  left: 'calc(50% - 24px)',
+  transform: 'translate(-50%, -50%)',
+  fontSize: 24,
+  color: '#fff',
+  textAlign: 'center',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 20,
+    },
+    '(max-width: 554px)': {
+      fontSize: 14,
+    },
+  },
+});
+
 export const gameListGrid = style({
   display: 'grid',
   gap: '24px',
@@ -58,11 +76,10 @@ export const gameListGrid = style({
 export const paginatorWrapper = style({
   position: 'absolute',
   bottom: 0,
-  width: '100%',
+  left: 'calc(50% - 24px)',
+  transform: 'translate(-50%, 0)',
   height: 60,
   display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
 });
 
 export const emptyCard = style({

@@ -85,9 +85,9 @@ export const chatMessage = style({
 
 export const profileImage = style({
   position: 'relative',
-  height: '75%',
-  minHeight: 80,
   top: 50,
+  display: 'flex',
+  justifyContent: 'center',
   '@media': {
     '(max-width: 768px)': {
       top: 0,

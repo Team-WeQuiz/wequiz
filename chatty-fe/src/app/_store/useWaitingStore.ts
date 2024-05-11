@@ -35,7 +35,9 @@ const useWaitingStore = create<WaitingStore>((set) => ({
         })
         .filter(Boolean) as UserStatus[];
 
-      const allUsersReady = updatedUserStatuses.every((user) => user.isReady);
+      const allUsersReady =
+        updatedUserStatuses.length > 0 &&
+        updatedUserStatuses.every((user) => user.isReady);
 
       return { userStatuses: updatedUserStatuses, allUsersReady };
     });
