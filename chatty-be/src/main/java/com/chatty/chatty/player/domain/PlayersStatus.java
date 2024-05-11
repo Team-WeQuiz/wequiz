@@ -18,6 +18,7 @@ public record PlayersStatus(
     }
 
     public PlayersStatus updateWithNewUser(Long userId, String nickname) {
+        playerStatusSet.removeIf(playerStatus -> playerStatus.userId().equals(userId));
         playerStatusSet.add(PlayerStatus.initNewUser(userId, nickname));
         return new PlayersStatus(playerStatusSet);
     }
