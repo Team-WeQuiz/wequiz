@@ -8,21 +8,24 @@ public record UserSubmitStatus(
 
         String nickname,
 
+        String profileImage,
+
         Boolean isSolved
 ) {
 
     private static final Boolean DEFAULT_SOLVED_STATUS = false;
     private static final Boolean SOLVED = true;
 
-    public static UserSubmitStatus init(Long userId, String nickname) {
+    public static UserSubmitStatus init(Long userId, String nickname, String profileImage) {
         return UserSubmitStatus.builder()
                 .userId(userId)
                 .nickname(nickname)
+                .profileImage(profileImage)
                 .isSolved(DEFAULT_SOLVED_STATUS)
                 .build();
     }
 
     public UserSubmitStatus submit() {
-        return new UserSubmitStatus(userId, nickname, SOLVED);
+        return new UserSubmitStatus(userId, nickname, profileImage, SOLVED);
     }
 }

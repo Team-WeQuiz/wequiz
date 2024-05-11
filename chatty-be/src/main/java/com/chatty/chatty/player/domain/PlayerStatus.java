@@ -6,22 +6,27 @@ import lombok.Builder;
 @Builder
 public record PlayerStatus(
         Long userId,
+
         Boolean isReady,
+
+        String profileImage,
+        
         String nickname
 ) {
 
     private static final Boolean DEFAULT_READY_STATUS = false;
 
-    public static PlayerStatus initNewUser(Long userId, String nickname) {
+    public static PlayerStatus initNewUser(Long userId, String nickname, String profileImage) {
         return PlayerStatus.builder()
                 .userId(userId)
                 .isReady(DEFAULT_READY_STATUS)
                 .nickname(nickname)
+                .profileImage(profileImage)
                 .build();
     }
 
     public PlayerStatus toggleReady() {
-        return new PlayerStatus(userId, !isReady, nickname);
+        return new PlayerStatus(userId, !isReady, profileImage, nickname);
     }
 
     @Override
