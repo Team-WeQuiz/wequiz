@@ -43,9 +43,8 @@ const EnteringModals = ({
           isFull: response.maxPlayers <= response.numOfPlayers,
         }));
         openModal();
-      } catch (error) {
-        console.error('error: ', error);
-        alert('방 정보를 불러오는 중 오류가 발생했습니다.');
+      } catch (error: any) {
+        alert(error.message);
         router.push('/main-lobby');
       } finally {
         setRequestState((prev) => ({
