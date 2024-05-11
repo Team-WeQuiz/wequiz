@@ -125,6 +125,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         if (countData.second === -1) {
           getQuiz(params.id);
           setCount(3);
+          setIsAnswered(false);
         }
       },
       {
