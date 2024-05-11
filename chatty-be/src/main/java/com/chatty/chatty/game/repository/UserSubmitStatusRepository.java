@@ -3,7 +3,6 @@ package com.chatty.chatty.game.repository;
 import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

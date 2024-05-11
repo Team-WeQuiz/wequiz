@@ -13,12 +13,14 @@ import com.chatty.chatty.game.controller.dto.model.MarkRequest.AnswerDTO;
 import com.chatty.chatty.game.controller.dto.model.MarkResponse;
 import com.chatty.chatty.game.domain.AnswerData;
 import com.chatty.chatty.game.domain.AnswerData.PlayerAnswerData;
+import com.chatty.chatty.game.domain.Phase;
 import com.chatty.chatty.game.domain.QuizData;
 import com.chatty.chatty.game.domain.ScoreData;
 import com.chatty.chatty.game.domain.UserSubmitStatus;
 import com.chatty.chatty.game.domain.UsersSubmitStatus;
 import com.chatty.chatty.game.repository.AnswerRepository;
 import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.game.repository.PhaseRepository;
 import com.chatty.chatty.game.repository.ScoreRepository;
 import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
@@ -55,6 +57,7 @@ public class GameService {
     private final DynamoDBService dynamoDBService;
     private final ModelService modelService;
     private final SimpMessagingTemplate template;
+    private final PhaseRepository phaseRepository;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId, NicknameRequest request) {
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId, request.nickname());
@@ -218,5 +221,54 @@ public class GameService {
         return ScoreResponse.builder()
                 .scores(scores)
                 .build();
+    }
+
+    private SubmitAnswerResponse getSubmitAnswerResponse(Long roomId) {
+        AnswerData answerData = answerRepository.getAnswerData(roomId);
+        UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.findByRoomId(roomId);
+        return SubmitAnswerResponse.builder()
+                .isMajority(answerData.checkSubmitStatus())
+                .timestamp(LocalDateTime.now())
+                .submitStatuses(usersSubmitStatus.usersSubmitStatus())
+                .build();
+    }
+
+    public void getPhase(Long roomId, Long userId) {
+        Phase currentPhase = phaseRepository.getPhase(roomId);
+        QuizResponse quizResponse = sendQuiz(roomId);
+        switch (currentPhase) {
+            case QUIZ_SOLVING -> {
+                template.convertAndSendToUser(
+                        userId.toString(),
+                        "/queue/rooms/" + roomId + "/quiz",
+                        quizResponse
+                );
+                template.convertAndSend(
+                        "/sub/rooms/" + roomId + "/submit",
+                        getSubmitAnswerResponse(roomId)
+                );
+            }
+            case Phase.COUNTDOWN -> {
+                template.convertAndSendToUser(
+                        userId.toString(),
+                        "/queue/rooms/" + roomId + "/quiz",
+                        quizResponse
+                );
+                template.convertAndSend(
+                        "/sub/rooms/" + roomId + "/submit",
+                        getSubmitAnswerResponse(roomId)
+                );
+                //TODO: 카운트 다운 보내기
+            }
+            case Phase.RESULT -> {
+                ScoreResponse scoreResponse = sendScore(roomId);
+                template.convertAndSendToUser(
+                        userId.toString(),
+                        "/queue/rooms/" + roomId + "/score",
+                        scoreResponse
+                );
+                //TODO: 카운트 다운 보내기
+            }
+        }
     }
 }
