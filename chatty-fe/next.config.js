@@ -19,11 +19,6 @@ const nextConfig = {
         port: '9010',
       },
     ],
-    serverRuntimeConfig: {
-      httpServerOptions: {
-        maxRequestBodySize: 50 * 1024 * 1024,
-      },
-    },
   },
 };
 
