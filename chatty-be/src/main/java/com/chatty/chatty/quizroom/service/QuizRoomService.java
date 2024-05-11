@@ -38,6 +38,7 @@ import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import jakarta.persistence.OptimisticLockException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -210,7 +211,11 @@ public class QuizRoomService {
                     }
                     validateRoomIfReady(quizRoom.getStatus());
                     quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
-                    updateRoomStatus(quizRoom, Status.STARTED);
+                    try {
+                        updateRoomStatus(quizRoom, Status.STARTED);
+                    } catch (OptimisticLockException e) {
+                        throw new QuizRoomException(ROOM_NOT_READY);
+                    }
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
                     players.playerStatusSet()
                             .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));
