@@ -17,6 +17,7 @@ import com.chatty.chatty.user.exception.UserException;
 import com.chatty.chatty.user.repository.UserRepository;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -85,10 +86,15 @@ public class UserService {
         userRepository.findById(userId)
                 .ifPresent(user -> {
                     try {
+                        String existingProfileImage = user.getProfileImage();
+                        if (existingProfileImage != null && existingProfileImage
+                                .startsWith(String.valueOf(userId))) {
+                            minioRepository.deleteFile(existingProfileImage);
+                        }
                         String profileImageName = minioRepository.saveProfileImage(
                                 userId,
                                 request.file().getInputStream(),
-                                request.file().getContentType()
+                                Objects.requireNonNull(request.file().getContentType())
                         );
                         user.changeProfileImage(profileImageName);
                         userRepository.save(user);
