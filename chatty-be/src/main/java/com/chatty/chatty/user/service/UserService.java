@@ -38,6 +38,17 @@ public class UserService {
     public UserInfoResponse getUserInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+        String finalProfileImage = getProfileImageUrl(user);
+        return UserInfoResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .profileImage(finalProfileImage)
+                .isValid(user.getIsValid())
+                .loginType(user.getLoginType())
+                .build();
+    }
+
+    public String getProfileImageUrl(User user) {
         String profileImage;
         if (user.getProfileImage() == null) {
             profileImage = null;
@@ -46,14 +57,7 @@ public class UserService {
         } else {
             profileImage = minioRepository.getProfileImageUrl(user.getProfileImage());
         }
-        String finalProfileImage = profileImage;
-        return UserInfoResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .profileImage(finalProfileImage)
-                .isValid(user.getIsValid())
-                .loginType(user.getLoginType())
-                .build();
+        return profileImage;
     }
 
     public ParticipatedQuizRoomListResponse getParticipatedQuizRooms(Long userId, Integer page) {

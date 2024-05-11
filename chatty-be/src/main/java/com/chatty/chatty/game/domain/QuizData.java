@@ -31,4 +31,9 @@ public class QuizData {
     public QuizDTO removeQuiz() {
         return quizDTOQueue.poll();
     }
+
+    public boolean isQueueEmpty() {
+        return quizDTOQueue.isEmpty();
+
+    }
 }
