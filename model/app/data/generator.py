@@ -54,6 +54,10 @@ class QuizGenerator():
                         type = "단답형"
                     else:
                         type = "객관식"
+                
+                if type == "객관식":
+                    if len(options) <= 1:
+                        raise QuizGenerationException(f"Generated options insufficient. length: {len(options)}")
 
                 data = {
                     "id": f'quiz-{uuid.uuid4()}',
