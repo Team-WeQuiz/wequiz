@@ -106,6 +106,7 @@ public class QuizRoomService {
                 .maxPlayers(quizRoom.getPlayerLimitNum())
                 .description(quizRoom.getDescription())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
+                .isFull(playersStatusRepository.countPlayers(quizRoom.getId()) >= quizRoom.getPlayerLimitNum())
                 .build();
     }
 
@@ -211,11 +212,7 @@ public class QuizRoomService {
                     }
                     validateRoomIfReady(quizRoom.getStatus());
                     quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
-                    try {
-                        updateRoomStatus(quizRoom, Status.STARTED);
-                    } catch (OptimisticLockException e) {
-                        throw new QuizRoomException(ROOM_NOT_READY);
-                    }
+                    updateRoomStatus(quizRoom, Status.STARTED);
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
                     players.playerStatusSet()
                             .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));

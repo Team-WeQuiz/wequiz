@@ -15,7 +15,9 @@ public record RoomDetailResponse(
 
         String description,
 
-        Integer numOfQuiz
+        Integer numOfQuiz,
+
+        Boolean isFull
 ) {
 
 }
