@@ -49,7 +49,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor,
-            NicknameRequest request) {
+                                     NicknameRequest request) {
         quizRoomService.broadcastUpdatedRoomList();
         return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
     }
@@ -84,7 +84,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/submit")
     @SendTo("/sub/rooms/{roomId}/submit")
     public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
-            SimpMessageHeaderAccessor headerAccessor) {
+                                             SimpMessageHeaderAccessor headerAccessor) {
         return gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
     }
 
@@ -100,6 +100,7 @@ public class GameController {
                 "/queue/rooms/" + roomId + "/score",
                 scoreResponse
         );
+        gameService.scoreCountDown(roomId);
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
