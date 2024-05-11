@@ -112,7 +112,7 @@ export default function SignIn() {
               src="/images/kakao_button.svg"
               width={172}
               height={40}
-              alt="kakobutton"
+              alt="kakaobutton"
             />
           </button>
           <button className={styles.socialButton} onClick={handleGoogleLogin}>
