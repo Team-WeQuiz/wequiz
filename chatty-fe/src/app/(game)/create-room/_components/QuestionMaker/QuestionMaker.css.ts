@@ -8,7 +8,7 @@ export const Container = style({
 
 export const RadioWrapper = style({
   display: 'flex',
-  gap: 24,
+  gap: 10,
   justifyContent: 'space-between',
   width: '100%',
 });

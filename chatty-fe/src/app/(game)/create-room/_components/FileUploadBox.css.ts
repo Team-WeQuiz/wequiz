@@ -55,6 +55,7 @@ export const ddWrapper = style({
   color: '#999',
   fontSize: 16,
   fontWeight: 500,
+  cursor: 'pointer',
 });
 
 export const title = style({
@@ -88,4 +89,8 @@ export const FileDeleteButton = style({
   height: 16,
   backgroundColor: globals.color.black_6,
   cursor: 'pointer',
+});
+
+export const fileInput = style({
+  display: 'none',
 });

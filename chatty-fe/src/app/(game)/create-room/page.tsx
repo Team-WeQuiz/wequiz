@@ -16,7 +16,6 @@ export default function CreateRoom() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [numberOfParticipants, setNumberOfParticipants] = useState(1);
-  const [password, setPassword] = useState('');
   const [numberOfProblems, setNumberOfProblems] = useState(5);
   const [qustionType, setQuestionType] = useState<'list' | 'create'>('create');
 
@@ -40,7 +39,6 @@ export default function CreateRoom() {
         description,
         numberOfProblems,
         numberOfParticipants,
-        password,
         files,
       );
       console.log(response);
@@ -62,7 +60,7 @@ export default function CreateRoom() {
           {/* 방 제목 */}
           <div className={styles.contentsWrapper}>
             <ContentsBox imgSrc="/images/Home.svg" title="방 제목" />
-            <div className={styles.titleWrapper}>
+            <div className={styles.defaultWrapper}>
               <TextInputField
                 type="text"
                 value={title}
@@ -92,65 +90,55 @@ export default function CreateRoom() {
             </div>
           </div>
 
-          {/* 인원 수 */}
-          <div className={styles.contentsWrapper}>
-            <ContentsBox imgSrc="/images/Group_add.svg" title="인원 수" />
-            <div className={styles.defaultWrapper}>
-              <TextInputField
-                type="number"
-                value={String(numberOfParticipants)}
-                onChange={(e) => {
-                  if (Number(e.target.value) > 10) setNumberOfParticipants(10);
-                  else setNumberOfParticipants(Number(e.target.value));
-                }}
-                borderRadius={12}
-              />
+          <div className={styles.dividedWrapper}>
+            {/* 인원 수 */}
+            <div className={styles.contentsWrapper}>
+              <ContentsBox imgSrc="/images/Group_add.svg" title="인원 수" />
+              <div className={styles.defaultWrapper}>
+                <TextInputField
+                  type="number"
+                  value={String(numberOfParticipants)}
+                  onChange={(e) => {
+                    if (Number(e.target.value) > 10)
+                      setNumberOfParticipants(10);
+                    else setNumberOfParticipants(Number(e.target.value));
+                  }}
+                  borderRadius={12}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* 비밀번호 */}
-          <div className={styles.contentsWrapper}>
-            <ContentsBox imgSrc="/images/Key.svg" title="비밀번호" />
-            <div className={styles.defaultWrapper}>
-              <TextInputField
-                type="text"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                borderRadius={12}
-              />
-            </div>
-          </div>
-
-          {/* 문제 수 */}
-          <div className={styles.contentsWrapper}>
-            <ContentsBox imgSrc="/images/Book_open_alt.svg" title="문제 수" />
-            <div className={styles.defaultWrapper}>
-              <div className={styles.radioButtonWrapper}>
-                <input
-                  type="radio"
-                  id="5"
-                  name="numberOfProblems"
-                  value={5}
-                  onChange={() => setNumberOfProblems(5)}
-                  checked={numberOfProblems === 5}
-                />
-                <label htmlFor="5">5개</label>
-                <input
-                  type="radio"
-                  id="10"
-                  name="numberOfProblems"
-                  value={10}
-                  onChange={() => setNumberOfProblems(10)}
-                />
-                <label htmlFor="10">10개</label>
-                <input
-                  type="radio"
-                  id="15"
-                  name="numberOfProblems"
-                  value={15}
-                  onChange={() => setNumberOfProblems(15)}
-                />
-                <label htmlFor="15">15개</label>
+            {/* 문제 수 */}
+            <div className={styles.contentsWrapper}>
+              <ContentsBox imgSrc="/images/Book_open_alt.svg" title="문제 수" />
+              <div className={styles.defaultWrapper}>
+                <div className={styles.radioButtonWrapper}>
+                  <input
+                    type="radio"
+                    id="5"
+                    name="numberOfProblems"
+                    value={5}
+                    onChange={() => setNumberOfProblems(5)}
+                    checked={numberOfProblems === 5}
+                  />
+                  <label htmlFor="5">5개</label>
+                  <input
+                    type="radio"
+                    id="10"
+                    name="numberOfProblems"
+                    value={10}
+                    onChange={() => setNumberOfProblems(10)}
+                  />
+                  <label htmlFor="10">10개</label>
+                  <input
+                    type="radio"
+                    id="15"
+                    name="numberOfProblems"
+                    value={15}
+                    onChange={() => setNumberOfProblems(15)}
+                  />
+                  <label htmlFor="15">15개</label>
+                </div>
               </div>
             </div>
           </div>

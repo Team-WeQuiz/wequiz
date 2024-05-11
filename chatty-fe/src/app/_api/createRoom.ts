@@ -11,7 +11,6 @@ export const postRoom = async (
   description: string,
   numOfQuiz: number,
   playerLimitNum: number,
-  code: string,
   files: File[],
 ) => {
   try {
@@ -20,7 +19,6 @@ export const postRoom = async (
     formData.append('description', description);
     formData.append('numOfQuiz', String(numOfQuiz));
     formData.append('playerLimitNum', String(playerLimitNum));
-    formData.append('code', code);
     formData.append('files', files[0], files[0].name);
 
     // formData.append(`files`, fs.createReadStream(files[0].name));
