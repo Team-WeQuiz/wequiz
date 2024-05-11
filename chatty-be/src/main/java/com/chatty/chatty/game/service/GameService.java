@@ -246,9 +246,18 @@ public class GameService {
             seconds--;
         }
         // seconds == -1
+        // 제출 안 한애들 빈값으로 제출 처리
+        AnswerData answerData = answerRepository.getAnswerData(roomId);
+        UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.findByRoomId(roomId);
+        usersSubmitStatus.usersSubmitStatus().stream()
+                .filter(userSubmitStatus -> !userSubmitStatus.isSolved())
+                .forEach(userSubmitStatus -> {
+                    answerData.addAnswer(userSubmitStatus.userId(),
+                            SubmitAnswerRequest.builder().playerAnswer("").build());
+                    userSubmitStatus.submit();
+                });
         // 퀴즈 끝났으면 다음 퀴즈 반환 준비
         QuizDTO solvedQuiz = gameRepository.getQuizData(roomId).getQuiz();
-        AnswerData answerData = answerRepository.getAnswerData(roomId);
         log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
         markAndUpdateScore(roomId, solvedQuiz, answerData);
         resetState(roomId);
