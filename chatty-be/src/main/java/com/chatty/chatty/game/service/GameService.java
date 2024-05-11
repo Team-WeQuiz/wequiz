@@ -161,6 +161,10 @@ public class GameService {
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
         AnswerData answerData = answerRepository.getAnswerData(roomId);
         Boolean submitStatus = answerData.addAnswer(userId, request);
+        if (submitStatus) {
+            phaseRepository.update(roomId, Phase.COUNTDOWN);
+            log.info("Phase UPDATED: COUNTDOWN");
+        }
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
         UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.submit(roomId, userId);
         long submitCount = usersSubmitStatus.usersSubmitStatus().stream()
