@@ -19,10 +19,12 @@ const nextConfig = {
         port: '9010',
       },
       {
-        hostname: 'http://t1.kakaocdn.net',
+        protocol: 'http',
+        hostname: 't1.kakaocdn.net',
       },
       {
-        hostname: 'http://lh3.googleusercontent.com',
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
       },
     ],
   },
