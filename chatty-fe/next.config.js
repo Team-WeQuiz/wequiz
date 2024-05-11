@@ -18,6 +18,14 @@ const nextConfig = {
         hostname: '3.35.178.237',
         port: '9010',
       },
+      {
+        protocol: 'http',
+        hostname: '*.kakaocdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
+      },
     ],
   },
 };

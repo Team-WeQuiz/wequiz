@@ -64,7 +64,7 @@ const NicknameModal = ({
                 value={nickname}
                 placeholder={'닉네임을 설정해 주세요.'}
                 onChange={(e) => {
-                  setNickname(e.target.value);
+                  if (e.target.value.length <= 10) setNickname(e.target.value);
                 }}
                 borderRadius={12}
               />
