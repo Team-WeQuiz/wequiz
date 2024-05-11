@@ -14,7 +14,6 @@ import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
 import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
-import { useRouter } from 'next/navigation';
 import client from '@/app/_api/client';
 
 type QuizSet = {
@@ -27,7 +26,6 @@ type QuizSet = {
 };
 
 type SubmitStatus = {
-  // status: 'ALL_SUBMITTED' | 'MAJORITY_SUBMITTED' | 'PARTIAL_SUBMITTED';
   isMajority: boolean;
   time: string;
 };
@@ -39,94 +37,24 @@ type PlayerScore = {
 };
 
 const QuizRoom = ({ params }: { params: { id: number } }) => {
-  const [quizSet, setQuizSet] = useState<QuizSet>();
-  const [isAnswered, setIsAnswered] = useState(false); // => 제출 상태 체크
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
+  const [quizSet, setQuizSet] = useState<QuizSet | null>(null);
+  const [count, setCount] = useState(3);
+  const [scoreCount, setScoreCount] = useState(0);
+  const [scores, setScores] = useState<PlayerScore[]>([]);
+  const [isAnswered, setIsAnswered] = useState(false);
   const [userAnswer, setUserAnswer] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [scores, setScores] = useState<PlayerScore[] | null>(null);
-  const [count, setCount] = useState(4);
-  const [modalCount, setModalCount] = useState(10);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
-  const { isOpen, openModal, closeModal } = useModal();
-
-  const router = useRouter();
+  const { openModal, closeModal, isOpen } = useModal();
 
   const handleOptionChange = (option: string, index: number) => {
     setUserAnswer(option);
     setSelectedOption(index);
   };
 
-  const getScore = (roomId: number) => {
-    console.log('get Score');
-    stompClient.publish({
-      destination: `/pub/rooms/${roomId}/score`,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-  };
-
-  const endRoom = async () => {
-    await client.delete(`/rooms/${params.id}/end`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    openModal();
-    const interval = setInterval(() => {
-      setModalCount((currentCount) => {
-        if (currentCount === 0) {
-          closeModal();
-          clearInterval(interval);
-          router.push(`/result/${params.id}`);
-        }
-        return currentCount - 1;
-      });
-    }, 1000);
-  };
-
-  const endRoundCountDown = () => {
-    const interval = setInterval(() => {
-      setModalCount((currentCount) => {
-        if (currentCount === 0) {
-          closeModal();
-          clearInterval(interval);
-          getQuiz(params.id);
-          return 10;
-        }
-        return currentCount - 1;
-      });
-    }, 1000);
-  };
-
-  const countDown = () => {
-    const interval = setInterval(() => {
-      setCount((currentCount) => {
-        if (currentCount === 1) {
-          if (!isAnswered) {
-            submitQuiz(params.id);
-          }
-          clearInterval(interval);
-          setIsAnswered(false);
-          setSubmitStatus(null);
-          if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
-            getScore(params.id);
-            endRoom();
-          } else if (quizSet?.quizNumber === 5) {
-            getScore(params.id);
-            openModal();
-            endRoundCountDown();
-          }
-          getQuiz(params.id);
-          return 4;
-        }
-        return currentCount - 1;
-      });
-    }, 1000);
-  };
-
+  // 퀴즈 구독
   const subscribeQuiz = (roomId: number) => {
     stompClient.subscribe(
       `/user/${userId}/queue/rooms/${roomId}/quiz`,
@@ -140,16 +68,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       },
     );
   };
-  const getQuiz = (roomId: number) => {
-    setUserAnswer(null);
-    stompClient.publish({
-      destination: `/pub/rooms/${roomId}/quiz`,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    setSelectedOption(null);
-  };
+
+  // 제출 상태 구독
   const subscribeSubmitStatus = (roomId: number) => {
     stompClient.subscribe(
       `/sub/rooms/${roomId}/submit`,
@@ -164,6 +84,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     );
   };
 
+  // 중간 점수 구독
   const subscribeScore = (roomId: number) => {
     stompClient.subscribe(
       `/user/${userId}/queue/rooms/${roomId}/score`,
@@ -178,6 +99,79 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     );
   };
 
+  // 카운트다운 구독
+  const subscribeCount = (roomId: number) => {
+    stompClient.subscribe(
+      `/sub/rooms/${roomId}/quizCount`,
+      (count) => {
+        const countData = JSON.parse(count.body);
+        setCount(countData.second);
+        if (countData.second === 0) {
+          if (!isAnswered) {
+            submitQuiz(params.id);
+          }
+          getQuiz(params.id);
+          setCount(3);
+        }
+      },
+      {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    );
+  };
+
+  // 모달 카운트 구독
+  const subscribeScoreCount = (roomId: number) => {
+    stompClient.subscribe(
+      `/sub/rooms/${roomId}/scoreCount`,
+      (count) => {
+        const countData = JSON.parse(count.body);
+        if (!isOpen) {
+          openModal();
+        }
+        setCount(countData.second);
+        if (countData.second === 0) {
+          closeModal();
+        }
+      },
+      {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    );
+  };
+
+  // 페이즈 구독
+  const getPhase = (roomId: number) => {
+    stompClient.publish({
+      destination: `/pub/rooms/${roomId}/phase`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  };
+
+  // 퀴즈 가져오기
+  const getQuiz = (roomId: number) => {
+    setUserAnswer(null);
+    stompClient.publish({
+      destination: `/pub/rooms/${roomId}/quiz`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    setSelectedOption(null);
+  };
+
+  // 퀴즈 끝내기 요청
+  const deleteRoom = async () => {
+    const response = await client.delete(`/rooms/${params.id}/end`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  };
+
+  // 퀴즈 제출
   const submitQuiz = (roomId: number) => {
     setIsAnswered(true);
     stompClient.publish({
@@ -190,23 +184,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         playerAnswer: userAnswer === null ? '' : userAnswer,
       }),
     });
-  };
-
-  const getSubmitMessage = () => {
-    if (!isAnswered) return '';
-    // switch (submitStatus?.status) {
-    //   case 'PARTIAL_SUBMITTED':
-    //     return '다른 참여자가 답변을 제출할 때 까지 기다려주세요 :)';
-    //   case 'MAJORITY_SUBMITTED':
-    //   case 'ALL_SUBMITTED':
-    //     return '과반수의 답안이 제출되어 다음 퀴즈로 넘어갑니다.';
-    //   default:
-    //     return '';
-    // }
-    if (submitStatus?.isMajority) {
-      return '과반수의 답안이 제출되어 다음 퀴즈로 넘어갑니다.';
-    }
-    return '다른 참여자가 답변을 제출할 때 까지 기다려주세요 :)';
   };
 
   useEffect(() => {
@@ -223,27 +200,15 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       stompClient.onConnect = () => {
         console.log('connected');
         subscribeQuiz(params.id);
-        getQuiz(params.id);
         subscribeSubmitStatus(params.id);
         subscribeScore(params.id);
+        subscribeCount(params.id);
+        subscribeScoreCount(params.id);
+        getPhase(params.id);
       };
       stompClient.activate();
     }
   }, [accessToken, userId, params.id]);
-
-  useEffect(() => {
-    console.log(quizSet);
-  }, [quizSet]);
-
-  useEffect(() => {
-    console.log(params.id);
-  }, [params.id]);
-
-  useEffect(() => {
-    if (submitStatus?.isMajority) {
-      countDown();
-    }
-  }, [submitStatus, isAnswered]);
 
   return (
     <div className={styles.Main}>
@@ -283,13 +248,17 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           </div>
           <div className={styles.StatusWrapper}>
             {isAnswered && submitStatus?.isMajority ? (
-              <h1 className={styles.Count}>{count - 1}</h1>
+              <h1 className={styles.Count}>{count}</h1>
             ) : isAnswered && !submitStatus?.isMajority ? (
               <BarSpinner />
             ) : (
               ''
             )}
-            <div>{getSubmitMessage()}</div>
+            <div>
+              {isAnswered && submitStatus?.isMajority
+                ? '과반수 이상이 제출하였습니다.'
+                : '다른 플레이어가 문제를 제출할 때 까지 기다려주세용 :)'}
+            </div>
           </div>
           <div className={styles.ButtonWrapper}>
             <GradButton
@@ -312,7 +281,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         <ResultModal
           currentRound={quizSet?.currentRound || 0}
           users={scores || []}
-          count={modalCount}
+          count={scoreCount}
         />
       ) : null}
     </div>

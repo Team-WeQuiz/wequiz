@@ -18,19 +18,11 @@ const nextConfig = {
         hostname: '3.35.178.237',
         port: '9010',
       },
-      {
-        protocol: 'http',
-        hostname: 't1.kakaocdn.net',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.googleusercontent.com',
-      },
     ],
-  },
-  serverRuntimeConfig: {
-    httpServerOptions: {
-      maxRequestBodySize: 50 * 1024 * 1024,
+    serverRuntimeConfig: {
+      httpServerOptions: {
+        maxRequestBodySize: 50 * 1024 * 1024,
+      },
     },
   },
 };
