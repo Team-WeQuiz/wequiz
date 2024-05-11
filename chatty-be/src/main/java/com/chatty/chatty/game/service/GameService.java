@@ -1,5 +1,8 @@
 package com.chatty.chatty.game.service;
 
+import static com.chatty.chatty.game.domain.Phase.COUNTDOWN;
+import static com.chatty.chatty.game.domain.Phase.RESULT;
+
 import com.chatty.chatty.common.util.ThreadSleep;
 import com.chatty.chatty.game.controller.dto.CountDownResponse;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
@@ -33,6 +36,7 @@ import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import com.chatty.chatty.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -62,9 +66,12 @@ public class GameService {
     private final ModelService modelService;
     private final SimpMessagingTemplate template;
     private final PhaseRepository phaseRepository;
+    private final UserService userService;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId, NicknameRequest request) {
-        PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId, request.nickname());
+        String profileImageUrl = userService.getProfileImageUrl(userId);
+        PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId, request.nickname(),
+                profileImageUrl);
         return buildDTO(roomId, playersStatus);
     }
 
@@ -217,6 +224,14 @@ public class GameService {
     private void resetState(Long roomId) {
         // 직전 문제 삭제
         removeQuiz(roomId);
+        QuizData quizData = gameRepository.getQuizData(roomId);
+        if (quizData.isQueueEmpty()) {
+            phaseRepository.update(roomId, RESULT);
+            log.info("Phase UPDATED: RESULT");
+        } else {
+            phaseRepository.update(roomId, Phase.QUIZ_SOLVING);
+            log.info("Phase UPDATED: QUIZ_SOLVING");
+        }
         // 플레이어 제출 상태, 답안 맵 초기화
         PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
         userSubmitStatusRepository.init(players, roomId);
@@ -228,6 +243,7 @@ public class GameService {
         Integer seconds = QUIZ_COUNT_SECONDS;
         do {
             if (seconds.equals(0)) {
+                //미제출자 처리
                 resetState(roomId);
             }
             template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
@@ -294,8 +310,9 @@ public class GameService {
     public void getPhase(Long roomId, Long userId) {
         Phase currentPhase = phaseRepository.getPhase(roomId);
         QuizResponse quizResponse = sendQuiz(roomId);
+        ScoreResponse scoreResponse = sendScore(roomId);
         switch (currentPhase) {
-            case QUIZ_SOLVING -> {
+            case QUIZ_SOLVING, COUNTDOWN -> {
                 template.convertAndSendToUser(
                         userId.toString(),
                         "/queue/rooms/" + roomId + "/quiz",
@@ -306,27 +323,11 @@ public class GameService {
                         getSubmitAnswerResponse(roomId)
                 );
             }
-            case Phase.COUNTDOWN -> {
-                template.convertAndSendToUser(
-                        userId.toString(),
-                        "/queue/rooms/" + roomId + "/quiz",
-                        quizResponse
-                );
-                template.convertAndSend(
-                        "/sub/rooms/" + roomId + "/submit",
-                        getSubmitAnswerResponse(roomId)
-                );
-                //TODO: 카운트 다운 보내기
-            }
-            case Phase.RESULT -> {
-                ScoreResponse scoreResponse = sendScore(roomId);
-                template.convertAndSendToUser(
-                        userId.toString(),
-                        "/queue/rooms/" + roomId + "/score",
-                        scoreResponse
-                );
-                //TODO: 카운트 다운 보내기
-            }
+            case RESULT -> template.convertAndSendToUser(
+                    userId.toString(),
+                    "/queue/rooms/" + roomId + "/score",
+                    scoreResponse
+            );
         }
     }
 }
