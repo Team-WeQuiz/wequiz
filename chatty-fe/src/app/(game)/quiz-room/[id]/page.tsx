@@ -128,11 +128,15 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       `/sub/rooms/${roomId}/scoreCount`,
       (count) => {
         const countData = JSON.parse(count.body);
+        setScoreCount(countData.second);
         if (!isOpen) {
           openModal();
         }
         setCount(countData.second);
         if (countData.second === 0) {
+          if (quizSet?.totalRound === quizSet?.currentRound) {
+            deleteRoom();
+          }
           closeModal();
         }
       },
