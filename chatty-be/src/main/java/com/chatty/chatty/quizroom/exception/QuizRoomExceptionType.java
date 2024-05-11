@@ -11,7 +11,7 @@ public enum QuizRoomExceptionType implements ExceptionType {
     ROOM_NOT_STARTED(Status.BAD_REQUEST, 1004, "방이 시작 상태가 아닙니다"),
     ROOM_NOT_FINISHED(Status.BAD_REQUEST, 1005, "방이 종료 상태가 아닙니다"),
     NO_ROOM_FOUND_BY_CODE(Status.BAD_REQUEST, 1006, "코드에 해당하는 방이 없습니다"),
-    CODE_INVALID(Status.BAD_REQUEST, 1006, "코드가 유효하지 않습니다"),
+    CODE_INVALID(Status.BAD_REQUEST, 1007, "코드가 유효하지 않습니다"),
     ;
 
     private final Status status;
