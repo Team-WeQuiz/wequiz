@@ -76,11 +76,13 @@ YOUR ANSWER:"""
 
 MARK_TEMPLATE = """
 Here is correct answer.
-{answer}
+CORRECT ANSWER: '{answer}'
 
 Here is user's answer.
-{user}
+USER ANSWER: '{user}'
 
 If the user answer is correct, return True or False.
+If the user answer is empty string, treat it as a wrong answer.
+Please grade carefully. I'll give you a tip if you do. 
 
 YOUR ANSWER:"""
