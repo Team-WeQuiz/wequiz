@@ -1,5 +1,7 @@
 package com.chatty.chatty.game.service;
 
+import com.chatty.chatty.common.util.ThreadSleep;
+import com.chatty.chatty.game.controller.dto.CountDownResponse;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizReadyResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
@@ -45,6 +47,8 @@ import org.springframework.stereotype.Service;
 public class GameService {
 
     private static final Integer QUIZ_SIZE = 5;
+    private static final Integer QUIZ_COUNT_SECONDS = 3;
+    private static final Integer SCORE_COUNT_SECONDS = 7;
 
     private final QuizRoomRepository quizRoomRepository;
     private final PlayersStatusRepository playersStatusRepository;
@@ -156,24 +160,33 @@ public class GameService {
     }
 
     public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
+        QuizDTO solvedQuiz = gameRepository.getQuizData(roomId).getQuiz();
         AnswerData answerData = answerRepository.getAnswerData(roomId);
+        // 플레이어 답안 맵에 답안 추가
         Boolean submitStatus = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
+
+        // 플레이어 제출 현황 갱신
         UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.submit(roomId, userId);
-        long submitCount = usersSubmitStatus.usersSubmitStatus().stream()
+        int submitCount = (int) usersSubmitStatus.usersSubmitStatus().stream()
                 .filter(UserSubmitStatus::isSolved)
                 .count();
 
-        if (submitCount == usersSubmitStatus.usersSubmitStatus().size()) {
+        // 과반수 제출일 때
+        // 3초 카운트다운 및 직전 퀴즈 데이터 초기화
+        if (submitCount == answerData.getMajorityNum()) {
+            quizCountDown(roomId);
+        }
+        // 전체 제출일 때 처리
+        else if (submitCount == usersSubmitStatus.usersSubmitStatus().size()) {
             log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
-            QuizDTO removedQuiz = removeQuiz(roomId);
-
+            // ML에 플레이어들 답안 넘겨서 채점 요청 후 채점 문서 id 저장
             QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
             MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
                     .id(quizRoom.getQuizDocId())
-                    .quiz_id(removedQuiz.id())
+                    .quiz_id(solvedQuiz.id())
                     .question_number(answerData.getQuizNum())
-                    .correct(removedQuiz.correct())
+                    .correct(solvedQuiz.correct())
                     .answers(getAnswers(answerData.getPlayerAnswers()))
                     .build());
             if (quizRoom.getMarkDocId() == null) {
@@ -181,18 +194,58 @@ public class GameService {
                 quizRoomRepository.save(quizRoom);
             }
 
+            // 점수 갱신
             ScoreData scoreData = scoreRepository.getScoreData(roomId);
             scoreData.addScore(answerData, markResponse.answers());
             log.info("ScoreMap: {}", scoreData.getPlayersScore());
-
-            PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
-            userSubmitStatusRepository.init(players, roomId);
-            answerRepository.clearAnswerData(roomId);
         }
         return SubmitAnswerResponse.builder()
                 .isMajority(submitStatus)
                 .timestamp(LocalDateTime.now())
                 .submitStatuses(usersSubmitStatus.usersSubmitStatus())
+                .build();
+    }
+
+
+    private void resetState(Long roomId) {
+        // 직전 문제 삭제
+        removeQuiz(roomId);
+        // 플레이어 제출 상태, 답안 맵 초기화
+        PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+        userSubmitStatusRepository.init(players, roomId);
+        answerRepository.clearAnswerData(roomId);
+    }
+
+    @Async
+    protected void quizCountDown(Long roomId) {
+        Integer seconds = QUIZ_COUNT_SECONDS;
+        do {
+            if (seconds.equals(0)) {
+                resetState(roomId);
+            }
+            template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
+                    buildCountDownResponse(seconds));
+            seconds--;
+            ThreadSleep.sleep(1000L);
+        }
+        while (seconds >= 0);
+    }
+
+    @Async
+    public void scoreCountDown(Long roomId) {
+        Integer seconds = SCORE_COUNT_SECONDS;
+        do {
+            template.convertAndSend("/sub/rooms/" + roomId + "/scoreCount",
+                    buildCountDownResponse(seconds));
+            seconds--;
+            ThreadSleep.sleep(1000L);
+        }
+        while (seconds >= 0);
+    }
+
+    private CountDownResponse buildCountDownResponse(Integer second) {
+        return CountDownResponse.builder()
+                .second(second)
                 .build();
     }
 
