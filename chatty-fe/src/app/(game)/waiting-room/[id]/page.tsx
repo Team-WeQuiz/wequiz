@@ -27,8 +27,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   // 퀴즈 생성 완료 체크
   const [isQuizReady, setIsQuizReady] = useState(false);
 
-  // polling
-
   // 연결 해제
   const disconnect = () => {
     if (isConnected) {
@@ -68,6 +66,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);
         console.log('Received status message:', chatMessage);
+        updateUsers(chatMessage.playerStatuses);
       });
     };
 
@@ -96,18 +95,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       );
     };
 
-    const subscribeQuiz = (roomId: number) => {
-      stompClient.subscribe(
-        `/user/${userId}/queue/rooms/${roomId}/quiz`,
-        (quiz) => {
-          const quizData = JSON.parse(quiz.body);
-          if (quizData.currentRound === 1) {
-            setIsQuizReady(true);
-          }
-        },
-      );
-    };
-
     // 방 참가
     const joinRoom = (roomId: number) => {
       stompClient.publish({
@@ -117,7 +104,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     };
 
     // quiz 생성 확인
-    const getQuiz = (userId: number | undefined, roomId: number) => {
+    const subscribeQuizReady = (userId: number | undefined, roomId: number) => {
       stompClient.subscribe(
         `/user/${userId}/queue/rooms/${roomId}/quizReady`,
         (message) => {
@@ -147,11 +134,10 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       setIsConnected(true);
       subscribeToStatus(params.id);
       subscribeToChat(params.id);
-      joinRoom(params.id);
       subscribeToDescription(userId, params.id);
-      getQuiz(userId, params.id);
+      subscribeQuizReady(userId, params.id);
       setIsSubscribed(true);
-      subscribeQuiz(params.id);
+      joinRoom(params.id);
     };
 
     if (accessToken && userId) stompClient.activate();
