@@ -34,16 +34,25 @@ export const ResultBox = style({
   display: 'flex',
   padding: '8px 0px',
   gap: 64,
+  maxWidth: '100%',
   justifyContent: 'center',
-  width: '100%',
   backgroundColor: globals.color.blue_7,
+  '@media': {
+    '(max-width: 768px)': {
+      gap: 32,
+      padding: '4px 0px',
+    },
+    '(max-width: 480px)': {
+      flexDirection: 'column',
+      gap: 16,
+    },
+  },
 });
 
 export const RankingBox = style({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  maxHeight: 240,
   gap: 12,
 });
 
@@ -51,7 +60,7 @@ export const RankingContents = style({
   display: 'flex',
   padding: '2px 0px',
   alignItems: 'center',
-  width: '100%',
+  maxWidth: '100%',
   gap: 24,
 });
 
@@ -73,7 +82,7 @@ export const RankingNumberWrapper = style({
 });
 
 export const NickNameArea = style({
-  width: 200,
+  maxWidth: '60%',
 });
 
 export const ScoreArea = style({
