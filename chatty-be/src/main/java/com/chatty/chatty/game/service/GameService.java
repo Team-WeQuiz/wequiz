@@ -271,6 +271,7 @@ public class GameService {
                 .map(entry -> PlayerScoreDTO.builder()
                         .playerId(entry.getKey())
                         .nickname(entry.getValue().getNickname())
+                        .profileImage(entry.getValue().getProfileImage())
                         .score(entry.getValue().getScore())
                         .build())
                 .sorted(Comparator.comparing(PlayerScoreDTO::score).reversed())
