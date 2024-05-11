@@ -6,6 +6,7 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NO
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_READY;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_STARTED;
 
+import com.chatty.chatty.common.util.RandomCodeGenerator;
 import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
 import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
@@ -94,6 +95,7 @@ public class QuizRoomService {
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
                 .name(quizRoom.getName())
+                .code(quizRoom.getCode())
                 .maxPlayers(quizRoom.getPlayerLimitNum())
                 .description(quizRoom.getDescription())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
@@ -145,6 +147,8 @@ public class QuizRoomService {
 
     @Transactional
     public CreateRoomResponse createRoom(CreateRoomRequest request, Long userId) {
+        //6자리 랜덤 입장 코드 생성
+        String code = generateQuizRoomCode();
         // 퀴즈룸 DB에 저장
         QuizRoom savedQuizRoom = quizRoomRepository.save(
                 QuizRoom.builder()
@@ -152,7 +156,7 @@ public class QuizRoomService {
                         .description(request.description())
                         .numOfQuiz(request.numOfQuiz())
                         .playerLimitNum(request.playerLimitNum())
-                        .code(request.code())
+                        .code(code)
                         .status(Status.READY)
                         .build()
         );
@@ -168,6 +172,14 @@ public class QuizRoomService {
         return CreateRoomResponse.builder()
                 .roomId(savedQuizRoom.getId())
                 .build();
+    }
+
+    private String generateQuizRoomCode() {
+        String code;
+        do {
+            code = RandomCodeGenerator.generateCode();
+        } while (quizRoomRepository.findByCode(code).isPresent());
+        return code;
     }
 
     @Transactional

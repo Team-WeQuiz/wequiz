@@ -13,8 +13,6 @@ public record CreateRoomRequest(
 
         Integer playerLimitNum,
 
-        String code,
-
         String type,
 
         List<MultipartFile> files
