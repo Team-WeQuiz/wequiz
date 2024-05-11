@@ -187,12 +187,17 @@ public class QuizRoomService {
                         .build()
         );
 
-        // minio에 파일(들) 업로드
-        List<String> fileNames = uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
+        // 기존 퀴즈로 진행하는 경우
+        if (request.existQuizDocId() != null) {
+            savedQuizRoom.setQuizDocId(request.existQuizDocId());
+        } else {
+            // minio에 파일(들) 업로드
+            List<String> fileNames = uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
 
-        // QuizDocId 저장
-        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom, fileNames);
-        savedQuizRoom.setQuizDocId(mlResponse.id());
+            // QuizDocId 저장
+            QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom, fileNames);
+            savedQuizRoom.setQuizDocId(mlResponse.id());
+        }
         quizRoomRepository.save(savedQuizRoom);
 
         return RoomIdResponse.builder()

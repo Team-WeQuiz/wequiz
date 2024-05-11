@@ -15,7 +15,9 @@ public record CreateRoomRequest(
 
         String type,
 
-        List<MultipartFile> files
+        List<MultipartFile> files,
+
+        String existQuizDocId
 ) {
 
 }
