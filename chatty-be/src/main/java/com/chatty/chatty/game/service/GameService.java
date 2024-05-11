@@ -169,14 +169,15 @@ public class GameService {
                 .build();
     }
 
-    public SubmitAnswerResponse addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
+    public void addPlayerAnswer(Long roomId, SubmitAnswerRequest request, Long userId) {
         // 플레이어 답안 맵에 답안 추가
         AnswerData answerData = answerRepository.getAnswerData(roomId);
-        Boolean submitStatus = answerData.addAnswer(userId, request);
+        Boolean isMajority = answerData.addAnswer(userId, request);
         log.info("Add Answer: PlayerAnswers: {}", answerData.getPlayerAnswers());
 
         // 플레이어 제출 현황 갱신
         UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.submit(roomId, userId);
+        sendPlayersSubmitStatus(roomId, isMajority, usersSubmitStatus);
         int submitCount = (int) usersSubmitStatus.usersSubmitStatus().stream()
                 .filter(UserSubmitStatus::isSolved)
                 .count();
@@ -188,12 +189,6 @@ public class GameService {
             log.info("Phase UPDATED: COUNTDOWN");
             quizCountDown(roomId);
         }
-
-        return SubmitAnswerResponse.builder()
-                .isMajority(submitStatus)
-                .timestamp(LocalDateTime.now())
-                .submitStatuses(usersSubmitStatus.usersSubmitStatus())
-                .build();
     }
 
     private void markAndUpdateScore(Long roomId, QuizDTO solvedQuiz, AnswerData answerData) {
@@ -231,6 +226,7 @@ public class GameService {
         // 플레이어 제출 상태, 답안 맵 초기화
         PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
         userSubmitStatusRepository.init(players, roomId);
+        sendPlayersSubmitStatus(roomId, false, userSubmitStatusRepository.findByRoomId(roomId));
         answerRepository.clearAnswerData(roomId);
         log.info("Reset");
     }
@@ -284,6 +280,14 @@ public class GameService {
                 .build();
     }
 
+    private void sendPlayersSubmitStatus(Long roomId, Boolean isMajority, UsersSubmitStatus status) {
+        template.convertAndSend("/sub/rooms/" + roomId + "/submit", SubmitAnswerResponse.builder()
+                .isMajority(isMajority)
+                .timestamp(LocalDateTime.now())
+                .submitStatuses(status.usersSubmitStatus())
+                .build());
+    }
+
     private List<AnswerDTO> getAnswers(Map<Long, PlayerAnswerData> playerAnswers) {
         return playerAnswers.entrySet().stream()
                 .map(entry -> AnswerDTO.builder()
@@ -322,7 +326,6 @@ public class GameService {
     public void getPhase(Long roomId, Long userId) {
         Phase currentPhase = phaseRepository.getPhase(roomId);
         QuizResponse quizResponse = sendQuiz(roomId);
-        ScoreResponse scoreResponse = sendScore(roomId);
         switch (currentPhase) {
             case QUIZ_SOLVING, COUNTDOWN -> {
                 template.convertAndSendToUser(
@@ -335,11 +338,14 @@ public class GameService {
                         getSubmitAnswerResponse(roomId)
                 );
             }
-            case RESULT -> template.convertAndSendToUser(
-                    userId.toString(),
-                    "/queue/rooms/" + roomId + "/score",
-                    scoreResponse
-            );
+            case RESULT -> {
+                ScoreResponse scoreResponse = sendScore(roomId);
+                template.convertAndSendToUser(
+                        userId.toString(),
+                        "/queue/rooms/" + roomId + "/score",
+                        scoreResponse
+                );
+            }
         }
     }
 }
