@@ -232,6 +232,7 @@ public class GameService {
         PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
         userSubmitStatusRepository.init(players, roomId);
         answerRepository.clearAnswerData(roomId);
+        log.info("Reset");
     }
 
     @Async
@@ -252,6 +253,7 @@ public class GameService {
         resetState(roomId);
         template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
                 buildCountDownResponse(seconds));
+        log.info("Countdown: {}", seconds);
     }
 
     @Async
