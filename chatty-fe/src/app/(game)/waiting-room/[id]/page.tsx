@@ -12,25 +12,20 @@ import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
 import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
 import { usePathname, useSearchParams } from 'next/navigation';
-import useModal from '@/app/_hooks/useModal';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const searchParams = useSearchParams();
   const nickname = searchParams.get('nickname');
-  const { isOpen } = useModal();
 
   const [isConnected, setIsConnected] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { accessToken } = useAuthStore();
-  const { userStatuses, updateUsers, setMessage, allUsersReady } =
-    useWaitingStore();
+  const { userStatuses, updateUsers, setMessage } = useWaitingStore();
   // 퀴즈 요약
   const [quizSummary, setQuizSummary] = useState<string>('');
   // 퀴즈 생성 완료 체크
   const [isQuizReady, setIsQuizReady] = useState(false);
-
-  // polling
 
   // 연결 해제
   const disconnect = () => {
@@ -71,6 +66,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);
         console.log('Received status message:', chatMessage);
+        updateUsers(chatMessage.playerStatuses);
       });
     };
 
@@ -99,18 +95,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       );
     };
 
-    const subscribeQuiz = (roomId: number) => {
-      stompClient.subscribe(
-        `/user/${userId}/queue/rooms/${roomId}/quiz`,
-        (quiz) => {
-          const quizData = JSON.parse(quiz.body);
-          if (quizData.currentRound === 1) {
-            setIsQuizReady(true);
-          }
-        },
-      );
-    };
-
     // 방 참가
     const joinRoom = (roomId: number) => {
       stompClient.publish({
@@ -120,7 +104,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     };
 
     // quiz 생성 확인
-    const getQuiz = (userId: number | undefined, roomId: number) => {
+    const subscribeQuizReady = (userId: number | undefined, roomId: number) => {
       stompClient.subscribe(
         `/user/${userId}/queue/rooms/${roomId}/quizReady`,
         (message) => {
@@ -150,11 +134,10 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       setIsConnected(true);
       subscribeToStatus(params.id);
       subscribeToChat(params.id);
-      joinRoom(params.id);
       subscribeToDescription(userId, params.id);
-      getQuiz(userId, params.id);
+      subscribeQuizReady(userId, params.id);
       setIsSubscribed(true);
-      subscribeQuiz(params.id);
+      joinRoom(params.id);
     };
 
     if (accessToken && userId) stompClient.activate();

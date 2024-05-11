@@ -1,16 +1,17 @@
-# 베이스 이미지 설정
 FROM node:20-alpine AS base
+
+FROM base AS deps
+
 WORKDIR /app
 
-# 의존성 파일 복사 후 설치
 COPY package.json package-lock.json* ./
 RUN npm ci
-
-# 소스 코드 복사
 COPY . .
 
-# 빌드 스테이지
 FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
@@ -20,30 +21,26 @@ ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
 RUN npm run build
 
-# 러너 스테이지
 FROM base AS runner
 WORKDIR /app
 
-# 환경 변수 설정
 ENV NODE_ENV production
-ENV PORT 3000
 
-# 애플리케이션 사용자 설정
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# 빌드 결과물 복사
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
 
-# 소유권 설정
+RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# 사용자 변경
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
 USER nextjs
 
-# 포트 노출
 EXPOSE 3000
 
-# 실행 명령
+ENV PORT 3000
+
 CMD ["node", "server.js"]

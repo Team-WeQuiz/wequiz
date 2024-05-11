@@ -26,7 +26,15 @@ type QuizSet = {
 };
 
 type SubmitStatus = {
+  userId: number;
+  nickname: string;
+  profileImage: string;
+  isSolved: boolean;
+};
+
+type SubmitStatuses = {
   isMajority: boolean;
+  submitStatuses: SubmitStatus[];
   time: string;
 };
 
@@ -44,7 +52,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [userAnswer, setUserAnswer] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
+  const [submitStatuses, setSubmitStatuses] = useState<SubmitStatuses | null>(
+    null,
+  );
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
   const { openModal, closeModal, isOpen } = useModal();
@@ -60,7 +70,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       `/user/${userId}/queue/rooms/${roomId}/quiz`,
       (quiz) => {
         const quizData = JSON.parse(quiz.body);
-        console.log('quiz: ', quizData);
+        console.log('퀴즈: ', quizData);
         setQuizSet(quizData);
       },
       {
@@ -75,8 +85,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       `/sub/rooms/${roomId}/submit`,
       (submitStatus) => {
         const statusData = JSON.parse(submitStatus.body);
-        console.log('ss', statusData);
-        setSubmitStatus(statusData);
+        console.log('제출현황: ', statusData);
+        setSubmitStatuses(statusData);
       },
       {
         Authorization: `Bearer ${accessToken}`,
@@ -90,7 +100,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       `/user/${userId}/queue/rooms/${roomId}/score`,
       (scoreStatus) => {
         const scoreData = JSON.parse(scoreStatus.body);
-        console.log('score: ', scoreData);
+        console.log('점수: ', scoreData);
         setScores(scoreData.scores);
       },
       {
@@ -106,6 +116,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       (count) => {
         const countData = JSON.parse(count.body);
         setCount(countData.second);
+        console.log('카운트: ', countData);
         if (countData.second === 0) {
           if (!isAnswered) {
             submitQuiz(params.id);
@@ -129,6 +140,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       (count) => {
         const countData = JSON.parse(count.body);
         setScoreCount(countData.second);
+        console.log('모달카운트: ', countData);
         if (!isOpen) {
           openModal();
         }
@@ -159,6 +171,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   // 퀴즈 가져오기
   const getQuiz = (roomId: number) => {
     setUserAnswer(null);
+    console.log('퀴즈 가져오기 신호보냄');
     stompClient.publish({
       destination: `/pub/rooms/${roomId}/quiz`,
       headers: {
@@ -190,6 +203,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         playerAnswer: userAnswer === null ? '' : userAnswer,
       }),
     });
+    console.log('퀴즈 보냈음.:', quizSet?.quizNumber);
+    console.log('퀴즈 답: ', userAnswer);
   };
 
   useEffect(() => {
@@ -253,15 +268,15 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
             </div>
           </div>
           <div className={styles.StatusWrapper}>
-            {isAnswered && submitStatus?.isMajority ? (
+            {isAnswered && submitStatuses?.isMajority ? (
               <h1 className={styles.Count}>{count <= 0 ? 0 : count}</h1>
-            ) : isAnswered && !submitStatus?.isMajority ? (
+            ) : isAnswered && !submitStatuses?.isMajority ? (
               <BarSpinner />
             ) : (
               ''
             )}
             <div>
-              {isAnswered && submitStatus?.isMajority
+              {isAnswered && submitStatuses?.isMajority
                 ? '과반수 이상이 제출하였습니다.'
                 : '다른 플레이어가 문제를 제출할 때 까지 기다려주세용 :)'}
             </div>
@@ -279,10 +294,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           </div>
         </div>
       </div>
-      <div className={styles.UserContainer}>
-        <MyProfile />
-        <UserGrid userCount={6} />
-      </div>
+      <UserGrid submitStatus={submitStatuses?.submitStatuses || []} />
       {isOpen ? (
         <ResultModal
           currentRound={quizSet?.currentRound || 0}

@@ -209,8 +209,8 @@ public class QuizRoomService {
                         return;
                     }
                     validateRoomIfReady(quizRoom.getStatus());
+                    quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
                     updateRoomStatus(quizRoom, Status.STARTED);
-                    savePlayersCount(quizRoom);
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
                     players.playerStatusSet()
                             .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));
@@ -237,11 +237,6 @@ public class QuizRoomService {
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
-    }
-
-    private void savePlayersCount(QuizRoom quizRoom) {
-        quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
-        quizRoomRepository.save(quizRoom);
     }
 
     private void updateRoomStatus(QuizRoom quizRoom, Status status) {

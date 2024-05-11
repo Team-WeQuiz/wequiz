@@ -3,6 +3,7 @@ export type UserStatus = {
   isReady: boolean;
   message?: string;
   nickname: string;
+  profileImage: string | null;
 };
 
 enum ChatType {

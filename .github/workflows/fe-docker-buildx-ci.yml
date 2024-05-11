@@ -14,6 +14,14 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
+
+      - name: Set up NPM cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3

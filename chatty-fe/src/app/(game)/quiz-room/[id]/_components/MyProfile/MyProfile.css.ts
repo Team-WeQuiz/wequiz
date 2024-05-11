@@ -1,6 +1,6 @@
 import { style } from '@vanilla-extract/css';
 
-export const Container = style({
+export const MyContainer = style({
   width: 434,
   height: 360,
   display: 'flex',
@@ -11,7 +11,7 @@ export const Container = style({
   gap: 10,
 });
 
-export const Nickname = style({
+export const MyNickname = style({
   fontSize: 20,
 });
 
