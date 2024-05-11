@@ -43,7 +43,7 @@ public class QuizRoomController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/create")
+    @GetMapping("/existQuiz")
     public ResponseEntity<ExistQuizIdResponse> getExistQuizIdList(@AuthUser Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getExistQuizIdList(userId));
     }

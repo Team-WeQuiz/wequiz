@@ -187,6 +187,7 @@ public class QuizRoomService {
                         .build()
         );
 
+        log.info(request.existQuizDocId());
         // 기존 퀴즈로 진행하는 경우
         if (request.existQuizDocId() != null) {
             savedQuizRoom.setQuizDocId(request.existQuizDocId());
