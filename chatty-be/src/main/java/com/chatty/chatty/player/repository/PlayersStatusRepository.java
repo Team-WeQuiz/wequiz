@@ -1,6 +1,8 @@
 package com.chatty.chatty.player.repository;
 
 import com.chatty.chatty.player.domain.PlayersStatus;
+import com.chatty.chatty.user.entity.User;
+import com.chatty.chatty.user.repository.UserRepository;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Repository;
 public class PlayersStatusRepository {
 
     private static final Map<Long, PlayersStatus> playersStatusMap = new ConcurrentHashMap<>();
+    private final UserRepository userRepository;
 
     public Optional<PlayersStatus> findByRoomId(Long roomId) {
         return Optional.ofNullable(playersStatusMap.get(roomId));
@@ -21,7 +24,8 @@ public class PlayersStatusRepository {
 
     public PlayersStatus saveUserToRoom(Long roomId, Long userId, String nickname) {
         PlayersStatus playersStatus = findByRoomId(roomId).orElse(PlayersStatus.init());
-        updateStatus(roomId, playersStatus.updateWithNewUser(userId, nickname));
+        User user = userRepository.findById(userId).get();
+        updateStatus(roomId, playersStatus.updateWithNewUser(userId, nickname, user.getProfileImage()));
         return playersStatus;
     }
 
