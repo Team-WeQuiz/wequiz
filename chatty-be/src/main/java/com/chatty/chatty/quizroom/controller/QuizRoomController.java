@@ -54,7 +54,6 @@ public class QuizRoomController {
     public ResponseEntity<RoomIdResponse> findRoomByCode(@RequestBody CodeRequestDTO request) {
         RoomIdResponse response = quizRoomService.findRoomByCode(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
-
     }
 
     @PostMapping("/{roomId}/start")
