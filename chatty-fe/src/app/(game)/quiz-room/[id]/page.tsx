@@ -106,7 +106,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       (count) => {
         const countData = JSON.parse(count.body);
         setCount(countData.second);
-        if (countData.second === 0) {
+        if (countData.second === -1) {
           if (!isAnswered) {
             submitQuiz(params.id);
           }
@@ -248,7 +248,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           </div>
           <div className={styles.StatusWrapper}>
             {isAnswered && submitStatus?.isMajority ? (
-              <h1 className={styles.Count}>{count}</h1>
+              <h1 className={styles.Count}>{count <= 0 ? 0 : count}</h1>
             ) : isAnswered && !submitStatus?.isMajority ? (
               <BarSpinner />
             ) : (
