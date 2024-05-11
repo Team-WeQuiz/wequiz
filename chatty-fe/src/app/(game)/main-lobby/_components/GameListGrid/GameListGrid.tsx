@@ -125,6 +125,11 @@ const GameListGrid = () => {
             handlePageNext={handlePageNext}
           />
         </div>
+        {pageData.length === 0 && (
+          <p className={styles.gameEmpty}>
+            입장할 수 있는 방이 없습니다.
+          </p>
+        )}
       </div>
     </>
   );

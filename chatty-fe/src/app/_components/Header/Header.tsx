@@ -37,34 +37,36 @@ export default function Header() {
       <button onClick={handleLogoClick} className={styles.mainButton}>
         <Image src="/images/logo.svg" height={52} width={112} alt="logo" />
       </button>
-      <div className={styles.profileButton}>
-        <button
-          onClick={(e) => handleProfileClick(e)}
-          className={styles.mainButton}
-        >
-          <Image
-            src="/images/person.svg"
-            height={48}
-            width={48}
-            alt="profile"
-          />
-        </button>
-        <div className={styles.dropdownMenu}>
-          <DropdownMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen}>
-            <li className={styles.dropdownMenuList}>
-              <button
-                onClick={() => navigate.push('/mypage')}
-                className={styles.menuButton}
-              >
-                마이페이지
-              </button>
-            </li>
-            <li className={styles.dropdownMenuList}>
-              <button onClick={handleLogout} className={styles.menuButton}>
-                로그아웃
-              </button>
-            </li>
-          </DropdownMenu>
+      <div>
+        <div className={styles.profileButton}>
+          <button
+            onClick={(e) => handleProfileClick(e)}
+            className={styles.mainButton}
+          >
+            <Image
+              src="/images/person.svg"
+              height={48}
+              width={48}
+              alt="profile"
+            />
+          </button>
+          <div className={styles.dropdownMenu}>
+            <DropdownMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen}>
+              <li className={styles.dropdownMenuList}>
+                <button
+                  onClick={() => navigate.push('/mypage')}
+                  className={styles.menuButton}
+                >
+                  마이페이지
+                </button>
+              </li>
+              <li className={styles.dropdownMenuList}>
+                <button onClick={handleLogout} className={styles.menuButton}>
+                  로그아웃
+                </button>
+              </li>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>

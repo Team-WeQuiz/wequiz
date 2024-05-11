@@ -12,19 +12,16 @@ import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
 import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
 import { usePathname, useSearchParams } from 'next/navigation';
-import useModal from '@/app/_hooks/useModal';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const searchParams = useSearchParams();
   const nickname = searchParams.get('nickname');
-  const { isOpen } = useModal();
 
   const [isConnected, setIsConnected] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { accessToken } = useAuthStore();
-  const { userStatuses, updateUsers, setMessage, allUsersReady } =
-    useWaitingStore();
+  const { userStatuses, updateUsers, setMessage } = useWaitingStore();
   // 퀴즈 요약
   const [quizSummary, setQuizSummary] = useState<string>('');
   // 퀴즈 생성 완료 체크
