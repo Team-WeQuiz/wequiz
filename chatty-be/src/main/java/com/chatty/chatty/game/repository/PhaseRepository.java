@@ -1,7 +1,5 @@
 package com.chatty.chatty.game.repository;
 
-import static com.chatty.chatty.game.domain.Phase.QUIZ_SOLVING;
-
 import com.chatty.chatty.game.domain.Phase;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,8 +15,7 @@ public class PhaseRepository {
     }
 
     public Phase init(Long roomId) {
-        phaseMap.put(roomId, Phase.init());
-        return QUIZ_SOLVING;
+        return Phase.init();
     }
 
     public void clear(Long roomId) {
