@@ -13,6 +13,7 @@ import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
 import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.repository.GameRepository;
+import com.chatty.chatty.game.repository.PhaseRepository;
 import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
@@ -67,6 +68,7 @@ public class QuizRoomService {
     private final UserSubmitStatusRepository userSubmitStatusRepository;
     private final SimpMessagingTemplate template;
     private final PlayerService playerService;
+    private final PhaseRepository phaseRepository;
 
     public RoomListResponse getRooms(Integer page) {
         PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
@@ -231,6 +233,7 @@ public class QuizRoomService {
                     gameRepository.clearQuizData(roomId);
                     playersStatusRepository.clear(roomId);
                     userSubmitStatusRepository.clear(roomId);
+                    phaseRepository.clear(roomId);
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });

@@ -6,6 +6,7 @@ import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
+import com.chatty.chatty.game.domain.Phase;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
@@ -101,6 +102,12 @@ public class GameController {
                 scoreResponse
         );
         gameService.scoreCountDown(roomId);
+    }
+
+    @MessageMapping("/rooms/{roomId}/phase")
+    @SendTo("/sub/rooms/{roomId}/phase")
+    public void getPhase(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        gameService.getPhase(roomId, getUserIdFromHeader(headerAccessor));
     }
 
     private Long getUserIdFromHeader(SimpMessageHeaderAccessor headerAccessor) {
