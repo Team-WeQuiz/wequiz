@@ -38,7 +38,7 @@ public class UserService {
     public UserInfoResponse getUserInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
-        String finalProfileImage = getProfileImageUrl(user);
+        String finalProfileImage = getProfileImageUrl(userId);
         return UserInfoResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -48,7 +48,9 @@ public class UserService {
                 .build();
     }
 
-    public String getProfileImageUrl(User user) {
+    public String getProfileImageUrl(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
         String profileImage;
         if (user.getProfileImage() == null) {
             profileImage = null;

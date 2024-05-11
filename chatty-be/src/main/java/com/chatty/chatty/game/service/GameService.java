@@ -1,7 +1,6 @@
 package com.chatty.chatty.game.service;
 
 import com.chatty.chatty.common.util.ThreadSleep;
-import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.controller.dto.CountDownResponse;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizReadyResponse;
@@ -34,7 +33,6 @@ import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import com.chatty.chatty.user.repository.UserRepository;
 import com.chatty.chatty.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -65,11 +63,10 @@ public class GameService {
     private final ModelService modelService;
     private final SimpMessagingTemplate template;
     private final PhaseRepository phaseRepository;
-    private final UserRepository userRepository;
     private final UserService userService;
 
     public PlayersStatusDTO joinRoom(Long roomId, Long userId, NicknameRequest request) {
-        String profileImageUrl = userService.getProfileImageUrl(userRepository.findById(userId).get());
+        String profileImageUrl = userService.getProfileImageUrl(userId);
         PlayersStatus playersStatus = playersStatusRepository.saveUserToRoom(roomId, userId, request.nickname(),
                 profileImageUrl);
         return buildDTO(roomId, playersStatus);
