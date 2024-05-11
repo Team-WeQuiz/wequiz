@@ -30,9 +30,9 @@ export const startQuiz = async (id: number, token: string) => {
       },
     );
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('error: ', error);
-    throw new Error('Failed to start quiz');
+    throw new Error(error);
   }
 };
 

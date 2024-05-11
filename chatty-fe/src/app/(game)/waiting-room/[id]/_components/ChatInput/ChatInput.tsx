@@ -55,7 +55,11 @@ const ChatInput = ({
         placeholder={disabled ? '연결 중 입니다...' : '메시지를 입력하세요'}
         isChat
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) => {
+          if (e.target.value.length < 100) {
+            setMessage(e.target.value);
+          }
+        }}
         endAdornment={<button type="submit" className={submitButton}></button>}
         disabled={disabled}
       />

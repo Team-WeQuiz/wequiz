@@ -48,7 +48,10 @@ const ReadyButton = ({
           const nextCount = prevCount - 1;
           if (nextCount === 0) {
             setToggleBlock(true);
-            startQuiz(roomId, accessToken);
+            // userStatuses에서 userId가 index 0 이면
+            if (userStatuses[0].userId === userId) {
+              startQuiz(roomId, accessToken);
+            }
           }
           if (nextCount === -1) {
             clearInterval(timer!);
