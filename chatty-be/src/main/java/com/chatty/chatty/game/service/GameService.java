@@ -1,5 +1,8 @@
 package com.chatty.chatty.game.service;
 
+import static com.chatty.chatty.game.domain.Phase.COUNTDOWN;
+import static com.chatty.chatty.game.domain.Phase.RESULT;
+
 import com.chatty.chatty.common.util.ThreadSleep;
 import com.chatty.chatty.game.controller.dto.CountDownResponse;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
@@ -223,7 +226,7 @@ public class GameService {
         removeQuiz(roomId);
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.isQueueEmpty()) {
-            phaseRepository.update(roomId, Phase.RESULT);
+            phaseRepository.update(roomId, RESULT);
             log.info("Phase UPDATED: RESULT");
         } else {
             phaseRepository.update(roomId, Phase.QUIZ_SOLVING);
@@ -240,6 +243,7 @@ public class GameService {
         Integer seconds = QUIZ_COUNT_SECONDS;
         do {
             if (seconds.equals(0)) {
+                //미제출자 처리
                 resetState(roomId);
             }
             template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
@@ -306,8 +310,9 @@ public class GameService {
     public void getPhase(Long roomId, Long userId) {
         Phase currentPhase = phaseRepository.getPhase(roomId);
         QuizResponse quizResponse = sendQuiz(roomId);
+        ScoreResponse scoreResponse = sendScore(roomId);
         switch (currentPhase) {
-            case QUIZ_SOLVING -> {
+            case QUIZ_SOLVING, COUNTDOWN -> {
                 template.convertAndSendToUser(
                         userId.toString(),
                         "/queue/rooms/" + roomId + "/quiz",
@@ -318,27 +323,11 @@ public class GameService {
                         getSubmitAnswerResponse(roomId)
                 );
             }
-            case Phase.COUNTDOWN -> {
-                template.convertAndSendToUser(
-                        userId.toString(),
-                        "/queue/rooms/" + roomId + "/quiz",
-                        quizResponse
-                );
-                template.convertAndSend(
-                        "/sub/rooms/" + roomId + "/submit",
-                        getSubmitAnswerResponse(roomId)
-                );
-                quizCountDown(roomId);
-            }
-            case Phase.RESULT -> {
-                ScoreResponse scoreResponse = sendScore(roomId);
-                template.convertAndSendToUser(
-                        userId.toString(),
-                        "/queue/rooms/" + roomId + "/score",
-                        scoreResponse
-                );
-                scoreCountDown(roomId);
-            }
+            case RESULT -> template.convertAndSendToUser(
+                    userId.toString(),
+                    "/queue/rooms/" + roomId + "/score",
+                    scoreResponse
+            );
         }
     }
 }
