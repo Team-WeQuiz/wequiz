@@ -239,6 +239,7 @@ public class GameService {
     protected void quizCountDown(Long roomId) {
         Integer seconds = QUIZ_COUNT_SECONDS;
         while (seconds >= 0) {
+            log.info("Countdown: {}", seconds);
             template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
                     buildCountDownResponse(seconds));
             ThreadSleep.sleep(1000L);
