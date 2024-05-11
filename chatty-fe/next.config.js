@@ -18,6 +18,12 @@ const nextConfig = {
         hostname: '3.35.178.237',
         port: '9010',
       },
+      {
+        hostname: 'http://t1.kakaocdn.net',
+      },
+      {
+        hostname: 'http://lh3.googleusercontent.com',
+      },
     ],
   },
   serverRuntimeConfig: {
