@@ -47,16 +47,18 @@ export const Number = style({
 });
 
 export const Wrapper = style({
-  display: 'inline-flex',
-  gap: 12,
-  alignItems: 'center',
-  padding: '10px 0',
+  display: 'flex',
+  flexDirection: 'column',
+  alignSelf: 'stretch',
+  gap: 10,
+  padding: 16,
+  width: '100%',
+  height: '100%',
 });
 
 export const Card = style({
   display: 'flex',
   width: '100%',
-  height: '100%',
   padding: 16,
   gap: 16,
   background: '#fff',
@@ -64,14 +66,39 @@ export const Card = style({
   alignItems: 'center',
 });
 
-export const UserWrapper = style({
+export const AnswerContainer = style({
   display: 'flex',
+  padding: 16,
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  flex: '1 0 0',
+  background: '#fff',
+  borderRadius: 16,
+});
+
+export const AnswerWrapper = style({
+  display: 'flex',
+  gap: 10,
+});
+
+export const MyAnswerWrapper = style({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  gap: 8,
+});
+
+export const Description = style({
+  color: globals.color.black_3,
+  fontSize: 14,
+});
+
+export const UserWrapper = style({
+  display: 'inline-flex',
   flexDirection: 'column',
   width: '100%',
   height: '100%',
   gap: 8,
-  padding: 0,
-  margin: 0,
 });
 
 export const QuestionMark = style({
@@ -104,4 +131,10 @@ export const CorrectAnswerMark = style({
   color: globals.color.blue_main,
   fontFamily: 'var(--bagel-font)',
   fontSize: 30,
+});
+
+export const ProfileWrapper = style({
+  display: 'flex',
+  gap: 4,
+  padding: 2,
 });

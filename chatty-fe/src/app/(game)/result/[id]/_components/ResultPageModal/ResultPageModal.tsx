@@ -89,34 +89,44 @@ export default function ResultPageModal({
           </div>
           <div className={styles.Wrapper}>
             <div className={styles.Card}>
-              <span className={styles.CorrectAnswerMark}>Q</span>
-              <span style={{ fontSize: '24px' }}>{answer?.quiz}</span>
+              <span className={styles.QuestionMark}>Q</span>
+              <span>{answer?.quiz}</span>
             </div>
-            <div
-              className={
-                checkAnswer()
-                  ? styles.CorrectAnswerCard
-                  : styles.WrongAnswerCard
-              }
-            >
-              <span
-                className={
-                  checkAnswer()
-                    ? styles.CorrectAnswerMark
-                    : styles.WrongAnswerMark
-                }
-              >
-                A
-              </span>
-              <span style={{ fontSize: '24px' }}>{findMyAnswer()}</span>
+            <div className={styles.AnswerContainer}>
+              <div className={styles.AnswerWrapper}>
+                <span className={styles.QuestionMark}>A</span>
+                <span>{answer?.correct}</span>
+              </div>
+              <div className={styles.MyAnswerWrapper}>
+                <div className={styles.Description}>
+                  <span>내가 쓴 답변</span>
+                </div>
+                <div
+                  className={
+                    checkAnswer()
+                      ? styles.CorrectAnswerCard
+                      : styles.WrongAnswerCard
+                  }
+                >
+                  <span
+                    className={
+                      checkAnswer()
+                        ? styles.CorrectAnswerMark
+                        : styles.WrongAnswerMark
+                    }
+                  >
+                    A
+                  </span>
+                  <span style={{ fontSize: '24px' }}>{findMyAnswer()}</span>
+                </div>
+              </div>
             </div>
           </div>
           <div className={styles.Wrapper}>
-            <div className={styles.Card}>
-              <span className={styles.CorrectAnswerMark}>A</span>
-              <span style={{ fontSize: '24px' }}>{answer?.correct}</span>
-            </div>
             <div className={styles.UserWrapper}>
+              <div className={styles.Description}>
+                <span>전체 참여자 답변</span>
+              </div>
               {answer?.playerAnswers.map((answer, index) => (
                 <div
                   key={index}
@@ -126,7 +136,10 @@ export default function ResultPageModal({
                       : styles.WrongAnswerCard
                   }
                 >
-                  <span style={{ fontSize: '24px' }}>{answer.nickname}</span>
+                  <div className={styles.ProfileWrapper}>
+                    <span>{answer.nickname}</span>
+                  </div>
+
                   <span style={{ fontSize: '24px' }}>
                     {answer.playerAnswer}
                   </span>
