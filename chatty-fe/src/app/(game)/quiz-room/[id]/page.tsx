@@ -106,10 +106,12 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       (count) => {
         const countData = JSON.parse(count.body);
         setCount(countData.second);
-        if (countData.second === -1) {
+        if (countData.second === 0) {
           if (!isAnswered) {
             submitQuiz(params.id);
           }
+        }
+        if (countData.second === -1) {
           getQuiz(params.id);
           setCount(3);
         }
