@@ -71,15 +71,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
         const chatMessage = JSON.parse(message.body);
         console.log('Received status message:', chatMessage);
-        // join 신호
-        updateUsers(chatMessage.playerStatuses);
-        chatMessage.playerStatuses.forEach((player: any) => {
-          if (player.userId === userId) {
-            if (player.nickname !== nickname) {
-              joinRoom(params.id);
-            }
-          }
-        });
       });
     };
 

@@ -11,4 +11,9 @@ export const mainContainer = style({
       padding: 20,
     },
   },
+  overflowY: 'scroll',
+  '::-webkit-scrollbar': {
+    display: 'none',
+  },
+  scrollbarWidth: 'none',
 });
