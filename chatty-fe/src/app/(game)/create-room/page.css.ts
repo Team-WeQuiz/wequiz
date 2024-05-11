@@ -6,10 +6,11 @@ export const mainContainer = style({
   flexDirection: 'column',
   width: '100%',
   height: '100%',
+  flexWrap: 'unset',
+  alignItems: 'center',
 });
 
 export const container = style({
-  margin: 'auto',
   display: 'flex',
   flexDirection: 'column',
   gap: 30,
