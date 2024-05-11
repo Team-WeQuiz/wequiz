@@ -4,7 +4,6 @@ import QuestionArea from './_components/QuestionArea/QuestionArea';
 import AnswerArea from './_components/AnswerArea/AnswerArea';
 import * as styles from './page.css';
 import GradButton from '@/app/_components/GradButton';
-import MyProfile from './_components/MyProfile/MyProfile';
 import UserGrid from './_components/UserGrid/UserGrid';
 import RoundProgress from './_components/RoundProgress/RoundProgress';
 import { useEffect, useState } from 'react';
@@ -15,6 +14,7 @@ import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
 import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
 import client from '@/app/_api/client';
+import { useRouter } from 'next/navigation';
 
 type QuizSet = {
   totalRound: number;
@@ -58,12 +58,20 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
   const { openModal, closeModal, isOpen } = useModal();
+  const router = useRouter();
 
   const handleOptionChange = (option: string, index: number) => {
     setUserAnswer(option);
     setSelectedOption(index);
   };
 
+  const checkLastRound = () => {
+    return quizSet?.currentRound === quizSet?.totalRound;
+  };
+
+  useEffect(() => {
+    console.log(isAnswered);
+  }, [isAnswered]);
   // 퀴즈 구독
   const subscribeQuiz = (roomId: number) => {
     stompClient.subscribe(
@@ -117,11 +125,11 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         const countData = JSON.parse(count.body);
         setCount(countData.second);
         console.log('카운트: ', countData);
-        if (countData.second === 0) {
-          if (!isAnswered) {
-            submitQuiz(params.id);
-          }
-        }
+        // if (countData.second === 0) {
+        //   if (!isAnswered) {
+        //     submitQuiz(params.id);
+        //   }
+        // }
         if (countData.second === -1) {
           getQuiz(params.id);
           setCount(3);
@@ -147,10 +155,13 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         }
         setCount(countData.second);
         if (countData.second === 0) {
-          if (quizSet?.totalRound === quizSet?.currentRound) {
+          if (checkLastRound()) {
             deleteRoom();
+            closeModal();
+            router.push(`/result/${params.id}`);
+          } else {
+            closeModal();
           }
-          closeModal();
         }
       },
       {
@@ -184,11 +195,16 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
 
   // 퀴즈 끝내기 요청
   const deleteRoom = async () => {
-    const response = await client.delete(`/rooms/${params.id}/end`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    try {
+      const response = await client.delete(`/rooms/${params.id}/end`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // 퀴즈 제출
@@ -230,7 +246,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       };
       stompClient.activate();
     }
-  }, [accessToken, userId, params.id]);
+  }, [accessToken, params.id]);
 
   return (
     <div className={styles.Main}>
@@ -279,7 +295,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
             <div>
               {isAnswered && submitStatuses?.isMajority
                 ? '과반수 이상이 제출하였습니다.'
-                : '다른 플레이어가 문제를 제출할 때 까지 기다려주세용 :)'}
+                : isAnswered && !submitStatuses?.isMajority
+                  ? '다른 플레이어가 문제를 제출할 때 까지 기다려주세용 :)'
+                  : ''}
             </div>
           </div>
           <div className={styles.ButtonWrapper}>

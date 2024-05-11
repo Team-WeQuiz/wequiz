@@ -5,10 +5,8 @@ export const Container = style({
   display: 'flex',
   width: 434,
   height: 516,
-  justifyContent: 'space-between',
   alignItems: 'flex-start',
-  alignContent: 'flex-start',
-  rowGap: 42,
+  gap: 8,
   flexShrink: 0,
   flexWrap: 'wrap',
 });
@@ -22,6 +20,14 @@ export const UserContainer = style({
   borderRadius: 20,
   background: globals.color.blue_6,
   gap: 30,
+});
+
+export const MyImage = style({
+  width: 180,
+  height: 180,
+  borderRadius: 100,
+  overflow: 'hidden',
+  background: '#fff',
 });
 
 export const UserImage = style({
