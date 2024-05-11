@@ -58,6 +58,7 @@ public class QuizRoomController {
 
     @PostMapping("/{roomId}/start")
     public ResponseEntity<Void> startRoom(@PathVariable Long roomId) {
+        log.info("start room 호출");
         quizRoomService.startRoom(roomId);
         quizRoomService.broadcastUpdatedRoomList();
         return ResponseEntity.status(HttpStatus.OK).build();
