@@ -2,9 +2,15 @@ package com.chatty.chatty.game.repository.dynamodb;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +22,7 @@ public class DynamoDBRepository {
 
     private static final String QUIZ_TABLE_NAME = "wequiz-quiz";
     private static final String MARK_TABLE_NAME = "wequiz-mark";
+    private static final String USER_ID_INDEX_NAME = "user_id-index";
     private static final String HASH_KEY = "id";
     private static final String RANGE_KEY = "timestamp";
     private static final String QUIZ = "questions";
@@ -27,6 +34,25 @@ public class DynamoDBRepository {
     public DynamoDBRepository(AmazonDynamoDB amazonDynamoDB) {
         this.dynamoDB = new DynamoDB(amazonDynamoDB);
     }
+
+    public List<String> getExistQuizIdList(Long userId) {
+        List<String> existQuizIdList = new ArrayList<>();
+
+        Index index = dynamoDB.getTable(QUIZ_TABLE_NAME).getIndex(USER_ID_INDEX_NAME);
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("user_id = :val")
+                .withValueMap(new ValueMap()
+                        .withLong(":val", userId));
+
+        ItemCollection<QueryOutcome> items = index.query(spec);
+        for (Item item : items) {
+            String primaryKey = item.getString("id");
+            existQuizIdList.add(primaryKey);
+        }
+        return existQuizIdList;
+    }
+
 
     public String getDescriptionFromDB(String itemId, String timestamp) {
         log.info("Getting description from DB for itemId: {} and timestamp: {}", itemId, timestamp);

@@ -15,6 +15,7 @@ import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.repository.PhaseRepository;
 import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
+import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
@@ -25,12 +26,13 @@ import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.player.service.PlayerService;
 import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
+import com.chatty.chatty.quizroom.controller.dto.ExistQuizIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO.PlayerAnswer;
 import com.chatty.chatty.quizroom.controller.dto.RoomAbstractDTO;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomResultResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -63,6 +65,7 @@ public class QuizRoomService {
     private final GameService gameService;
     private final ModelService modelService;
     private final DynamoDBService dynamoDBService;
+    private final DynamoDBRepository dynamoDBRepository;
     private final PlayerRepository playerRepository;
     private final MinioRepository minioRepository;
     private final PlayersStatusRepository playersStatusRepository;
@@ -107,6 +110,10 @@ public class QuizRoomService {
                 .description(quizRoom.getDescription())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
                 .build();
+    }
+
+    public ExistQuizIdResponse getExistQuizIdList(Long userId) {
+        return new ExistQuizIdResponse(dynamoDBRepository.getExistQuizIdList(userId));
     }
 
     public RoomIdResponse findRoomByCode(CodeRequestDTO request) {
