@@ -4,14 +4,8 @@ import { style } from '@vanilla-extract/css';
 export const mypageContainer = style({
   display: 'flex',
   maxWidth: 1124,
-  flexGrow: 1,
+  width: '100%',
   flexDirection: 'column',
-  alignItems: 'center',
-  overflowY: 'scroll',
-  '::-webkit-scrollbar': {
-    display: 'none',
-  },
-  scrollbarWidth: 'none',
   '@media': {
     '(max-width: 768px)': {
       height: 'calc(100% - 35px)',
