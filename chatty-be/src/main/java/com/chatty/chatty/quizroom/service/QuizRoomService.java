@@ -73,6 +73,7 @@ public class QuizRoomService {
         List<RoomAbstractDTO> rooms = quizRoomRepository.findByStatusOrderByCreatedAt(Status.READY, pageRequest)
                 .getContent()
                 .stream()
+                .filter(quizRoom -> playersStatusRepository.countPlayers(quizRoom.getId()) > 0)
                 .map(quizRoom -> RoomAbstractDTO.builder()
                         .roomId(quizRoom.getId())
                         .name(quizRoom.getName())
