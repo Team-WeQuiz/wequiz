@@ -1,8 +1,9 @@
 package com.chatty.chatty.quizroom.controller;
 
 import com.chatty.chatty.auth.support.AuthUser;
+import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomResultResponse;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,11 +33,11 @@ public class QuizRoomController {
     private final QuizRoomService quizRoomService;
 
     @PostMapping
-    public ResponseEntity<CreateRoomResponse> createRoom(
+    public ResponseEntity<RoomIdResponse> createRoom(
             @ModelAttribute CreateRoomRequest request,
             @AuthUser Long userId
     ) {
-        CreateRoomResponse response = quizRoomService.createRoom(request, userId);
+        RoomIdResponse response = quizRoomService.createRoom(request, userId);
         quizRoomService.broadcastUpdatedRoomList();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -46,6 +48,12 @@ public class QuizRoomController {
             @AuthUser Long userId
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getReadyRoomDetails(roomId, userId));
+    }
+
+    @PostMapping("/find-by-code")
+    public ResponseEntity<RoomIdResponse> findRoomByCode(@RequestBody CodeRequestDTO request) {
+        RoomIdResponse response = quizRoomService.findRoomByCode(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/{roomId}/start")

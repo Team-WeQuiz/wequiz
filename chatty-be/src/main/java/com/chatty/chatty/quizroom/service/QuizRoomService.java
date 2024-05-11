@@ -2,10 +2,13 @@ package com.chatty.chatty.quizroom.service;
 
 import static com.chatty.chatty.player.exception.PlayerExceptionType.PLAYER_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.FileExceptionType.FILE_INPUT_STREAM_FAILED;
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.CODE_INVALID;
+import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.NO_ROOM_FOUND_BY_CODE;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_READY;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_STARTED;
 
+import com.chatty.chatty.common.util.RandomCodeGenerator;
 import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
 import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
@@ -19,8 +22,9 @@ import com.chatty.chatty.player.exception.PlayerException;
 import com.chatty.chatty.player.repository.PlayerRepository;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.player.service.PlayerService;
+import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.CreateRoomResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO.PlayerAnswer;
@@ -69,6 +73,7 @@ public class QuizRoomService {
         List<RoomAbstractDTO> rooms = quizRoomRepository.findByStatusOrderByCreatedAt(Status.READY, pageRequest)
                 .getContent()
                 .stream()
+                .filter(quizRoom -> playersStatusRepository.countPlayers(quizRoom.getId()) > 0)
                 .map(quizRoom -> RoomAbstractDTO.builder()
                         .roomId(quizRoom.getId())
                         .name(quizRoom.getName())
@@ -94,9 +99,22 @@ public class QuizRoomService {
         return RoomDetailResponse.builder()
                 .roomId(quizRoom.getId())
                 .name(quizRoom.getName())
+                .code(quizRoom.getCode())
                 .maxPlayers(quizRoom.getPlayerLimitNum())
                 .description(quizRoom.getDescription())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
+                .build();
+    }
+
+    public RoomIdResponse findRoomByCode(CodeRequestDTO request) {
+        validateCode(request.code());
+        QuizRoom quizRoom = quizRoomRepository.findByCode(request.code())
+                .orElseThrow(() -> new QuizRoomException(NO_ROOM_FOUND_BY_CODE));
+        if (quizRoom.getStatus() != Status.READY) {
+            throw new QuizRoomException(ROOM_NOT_READY);
+        }
+        return RoomIdResponse.builder()
+                .roomId(quizRoom.getId())
                 .build();
     }
 
@@ -144,7 +162,9 @@ public class QuizRoomService {
     }
 
     @Transactional
-    public CreateRoomResponse createRoom(CreateRoomRequest request, Long userId) {
+    public RoomIdResponse createRoom(CreateRoomRequest request, Long userId) {
+        //6자리 랜덤 입장 코드 생성
+        String code = generateQuizRoomCode();
         // 퀴즈룸 DB에 저장
         QuizRoom savedQuizRoom = quizRoomRepository.save(
                 QuizRoom.builder()
@@ -152,7 +172,7 @@ public class QuizRoomService {
                         .description(request.description())
                         .numOfQuiz(request.numOfQuiz())
                         .playerLimitNum(request.playerLimitNum())
-                        .code(request.code())
+                        .code(code)
                         .status(Status.READY)
                         .build()
         );
@@ -165,9 +185,17 @@ public class QuizRoomService {
         savedQuizRoom.setQuizDocId(mlResponse.id());
         quizRoomRepository.save(savedQuizRoom);
 
-        return CreateRoomResponse.builder()
+        return RoomIdResponse.builder()
                 .roomId(savedQuizRoom.getId())
                 .build();
+    }
+
+    private String generateQuizRoomCode() {
+        String code;
+        do {
+            code = RandomCodeGenerator.generateCode();
+        } while (quizRoomRepository.findByCode(code).isPresent());
+        return code;
     }
 
     @Transactional
@@ -241,6 +269,12 @@ public class QuizRoomService {
                     }
                 });
         return fileNames;
+    }
+
+    private void validateCode(String code) {
+        if (code.length() != 6) {
+            throw new QuizRoomException(CODE_INVALID);
+        }
     }
 
     private void validateRoomIfReady(Status status) {

@@ -9,6 +9,8 @@ public record RoomDetailResponse(
 
         String name,
 
+        String code,
+
         Integer maxPlayers,
 
         String description,
