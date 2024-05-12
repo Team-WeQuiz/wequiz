@@ -100,6 +100,9 @@ public class GameService {
     }
 
     public QuizResponse sendQuiz(Long roomId) {
+        if (phaseRepository.getPhase(roomId) == RESULT) {
+            return null;
+        }
         QuizData quizData = gameRepository.getQuizData(roomId);
         initQuiz(quizData);
         log.info("Send: Quiz: {}", gameRepository.getQuizData(roomId).getQuiz());
@@ -212,15 +215,13 @@ public class GameService {
         log.info("Updated Score");
     }
 
-    private void resetState(Long roomId, Long userId) {
+    private void resetState(Long roomId) {
         // 직전 문제 삭제
         removeQuiz(roomId);
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.isQueueEmpty()) {
             phaseRepository.update(roomId, RESULT);
             log.info("Phase UPDATED: RESULT");
-            getPhase(roomId, userId);
-            scoreCountDown(roomId);
         } else {
             phaseRepository.update(roomId, Phase.QUIZ_SOLVING);
             log.info("Phase UPDATED: QUIZ_SOLVING");
@@ -257,13 +258,14 @@ public class GameService {
         QuizDTO solvedQuiz = gameRepository.getQuizData(roomId).getQuiz();
         log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
         markAndUpdateScore(roomId, solvedQuiz, answerData);
-        resetState(roomId, userId);
-        if (phaseRepository.getPhase(roomId) == RESULT) {
-            return;
-        }
+        resetState(roomId);
         template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
                 buildCountDownResponse(seconds));
         log.info("Countdown: {}", seconds);
+        if (phaseRepository.getPhase(roomId) == RESULT) {
+            getPhase(roomId, userId);
+            scoreCountDown(roomId);
+        }
     }
 
     private void scoreCountDown(Long roomId) {
@@ -343,9 +345,7 @@ public class GameService {
             }
             case RESULT -> {
                 ScoreResponse scoreResponse = sendScore(roomId);
-                template.convertAndSendToUser(
-                        userId.toString(),
-                        "/queue/rooms/" + roomId + "/score",
+                template.convertAndSend("/sub/rooms/" + roomId + "/score",
                         scoreResponse
                 );
             }
