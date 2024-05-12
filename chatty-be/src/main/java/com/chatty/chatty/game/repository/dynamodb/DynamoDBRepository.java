@@ -49,7 +49,7 @@ public class DynamoDBRepository {
 
         ItemCollection<QueryOutcome> items = index.query(spec);
         for (Item item : items) {
-            String primaryKey = item.getString("id");
+            String primaryKey = item.getString(HASH_KEY);
             existQuizIdList.add(primaryKey);
         }
         return existQuizIdList;
