@@ -35,6 +35,7 @@ import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
 import com.chatty.chatty.player.domain.PlayersStatus;
 import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
+import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import com.chatty.chatty.user.service.UserService;
 import java.time.LocalDateTime;
@@ -82,6 +83,11 @@ public class GameService {
 
     public PlayersStatusDTO toggleReady(Long roomId, Long userId) {
         PlayersStatus playersStatus = playersStatusRepository.toggleReady(roomId, userId);
+        if (playersStatus.isAllReady()) {
+            quizRoomRepository.updateStatusById(roomId, Status.STARTED);
+        } else {
+            quizRoomRepository.updateStatusById(roomId, Status.READY);
+        }
         return buildDTO(roomId, playersStatus);
     }
 

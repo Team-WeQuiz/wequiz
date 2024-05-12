@@ -38,4 +38,8 @@ public record PlayersStatus(
                 });
         return new PlayersStatus(playerStatusSet);
     }
+
+    public boolean isAllReady() {
+        return playerStatusSet.stream().allMatch(PlayerStatus::isReady);
+    }
 }
