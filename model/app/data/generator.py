@@ -5,7 +5,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 from model.chain import QuizPipeline
-from data.settings import QUIZ_GENERATE_RETRY, QUIZ_LENGTH_MIN_LIMIT
+from data.settings import *
 from utils.logger import *
 from utils.exception import *
 # 로깅 설정
@@ -29,11 +29,14 @@ class QuizGenerator():
         elif '3' in text.lower() or ('yes' in text.lower() and 'no' in text.lower()):
             return "OX퀴즈"
     
-    def set_options(self, type, option_list):
+    def set_options_correct(self, type, option_list, correct):
         if type == "OX퀴즈":
-            return ["YES", "NO"]
-        else:
-            return option_list
+            option_list = ["YES", "NO"]
+            if correct.strip().lower() in YES_LIST:
+                correct = 'YES'
+            else:
+                correct = 'NO'
+        return option_list, correct
     
     def generate(self, keyword, question_number):
         retry = 0
@@ -47,7 +50,7 @@ class QuizGenerator():
                     raise QuizGenerationException(f"Generated quiz is shorter than threshold({QUIZ_LENGTH_MIN_LIMIT}). length: {len(question)}")
 
                 type = self.get_type(response["text"]["type"])
-                options = self.set_options(type, response["text"]["choices"])
+                options, correct = self.set_optitons_correct(type, response["text"]["choices"], response["text"]["correct"])
                 if type == "OX퀴즈": type = "객관식"    # ox퀴즈도 객관식으로 설정
                 if type is None:   # type이 None인 경우 예외처리
                     if len(options) == 0:
@@ -65,7 +68,7 @@ class QuizGenerator():
                     "type": type,
                     "question": question,
                     "options": options,
-                    "correct": response["text"]["correct"]
+                    "correct": correct,
                 }
                 break
             except KeyError:
@@ -94,7 +97,7 @@ class Marker():
         self.marker_chain = MarkChain()
     
     def mark(self, answer, user):
-        if user.sprit() == '':
+        if user.strip() == '':
             return 'false'
         else:
             response = self.marker_chain.mark(answer, user)
