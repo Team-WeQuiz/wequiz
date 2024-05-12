@@ -25,12 +25,12 @@ import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.player.service.PlayerService;
 import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO.PlayerAnswer;
 import com.chatty.chatty.quizroom.controller.dto.RoomAbstractDTO;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
+import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomResultResponse;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
@@ -38,7 +38,6 @@ import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import jakarta.persistence.OptimisticLockException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -234,12 +233,12 @@ public class QuizRoomService {
                     if (quizRoom.getStatus() == Status.FINISHED) {
                         return;
                     }
-                    validateRoomIfStarted(quizRoom.getStatus());
                     updateRoomStatus(quizRoom, Status.FINISHED);
                     gameRepository.clearQuizData(roomId);
                     playersStatusRepository.clear(roomId);
                     userSubmitStatusRepository.clear(roomId);
                     phaseRepository.clear(roomId);
+                    log.info("Room {} is finished", roomId);
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
