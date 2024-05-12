@@ -28,7 +28,7 @@ type QuizSet = {
 type SubmitStatus = {
   userId: number;
   nickname: string;
-  profileImage: string;
+  profileImage: string | null;
   isSolved: boolean;
 };
 
@@ -196,8 +196,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     setSelectedOption(null);
   };
 
-
-
   // 퀴즈 제출
   const submitQuiz = (roomId: number) => {
     setIsAnswered(true);
@@ -277,7 +275,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           </div>
           <div className={styles.StatusWrapper}>
             {count !== null ? (
-              <h1 className={styles.Count}>{count <= 0 ? 0 : count}</h1>
+              <h1 className={styles.Count}>
+                {count <= 0 || count === null ? 0 : count}
+              </h1>
             ) : isAnswered ? (
               <BarSpinner />
             ) : (
@@ -308,8 +308,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       {isOpen ? (
         <ResultModal
           currentRound={quizSet?.currentRound || 0}
-          users={scores || []}
-          count={scoreCount || 0}
+          users={scores.length > 0 ? scores : []}
+          count={scoreCount === null ? 0 : scoreCount}
         />
       ) : null}
     </div>
