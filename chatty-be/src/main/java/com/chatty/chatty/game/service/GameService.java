@@ -85,7 +85,11 @@ public class GameService {
         PlayersStatus playersStatus = playersStatusRepository.toggleReady(roomId, userId);
         if (playersStatus.isAllReady()) {
             quizRoomRepository.updateStatusById(roomId, Status.STARTED);
+            log.info("모두 레디 상태");
+            log.info("room status: {}", quizRoomRepository.findById(roomId).get().getStatus());
         } else {
+            log.info("레디 상태 아님");
+            log.info("room status: {}", quizRoomRepository.findById(roomId).get().getStatus());
             quizRoomRepository.updateStatusById(roomId, Status.READY);
         }
         return buildDTO(roomId, playersStatus);

@@ -213,10 +213,6 @@ public class QuizRoomService {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom
                         -> {
-                    if (quizRoom.getStatus() == Status.STARTED) {
-                        return;
-                    }
-                    validateRoomIfReady(quizRoom.getStatus());
                     quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
                     updateRoomStatus(quizRoom, Status.STARTED);
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
@@ -279,12 +275,6 @@ public class QuizRoomService {
     private void validateCode(String code) {
         if (code.length() != 6) {
             throw new QuizRoomException(CODE_INVALID);
-        }
-    }
-
-    private void validateRoomIfReady(Status status) {
-        if (status != Status.READY) {
-            throw new QuizRoomException(ROOM_NOT_READY);
         }
     }
 
