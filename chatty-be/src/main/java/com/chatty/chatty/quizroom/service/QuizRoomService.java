@@ -6,7 +6,6 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.CODE_IN
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.NO_ROOM_FOUND_BY_CODE;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_READY;
-import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_STARTED;
 
 import com.chatty.chatty.common.util.RandomCodeGenerator;
 import com.chatty.chatty.config.minio.MinioRepository;
@@ -110,10 +109,11 @@ public class QuizRoomService {
                 .isFull(playersStatusRepository.countPlayers(quizRoom.getId()) >= quizRoom.getPlayerLimitNum())
                 .build();
     }
-  
+
     public ExistQuizIdResponse getExistQuizIdList(Long userId) {
         return new ExistQuizIdResponse(dynamoDBRepository.getExistQuizIdList(userId));
-      
+    }
+
     public QuizRoom getQuizRoom(Long roomId) {
         return quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
