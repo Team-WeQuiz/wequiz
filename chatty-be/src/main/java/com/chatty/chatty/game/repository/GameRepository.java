@@ -3,6 +3,7 @@ package com.chatty.chatty.game.repository;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 
 import com.chatty.chatty.game.domain.QuizData;
+import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
@@ -22,6 +23,7 @@ public class GameRepository {
     private static final Map<Long, QuizData> quizDataMap = new ConcurrentHashMap<>();
 
     private final QuizRoomRepository quizRoomRepository;
+    private final DynamoDBRepository dynamoDBRepository;
 
     public QuizData getQuizData(Long roomId) {
         return quizDataMap.computeIfAbsent(roomId, this::initQuizData);
@@ -30,11 +32,14 @@ public class GameRepository {
     private QuizData initQuizData(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        String quizDocId = quizRoom.getQuizDocId();
+        String timestamp = dynamoDBRepository.getTimeStampFromDB(quizRoom.getQuizDocId());
+        Integer numOfQuiz = dynamoDBRepository.getQuizFromDB(quizDocId, timestamp).size();
         log.info("Init Quiz Data: roomId: {}", roomId);
         return QuizData.builder()
-                .quizDocId(quizRoom.getQuizDocId())
-                .timestamp(quizRoom.getCreatedAt().toString())
-                .totalRound(quizRoom.getNumOfQuiz() / QUIZ_PER_ROUND)
+                .quizDocId(quizDocId)
+                .timestamp(timestamp)
+                .totalRound(numOfQuiz / QUIZ_PER_ROUND)
                 .currentRound(DEFAULT_ROUND)
                 .build();
     }

@@ -9,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class DynamoDBRepository {
     private static final String HASH_KEY = "id";
     private static final String RANGE_KEY = "timestamp";
     private static final String QUIZ = "questions";
+    private static final String TIMESTAMP = "timestamp";
     private static final String DESCRIPTION = "description";
     private static final String ANSWERS = "answers";
 
@@ -53,6 +55,20 @@ public class DynamoDBRepository {
         return existQuizIdList;
     }
 
+    public String getTimeStampFromDB(String quizDocId) {
+        Table table = dynamoDB.getTable(QUIZ_TABLE_NAME);
+
+        QuerySpec querySpec = new QuerySpec()
+                .withKeyConditionExpression("#pk = :pk")
+                .withNameMap(new NameMap().with("#pk", HASH_KEY))
+                .withValueMap(new ValueMap().with(":pk", quizDocId));
+        //.withProjectionExpression(TIMESTAMP);
+
+        Item item = table.query(querySpec).iterator().next();
+        log.info("Item: {}", item);
+
+        return item.getString(TIMESTAMP);
+    }
 
     public String getDescriptionFromDB(String itemId, String timestamp) {
         log.info("Getting description from DB for itemId: {} and timestamp: {}", itemId, timestamp);
