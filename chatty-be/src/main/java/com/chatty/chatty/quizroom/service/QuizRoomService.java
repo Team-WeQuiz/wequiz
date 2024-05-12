@@ -92,8 +92,7 @@ public class QuizRoomService {
     }
 
     public RoomDetailResponse getReadyRoomDetails(Long roomId, Long userId) {
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId)
-                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        QuizRoom quizRoom = getQuizRoom(roomId);
         validateRoomIfReady(quizRoom.getStatus());
         gameService.sendDescription(quizRoom.getId(), userId);
         gameService.sendQuizReady(quizRoom.getId(), userId);
@@ -109,6 +108,11 @@ public class QuizRoomService {
                 .build();
     }
 
+    public QuizRoom getQuizRoom(Long roomId) {
+        return quizRoomRepository.findById(roomId)
+                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+    }
+
     public RoomIdResponse findRoomByCode(CodeRequestDTO request) {
         validateCode(request.code());
         QuizRoom quizRoom = quizRoomRepository.findByCode(request.code())
@@ -122,8 +126,7 @@ public class QuizRoomService {
     }
 
     public RoomResultResponse getTotalResult(Long roomId) {
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId)
-                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        QuizRoom quizRoom = getQuizRoom(roomId);
         List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId(),
                 quizRoom.getCreatedAt().toString());
         List<MarkDTO> markDTOList = dynamoDBService.getMark(quizRoom.getMarkDocId());
@@ -238,7 +241,6 @@ public class QuizRoomService {
                     playersStatusRepository.clear(roomId);
                     userSubmitStatusRepository.clear(roomId);
                     phaseRepository.clear(roomId);
-                    log.info("Room {} is finished", roomId);
                 }, () -> {
                     throw new QuizRoomException(ROOM_NOT_FOUND);
                 });
@@ -283,12 +285,6 @@ public class QuizRoomService {
     private void validateRoomIfReady(Status status) {
         if (status != Status.READY) {
             throw new QuizRoomException(ROOM_NOT_READY);
-        }
-    }
-
-    private void validateRoomIfStarted(Status status) {
-        if (status != Status.STARTED) {
-            throw new QuizRoomException(ROOM_NOT_STARTED);
         }
     }
 
