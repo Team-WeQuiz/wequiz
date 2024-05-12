@@ -2,8 +2,6 @@ package com.chatty.chatty.config;
 
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
-import com.chatty.chatty.player.repository.PlayersStatusRepository;
-import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.service.QuizRoomService;
 import java.util.Objects;
@@ -30,15 +28,17 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         Long userId = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
         Long roomId = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("roomId");
-        if (!(headerAccessor.getCommand() == StompCommand.DISCONNECT
-                && quizRoomService.getQuizRoom(roomId).getStatus() == Status.STARTED)) {
-            log.info("User {} disconnected from room {}", userId, roomId);
-            PlayersStatusDTO playersStatusDTO = gameService.leaveRoom(roomId, userId);
-            if (playersStatusDTO.playerStatuses().isEmpty()) {
-                quizRoomService.finishRoom(roomId);
+        if (headerAccessor.getCommand() == StompCommand.DISCONNECT) {
+            if (quizRoomService.getQuizRoom(roomId).getStatus() != Status.STARTED) {
+                PlayersStatusDTO playersStatusDTO = gameService.leaveRoom(roomId, userId);
+                log.info("User {} disconnected from room {}", userId, roomId);
+                if (playersStatusDTO.playerStatuses().isEmpty()) {
+                    quizRoomService.finishRoom(roomId);
+                }
+                template.convertAndSend("/sub/rooms/" + roomId + "/status", playersStatusDTO);
+                quizRoomService.broadcastUpdatedRoomList();
+
             }
-            template.convertAndSend("/sub/rooms/" + roomId + "/status", playersStatusDTO);
-            quizRoomService.broadcastUpdatedRoomList();
         }
     }
 }
