@@ -6,7 +6,7 @@ import useUserInfoStore from '@/app/_store/useUserInfoStore';
 type SubmitStatus = {
   userId: number;
   nickname: string;
-  profileImage: string;
+  profileImage: string | null;
   isSolved: boolean;
 };
 
@@ -73,7 +73,7 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
             <div className={styles.UserBox} key={status.userId}>
               <div className={styles.UserImage}>
                 <Image
-                  src={status.profileImage}
+                  src={status.profileImage || '/images/profile.svg'}
                   alt="profile"
                   width={120}
                   height={120}

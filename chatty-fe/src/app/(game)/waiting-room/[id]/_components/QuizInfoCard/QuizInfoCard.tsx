@@ -5,6 +5,7 @@ import { getQuizInfo } from '@/app/_api/quiz';
 import { useState, useEffect } from 'react';
 import useAuthStore from '@/app/_store/useAuthStore';
 import { useRouter } from 'next/navigation';
+import useWaitingStore from '@/app/_store/useWaitingStore';
 
 const initialData: QuizInfo = {
   roomId: 0,
@@ -25,14 +26,15 @@ const QuizInfoCard = ({
   const [data, setData] = useState<QuizInfo>(initialData);
   const { accessToken } = useAuthStore();
   const router = useRouter();
+  const { userStatuses } = useWaitingStore();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getQuizInfo(roomId, accessToken);
+        const response: QuizInfo = await getQuizInfo(roomId, accessToken);
         setData(response);
-        if (response.isFull) {
-          alert('방이 꽉 찼습니다. 메인 로비로 이동합니다.');
+        if (userStatuses.length >= response.maxPlayers) {
+          alert('방이 다 찼습니다. 로비로 이동합니다.');
           router.push('/main-lobby');
         }
       } catch (error: any) {
