@@ -4,7 +4,6 @@ import QuestionArea from './_components/QuestionArea/QuestionArea';
 import AnswerArea from './_components/AnswerArea/AnswerArea';
 import * as styles from './page.css';
 import GradButton from '@/app/_components/GradButton';
-import MyProfile from './_components/MyProfile/MyProfile';
 import UserGrid from './_components/UserGrid/UserGrid';
 import RoundProgress from './_components/RoundProgress/RoundProgress';
 import { useEffect, useState } from 'react';
@@ -15,6 +14,7 @@ import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
 import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
 import client from '@/app/_api/client';
+import { useRouter } from 'next/navigation';
 
 type QuizSet = {
   totalRound: number;
@@ -28,7 +28,7 @@ type QuizSet = {
 type SubmitStatus = {
   userId: number;
   nickname: string;
-  profileImage: string;
+  profileImage: string | null;
   isSolved: boolean;
 };
 
@@ -46,8 +46,8 @@ type PlayerScore = {
 
 const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [quizSet, setQuizSet] = useState<QuizSet | null>(null);
-  const [count, setCount] = useState(3);
-  const [scoreCount, setScoreCount] = useState(0);
+  const [count, setCount] = useState<number | null>(null);
+  const [scoreCount, setScoreCount] = useState<number | null>(null);
   const [scores, setScores] = useState<PlayerScore[]>([]);
   const [isAnswered, setIsAnswered] = useState(false);
   const [userAnswer, setUserAnswer] = useState<string | null>(null);
@@ -58,12 +58,20 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
   const { openModal, closeModal, isOpen } = useModal();
+  const router = useRouter();
 
   const handleOptionChange = (option: string, index: number) => {
     setUserAnswer(option);
     setSelectedOption(index);
   };
 
+  const checkLastRound = () => {
+    return quizSet?.currentRound === quizSet?.totalRound;
+  };
+
+  useEffect(() => {
+    console.log(isAnswered);
+  }, [isAnswered]);
   // 퀴즈 구독
   const subscribeQuiz = (roomId: number) => {
     stompClient.subscribe(
@@ -117,14 +125,14 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         const countData = JSON.parse(count.body);
         setCount(countData.second);
         console.log('카운트: ', countData);
-        if (countData.second === 0) {
-          if (!isAnswered) {
-            submitQuiz(params.id);
-          }
-        }
+        // if (countData.second === 0) {
+        //   if (!isAnswered) {
+        //     submitQuiz(params.id);
+        //   }
+        // }
         if (countData.second === -1) {
           getQuiz(params.id);
-          setCount(3);
+          setCount(null);
           setIsAnswered(false);
         }
       },
@@ -147,10 +155,16 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         }
         setCount(countData.second);
         if (countData.second === 0) {
-          if (quizSet?.totalRound === quizSet?.currentRound) {
-            deleteRoom();
+          if (checkLastRound()) {
+            closeModal();
+            router.push(`/result/${params.id}`);
+          } else {
+            closeModal();
           }
-          closeModal();
+        }
+        if (countData.second === -1) {
+          setScoreCount(null);
+          getQuiz(params.id);
         }
       },
       {
@@ -180,15 +194,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       },
     });
     setSelectedOption(null);
-  };
-
-  // 퀴즈 끝내기 요청
-  const deleteRoom = async () => {
-    const response = await client.delete(`/rooms/${params.id}/end`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
   };
 
   // 퀴즈 제출
@@ -230,7 +235,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       };
       stompClient.activate();
     }
-  }, [accessToken, userId, params.id]);
+  }, [accessToken, params.id]);
 
   return (
     <div className={styles.Main}>
@@ -269,17 +274,21 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
             </div>
           </div>
           <div className={styles.StatusWrapper}>
-            {isAnswered && submitStatuses?.isMajority ? (
-              <h1 className={styles.Count}>{count <= 0 ? 0 : count}</h1>
-            ) : isAnswered && !submitStatuses?.isMajority ? (
+            {count !== null ? (
+              <h1 className={styles.Count}>
+                {count <= 0 || count === null ? 0 : count}
+              </h1>
+            ) : isAnswered ? (
               <BarSpinner />
             ) : (
               ''
             )}
             <div>
-              {isAnswered && submitStatuses?.isMajority
+              {count !== null
                 ? '과반수 이상이 제출하였습니다.'
-                : '다른 플레이어가 문제를 제출할 때 까지 기다려주세용 :)'}
+                : isAnswered
+                  ? '다른 플레이어가 문제를 제출할 때 까지 기다려주세용 :)'
+                  : ''}
             </div>
           </div>
           <div className={styles.ButtonWrapper}>
@@ -299,8 +308,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       {isOpen ? (
         <ResultModal
           currentRound={quizSet?.currentRound || 0}
-          users={scores || []}
-          count={scoreCount}
+          users={scores.length > 0 ? scores : []}
+          count={scoreCount === null ? 0 : scoreCount}
         />
       ) : null}
     </div>

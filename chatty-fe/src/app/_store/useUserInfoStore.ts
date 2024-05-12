@@ -3,7 +3,7 @@ import { create } from 'zustand';
 type UserInfoState = {
   id: number | undefined;
   email: string;
-  profileImage: string;
+  profileImage: string | null;
   loginType: string;
   isValid: boolean;
 };
@@ -16,7 +16,7 @@ type UserInfoActions = {
 const useUserInfoStore = create<UserInfoState & UserInfoActions>((set) => ({
   id: undefined,
   email: '',
-  profileImage: '',
+  profileImage: null,
   loginType: '',
   isValid: false,
   setUserInfo: (userInfo: UserInfoState) => set(userInfo),
@@ -24,7 +24,7 @@ const useUserInfoStore = create<UserInfoState & UserInfoActions>((set) => ({
     set({
       id: undefined,
       email: '',
-      profileImage: '',
+      profileImage: null,
       loginType: '',
       isValid: false,
     }),

@@ -6,7 +6,7 @@ import useUserInfoStore from '@/app/_store/useUserInfoStore';
 type SubmitStatus = {
   userId: number;
   nickname: string;
-  profileImage: string;
+  profileImage: string | null;
   isSolved: boolean;
 };
 
@@ -27,23 +27,26 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
   return (
     <div className={styles.UserContainer}>
       <div className={styles.MyContainer}>
-        <Image
-          src={
-            submitStatus.find((status) => status.userId === userId)
-              ?.profileImage || '/images/profile.svg'
-          }
-          alt="profile"
-          width={180}
-          height={180}
-        />
+        <div className={styles.MyImage}>
+          <Image
+            src={
+              submitStatus.find((status) => status.userId === userId)
+                ?.profileImage || '/images/profile.svg'
+            }
+            alt="profile"
+            width={180}
+            height={180}
+          />
+        </div>
+
         <div className={styles.MyNickname}>
           <span>
             {submitStatus.find((status) => status.userId === userId)?.nickname}
           </span>
           <span>
             {submitStatus.find((status) => status.userId === userId)?.isSolved
-              ? '🟢'
-              : '제출안함'}
+              ? ' 🟢'
+              : ' 🔴'}
           </span>
         </div>
         <div className={styles.EmojiContainer}>
@@ -65,22 +68,22 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
         </div>
       </div>
       <div className={styles.Container}>
-        {submitStatus
-          .filter((status) => status.userId !== userId)
-          .map((status, index) => (
-            <div className={styles.UserBox} key={index}>
+        {submitStatus.map((status, index) =>
+          status.userId !== userId ? (
+            <div className={styles.UserBox} key={status.userId}>
               <div className={styles.UserImage}>
                 <Image
-                  src={status.profileImage}
+                  src={status.profileImage || '/images/profile.svg'}
                   alt="profile"
                   width={120}
                   height={120}
                 />
               </div>
               <div>{status.nickname}</div>
-              <span>{status.isSolved ? '🟢' : '제출안함'}</span>
+              <span>{status.isSolved ? '🟢' : '🔴'}</span>
             </div>
-          ))}
+          ) : null,
+        )}
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import { revalidatePath } from 'next/cache';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
 
-const ProfileEditor = ({ profile }: { profile: string }) => {
+const ProfileEditor = ({ profile }: { profile: string | null }) => {
   const { isOpen, openModal, closeModal } = useModal();
   const imageRef = useRef<HTMLImageElement>(null);
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
@@ -100,11 +100,7 @@ const ProfileEditor = ({ profile }: { profile: string }) => {
   return (
     <div className={styles.profileWrapper}>
       <Image
-        src={
-          profile && profile !== 'bit.ly/wequiz_profile_image'
-            ? profile
-            : '/images/Empty_profile.svg'
-        }
+        src={profile || '/images/Empty_profile.svg'}
         alt="user_profile"
         width={120}
         height={120}

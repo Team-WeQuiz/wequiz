@@ -5,7 +5,6 @@ import com.chatty.chatty.game.controller.dto.ChatResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
-import com.chatty.chatty.game.controller.dto.SubmitAnswerResponse;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
 import com.chatty.chatty.player.controller.dto.PlayersStatusDTO;
@@ -49,16 +48,11 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor,
-                                     NicknameRequest request) {
+            NicknameRequest request) {
+        headerAccessor.getSessionAttributes().put("roomId", roomId);
+        PlayersStatusDTO response = gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
         quizRoomService.broadcastUpdatedRoomList();
-        return gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
-    }
-
-    @MessageMapping("/rooms/{roomId}/leave")
-    @SendTo("/sub/rooms/{roomId}/status")
-    public PlayersStatusDTO leaveRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
-        quizRoomService.broadcastUpdatedRoomList();
-        return gameService.leaveRoom(roomId, getUserIdFromHeader(headerAccessor));
+        return response;
     }
 
     @MessageMapping("/rooms/{roomId}/ready")
@@ -82,12 +76,11 @@ public class GameController {
     }
 
     @MessageMapping("/rooms/{roomId}/submit")
-    @SendTo("/sub/rooms/{roomId}/submit")
-    public SubmitAnswerResponse submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
-                                             SimpMessageHeaderAccessor headerAccessor) {
+    public void submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
+            SimpMessageHeaderAccessor headerAccessor) {
         log.info("Submit request: {}", request);
         log.info("Submit userId: {}", getUserIdFromHeader(headerAccessor));
-        return gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
+        gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
     }
 
     /*
@@ -102,7 +95,6 @@ public class GameController {
                 "/queue/rooms/" + roomId + "/score",
                 scoreResponse
         );
-        gameService.scoreCountDown(roomId);
     }
 
     @MessageMapping("/rooms/{roomId}/phase")

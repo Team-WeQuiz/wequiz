@@ -33,14 +33,14 @@ export default function ResultModal({
     return chunks;
   };
 
-  const rankedUsers = calcRanking(users);
+  // const rankedUsers = calcRanking(users);
 
   return (
     <div className={styles.ModalBackground}>
       <div className={styles.Modal}>
         <div className={styles.Title}>{currentRound}라운드 등수</div>
         <div className={styles.ResultBox}>
-          {chunkedUsers(rankedUsers, 5).map((userGroup, groupIndex) => (
+          {chunkedUsers(users, 5).map((userGroup, groupIndex) => (
             <div key={groupIndex} className={styles.RankingBox}>
               {userGroup.map((user, index) => (
                 <div
@@ -51,7 +51,7 @@ export default function ResultModal({
                       : styles.RankingContents
                   }
                 >
-                  {rankedUsers.indexOf(user) === 0 ? (
+                  {users.indexOf(user) === 0 ? (
                     <>
                       <div className={styles.RankingNumberWrapper}>
                         <Image
@@ -66,7 +66,7 @@ export default function ResultModal({
                       </span>
                       <span className={styles.ScoreArea}>{user.score}점</span>
                     </>
-                  ) : rankedUsers.indexOf(user) === 1 ? (
+                  ) : users.indexOf(user) === 1 ? (
                     <>
                       <div className={styles.RankingNumberWrapper}>
                         <Image
@@ -81,7 +81,7 @@ export default function ResultModal({
                       </span>
                       <span className={styles.ScoreArea}>{user.score}점</span>
                     </>
-                  ) : rankedUsers.indexOf(user) === 2 ? (
+                  ) : users.indexOf(user) === 2 ? (
                     <>
                       <div className={styles.RankingNumberWrapper}>
                         <Image
@@ -100,7 +100,7 @@ export default function ResultModal({
                     <>
                       <div className={styles.RankingNumberWrapper}>
                         <span className={styles.RankingNumber}>
-                          {rankedUsers.indexOf(user) + 1}
+                          {users.indexOf(user) + 1}
                         </span>
                       </div>
                       <span className={styles.NickNameArea}>

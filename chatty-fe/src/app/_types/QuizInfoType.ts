@@ -4,4 +4,5 @@ export type QuizInfo = {
   maxPlayers: number;
   description: string;
   numOfQuiz: number;
+  isFull: boolean;
 };

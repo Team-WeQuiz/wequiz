@@ -40,7 +40,6 @@ import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import jakarta.persistence.OptimisticLockException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -96,8 +95,7 @@ public class QuizRoomService {
     }
 
     public RoomDetailResponse getReadyRoomDetails(Long roomId, Long userId) {
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId)
-                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        QuizRoom quizRoom = getQuizRoom(roomId);
         validateRoomIfReady(quizRoom.getStatus());
         gameService.sendDescription(quizRoom.getId(), userId);
         gameService.sendQuizReady(quizRoom.getId(), userId);
@@ -109,11 +107,16 @@ public class QuizRoomService {
                 .maxPlayers(quizRoom.getPlayerLimitNum())
                 .description(quizRoom.getDescription())
                 .numOfQuiz(quizRoom.getNumOfQuiz())
+                .isFull(playersStatusRepository.countPlayers(quizRoom.getId()) >= quizRoom.getPlayerLimitNum())
                 .build();
     }
-
+  
     public ExistQuizIdResponse getExistQuizIdList(Long userId) {
         return new ExistQuizIdResponse(dynamoDBRepository.getExistQuizIdList(userId));
+      
+    public QuizRoom getQuizRoom(Long roomId) {
+        return quizRoomRepository.findById(roomId)
+                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
     }
 
     public RoomIdResponse findRoomByCode(CodeRequestDTO request) {
@@ -129,8 +132,7 @@ public class QuizRoomService {
     }
 
     public RoomResultResponse getTotalResult(Long roomId) {
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId)
-                .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
+        QuizRoom quizRoom = getQuizRoom(roomId);
         List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId(),
                 quizRoom.getCreatedAt().toString());
         List<MarkDTO> markDTOList = dynamoDBService.getMark(quizRoom.getMarkDocId());
@@ -144,6 +146,8 @@ public class QuizRoomService {
             List<PlayerAnswer> playerAnswers = new ArrayList<>();
             for (int playerIndex = 0; playerIndex < markDTO.markeds().size(); playerIndex++) {
                 MarkDTO.Marked marked = markDTO.markeds().get(playerIndex);
+                log.info("playerId: {}", marked.playerId());
+                log.info("playerAnswer: {}", marked.playerAnswer());
 
                 // Player 엔티티에서 닉네임 가져오기
                 String nickname = playerRepository.findByUserIdAndQuizRoomId(marked.playerId(), roomId)
@@ -152,9 +156,11 @@ public class QuizRoomService {
                 playerAnswers.add(
                         new PlayerAnswer(marked.playerId(), nickname, marked.playerAnswer(), marked.marking()));
             }
+            log.info("playerAnswers: {}", playerAnswers);
 
             // 정답률 계산
             int correctRate = calculateCorrectRate(playerAnswers);
+            log.info("correctRate: {}", correctRate);
 
             quizResultDTOList.add(QuizResultDTO.builder()
                     .quizNumber(quizDTO.questionNumber())
@@ -219,16 +225,8 @@ public class QuizRoomService {
         quizRoomRepository.findById(roomId)
                 .ifPresentOrElse(quizRoom
                         -> {
-                    if (quizRoom.getStatus() == Status.STARTED) {
-                        return;
-                    }
-                    validateRoomIfReady(quizRoom.getStatus());
                     quizRoom.setPlayerNum(playersStatusRepository.countPlayers(quizRoom.getId()));
-                    try {
-                        updateRoomStatus(quizRoom, Status.STARTED);
-                    } catch (OptimisticLockException e) {
-                        throw new QuizRoomException(ROOM_NOT_READY);
-                    }
+                    updateRoomStatus(quizRoom, Status.STARTED);
                     PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
                     players.playerStatusSet()
                             .forEach(player -> playerService.savePlayer(player.userId(), roomId, player.nickname()));
@@ -246,7 +244,6 @@ public class QuizRoomService {
                     if (quizRoom.getStatus() == Status.FINISHED) {
                         return;
                     }
-                    validateRoomIfStarted(quizRoom.getStatus());
                     updateRoomStatus(quizRoom, Status.FINISHED);
                     gameRepository.clearQuizData(roomId);
                     playersStatusRepository.clear(roomId);
@@ -293,21 +290,15 @@ public class QuizRoomService {
         }
     }
 
-    private void validateRoomIfReady(Status status) {
-        if (status != Status.READY) {
-            throw new QuizRoomException(ROOM_NOT_READY);
-        }
-    }
-
-    private void validateRoomIfStarted(Status status) {
-        if (status != Status.STARTED) {
-            throw new QuizRoomException(ROOM_NOT_STARTED);
-        }
-    }
-
     private int calculateCorrectRate(List<PlayerAnswer> playerAnswers) {
         int totalAnswers = playerAnswers.size();
         int correctCount = (int) playerAnswers.stream().filter(PlayerAnswer::marking).count();
         return totalAnswers > 0 ? (correctCount * 100) / totalAnswers : 0;
+    }
+
+    private void validateRoomIfReady(Status status) {
+        if (status != Status.READY) {
+            throw new QuizRoomException(ROOM_NOT_READY);
+        }
     }
 }

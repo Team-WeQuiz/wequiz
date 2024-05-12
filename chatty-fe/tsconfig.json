@@ -28,7 +28,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/api/s3.js"
-, "src/app/(game)/@modal/page.tsx"  ],
+    "src/app/api/s3.js",
+    "src/app/(game)/@modal/page.tsx"
+  ],
   "exclude": ["node_modules"]
 }
