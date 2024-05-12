@@ -283,4 +283,10 @@ public class QuizRoomService {
         int correctCount = (int) playerAnswers.stream().filter(PlayerAnswer::marking).count();
         return totalAnswers > 0 ? (correctCount * 100) / totalAnswers : 0;
     }
+
+    private void validateRoomIfReady(Status status) {
+        if (status != Status.READY) {
+            throw new QuizRoomException(ROOM_NOT_READY);
+        }
+    }
 }
