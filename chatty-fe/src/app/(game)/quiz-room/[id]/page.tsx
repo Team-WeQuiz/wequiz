@@ -156,7 +156,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         setCount(countData.second);
         if (countData.second === 0) {
           if (checkLastRound()) {
-            deleteRoom();
             closeModal();
             router.push(`/result/${params.id}`);
           } else {
@@ -197,19 +196,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     setSelectedOption(null);
   };
 
-  // 퀴즈 끝내기 요청
-  const deleteRoom = async () => {
-    try {
-      const response = await client.delete(`/rooms/${params.id}/end`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
 
   // 퀴즈 제출
   const submitQuiz = (roomId: number) => {
