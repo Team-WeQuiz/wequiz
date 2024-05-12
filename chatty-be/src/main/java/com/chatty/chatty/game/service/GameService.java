@@ -187,7 +187,7 @@ public class GameService {
         if (submitCount == answerData.getMajorityNum()) {
             phaseRepository.update(roomId, COUNTDOWN);
             log.info("Phase UPDATED: COUNTDOWN");
-            quizCountDown(roomId);
+            quizCountDown(roomId, userId);
         }
     }
 
@@ -212,13 +212,15 @@ public class GameService {
         log.info("Updated Score");
     }
 
-    private void resetState(Long roomId) {
+    private void resetState(Long roomId, Long userId) {
         // 직전 문제 삭제
         removeQuiz(roomId);
         QuizData quizData = gameRepository.getQuizData(roomId);
         if (quizData.isQueueEmpty()) {
             phaseRepository.update(roomId, RESULT);
             log.info("Phase UPDATED: RESULT");
+            getPhase(roomId, userId);
+            scoreCountDown(roomId);
         } else {
             phaseRepository.update(roomId, Phase.QUIZ_SOLVING);
             log.info("Phase UPDATED: QUIZ_SOLVING");
@@ -231,8 +233,7 @@ public class GameService {
         log.info("Reset");
     }
 
-    @Async
-    protected void quizCountDown(Long roomId) {
+    private void quizCountDown(Long roomId, Long userId) {
         Integer seconds = QUIZ_COUNT_SECONDS;
         while (seconds >= 0) {
             log.info("Countdown: {}", seconds);
@@ -256,20 +257,22 @@ public class GameService {
         QuizDTO solvedQuiz = gameRepository.getQuizData(roomId).getQuiz();
         log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
         markAndUpdateScore(roomId, solvedQuiz, answerData);
-        resetState(roomId);
+        resetState(roomId, userId);
+        if (phaseRepository.getPhase(roomId) == RESULT) {
+            return;
+        }
         template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
                 buildCountDownResponse(seconds));
         log.info("Countdown: {}", seconds);
     }
 
-    @Async
-    public void scoreCountDown(Long roomId) {
+    private void scoreCountDown(Long roomId) {
         Integer seconds = SCORE_COUNT_SECONDS;
         do {
             template.convertAndSend("/sub/rooms/" + roomId + "/scoreCount",
                     buildCountDownResponse(seconds));
-            seconds--;
             ThreadSleep.sleep(1000L);
+            seconds--;
         }
         while (seconds >= 0);
     }

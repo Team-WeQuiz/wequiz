@@ -102,7 +102,6 @@ public class GameController {
                 "/queue/rooms/" + roomId + "/score",
                 scoreResponse
         );
-        gameService.scoreCountDown(roomId);
     }
 
     @MessageMapping("/rooms/{roomId}/phase")
