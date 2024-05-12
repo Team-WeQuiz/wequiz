@@ -94,9 +94,11 @@ class Marker():
         self.marker_chain = MarkChain()
     
     def mark(self, answer, user):
-        response = self.marker_chain.mark(answer, user)
-        
-        return 'true' in response['text'].lower()
+        if user.sprit() == '':
+            return 'false'
+        else:
+            response = self.marker_chain.mark(answer, user)
+            return 'true' in response['text'].lower()
 
 
 ########################################################################################
