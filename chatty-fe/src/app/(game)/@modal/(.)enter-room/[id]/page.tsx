@@ -3,7 +3,6 @@
 import EnteringModals from '@/app/(game)/enter-room/[id]/_component/EnteringModals/EnteringModals';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-
 const EnterRoomModal = ({
   params: { id: roomId },
 }: {
@@ -14,10 +13,12 @@ const EnterRoomModal = ({
 
   const creation = Boolean(searchParams.get('create')) || false;
 
-
   const handleBack = () => {
-    if (creation) return;
-    router.back();
+    if (creation) {
+      router.push('/main-lobby');
+    } else {
+      router.back();
+    }
   };
   return <EnteringModals id={roomId} goingBack={handleBack} />;
 };

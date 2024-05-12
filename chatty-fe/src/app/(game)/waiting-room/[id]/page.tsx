@@ -27,40 +27,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   // 퀴즈 생성 완료 체크
   const [isQuizReady, setIsQuizReady] = useState(false);
 
-  // 연결 해제
-  const disconnect = () => {
-    if (isConnected) {
-      console.log('Disconnecting from WebSocket!!!!!');
-      stompClient.publish({
-        destination: `/pub/rooms/${params.id}/leave`,
-      });
-      if (userStatuses.length === 1) {
-        alert('방이 종료됩니다.');
-        stompClient.publish({
-          destination: `/pub/rooms/${params.id}/end`,
-        });
-      }
-      stompClient.deactivate();
-    }
-  };
-
-  const pathname = usePathname();
-  useEffect(() => {
-    if (!pathname.includes(`waiting-room/${params.id}`)) {
-      console.log('is detecting?');
-      disconnect();
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    window.addEventListener('popstate', disconnect);
-    window.addEventListener('beforeunload', disconnect);
-    return () => {
-      window.removeEventListener('popstate', disconnect);
-      window.removeEventListener('beforeunload', disconnect);
-    };
-  }, []);
-
   useEffect(() => {
     const subscribeToStatus = (roomId: number) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/status`, (message) => {
@@ -125,7 +91,6 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
 
     stompClient.onDisconnect = () => {
       console.log('Disconnected from WebSocket');
-      disconnect();
     };
 
     stompClient.onConnect = () => {

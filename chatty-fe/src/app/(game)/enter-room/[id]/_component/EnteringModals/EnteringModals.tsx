@@ -20,12 +20,10 @@ const EnteringModals = ({
   const { isOpen, openModal, closeModal } = useModal();
   const [requestState, setRequestState] = useState<{
     data: QuizInfo | null;
-    isFull: boolean;
     isLoading: boolean;
   }>({
     data: null,
     isLoading: true,
-    isFull: false,
   });
 
   const [isLocked] = useState(false);
@@ -40,7 +38,6 @@ const EnteringModals = ({
         setRequestState((prev) => ({
           ...prev,
           data: response,
-          isFull: response.maxPlayers <= response.numOfPlayers,
         }));
         openModal();
       } catch (error: any) {
@@ -66,7 +63,6 @@ const EnteringModals = ({
       setRequestState({
         data: null,
         isLoading: true,
-        isFull: false,
       });
     }
   }, [isOpen]);
@@ -79,7 +75,7 @@ const EnteringModals = ({
   return (
     <>
       {requestState.data &&
-        (requestState.isFull ? (
+        (requestState.data.isFull ? (
           <BlockingModal
             name={requestState.data?.name}
             isOpen={isOpen}

@@ -12,6 +12,7 @@ const initialData: QuizInfo = {
   maxPlayers: 0,
   description: '',
   numOfQuiz: 0,
+  isFull: false,
 };
 
 const QuizInfoCard = ({
@@ -30,6 +31,10 @@ const QuizInfoCard = ({
       try {
         const response = await getQuizInfo(roomId, accessToken);
         setData(response);
+        if (response.isFull) {
+          alert('방이 꽉 찼습니다. 메인 로비로 이동합니다.');
+          router.push('/main-lobby');
+        }
       } catch (error: any) {
         setData({
           roomId: 0,
@@ -37,6 +42,7 @@ const QuizInfoCard = ({
           maxPlayers: 0,
           description: '',
           numOfQuiz: 0,
+          isFull: false,
         });
         alert(error.message);
         router.push('/main-lobby');

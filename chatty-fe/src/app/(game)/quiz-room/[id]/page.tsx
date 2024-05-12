@@ -46,8 +46,8 @@ type PlayerScore = {
 
 const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [quizSet, setQuizSet] = useState<QuizSet | null>(null);
-  const [count, setCount] = useState(3);
-  const [scoreCount, setScoreCount] = useState(0);
+  const [count, setCount] = useState<number | null>(null);
+  const [scoreCount, setScoreCount] = useState<number | null>(null);
   const [scores, setScores] = useState<PlayerScore[]>([]);
   const [isAnswered, setIsAnswered] = useState(false);
   const [userAnswer, setUserAnswer] = useState<string | null>(null);
@@ -132,7 +132,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         // }
         if (countData.second === -1) {
           getQuiz(params.id);
-          setCount(3);
+          setCount(null);
           setIsAnswered(false);
         }
       },
@@ -156,12 +156,15 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         setCount(countData.second);
         if (countData.second === 0) {
           if (checkLastRound()) {
-            deleteRoom();
             closeModal();
             router.push(`/result/${params.id}`);
           } else {
             closeModal();
           }
+        }
+        if (countData.second === -1) {
+          setScoreCount(null);
+          getQuiz(params.id);
         }
       },
       {
@@ -193,19 +196,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     setSelectedOption(null);
   };
 
-  // 퀴즈 끝내기 요청
-  const deleteRoom = async () => {
-    try {
-      const response = await client.delete(`/rooms/${params.id}/end`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
 
   // 퀴즈 제출
   const submitQuiz = (roomId: number) => {
@@ -285,17 +276,17 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
             </div>
           </div>
           <div className={styles.StatusWrapper}>
-            {isAnswered && submitStatuses?.isMajority ? (
+            {count !== null ? (
               <h1 className={styles.Count}>{count <= 0 ? 0 : count}</h1>
-            ) : isAnswered && !submitStatuses?.isMajority ? (
+            ) : isAnswered ? (
               <BarSpinner />
             ) : (
               ''
             )}
             <div>
-              {isAnswered && submitStatuses?.isMajority
+              {count !== null
                 ? '과반수 이상이 제출하였습니다.'
-                : isAnswered && !submitStatuses?.isMajority
+                : isAnswered
                   ? '다른 플레이어가 문제를 제출할 때 까지 기다려주세용 :)'
                   : ''}
             </div>
@@ -318,7 +309,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         <ResultModal
           currentRound={quizSet?.currentRound || 0}
           users={scores || []}
-          count={scoreCount}
+          count={scoreCount || 0}
         />
       ) : null}
     </div>
