@@ -1,5 +1,6 @@
 package com.chatty.chatty.game.controller;
 
+import com.chatty.chatty.config.GlobalMessagingTemplate;
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
@@ -17,7 +18,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,7 +27,7 @@ public class GameController {
 
     private final GameService gameService;
     private final QuizRoomService quizRoomService;
-    private final SimpMessagingTemplate template;
+    private final GlobalMessagingTemplate template;
 
     @MessageMapping("/rooms/{roomId}/chat")
     @SendTo("/sub/rooms/{roomId}/chat")
@@ -68,11 +68,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/quiz")
     public void sendQuiz(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         QuizResponse quizResponse = gameService.sendQuiz(roomId);
-        template.convertAndSendToUser(
-                getUserIdFromHeader(headerAccessor).toString(),
-                "/queue/rooms/" + roomId + "/quiz",
-                quizResponse
-        );
+        template.publishQuiz(getUserIdFromHeader(headerAccessor), roomId, quizResponse);
     }
 
     @MessageMapping("/rooms/{roomId}/submit")
@@ -90,11 +86,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/score")
     public void sendScore(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         ScoreResponse scoreResponse = gameService.sendScore(roomId);
-        template.convertAndSendToUser(
-                getUserIdFromHeader(headerAccessor).toString(),
-                "/queue/rooms/" + roomId + "/score",
-                scoreResponse
-        );
+        template.publishScore(roomId, scoreResponse);
     }
 
     @MessageMapping("/rooms/{roomId}/phase")
