@@ -13,7 +13,6 @@ import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
 import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
-import client from '@/app/_api/client';
 import { useRouter } from 'next/navigation';
 
 type QuizSet = {
@@ -55,6 +54,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [submitStatuses, setSubmitStatuses] = useState<SubmitStatuses | null>(
     null,
   );
+  const [isLastQuiz, setIsLastQuiz] = useState(false);
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
   const { openModal, closeModal, isOpen } = useModal();
@@ -65,8 +65,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     setSelectedOption(index);
   };
 
-  const checkLastRound = () => {
-    return quizSet?.currentRound === quizSet?.totalRound;
+  const checkLastQuiz = () => {
+    return quizSet?.quizNumber === (quizSet?.totalRound ?? 0) * 5;
   };
 
   useEffect(() => {
@@ -80,6 +80,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         const quizData = JSON.parse(quiz.body);
         console.log('퀴즈: ', quizData);
         setQuizSet(quizData);
+        setIsLastQuiz(checkLastQuiz());
       },
       {
         Authorization: `Bearer ${accessToken}`,
@@ -127,8 +128,8 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         console.log('카운트: ', countData);
         if (countData.second === -1) {
           getQuiz(params.id);
-          setCount(null);
           setIsAnswered(false);
+          setCount(null);
         }
       },
       {
@@ -149,17 +150,17 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           openModal();
         }
         setCount(countData.second);
-        if (countData.second === 0) {
-          if (checkLastRound()) {
+        if (countData.second === -1) {
+          if (isLastQuiz) {
             closeModal();
             router.push(`/result/${params.id}`);
           } else {
             closeModal();
+            setScoreCount(null);
+            getQuiz(params.id);
+            setCount(null);
+            setIsAnswered(false);
           }
-        }
-        if (countData.second === -1) {
-          setScoreCount(null);
-          getQuiz(params.id);
         }
       },
       {
