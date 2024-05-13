@@ -271,7 +271,7 @@ public class GameService {
             ThreadSleep.sleep(1000L);
             seconds--;
         }
-        while (seconds >= 0);
+        while (seconds >= -1);
     }
 
     private CountDownResponse buildCountDownResponse(Integer second) {
