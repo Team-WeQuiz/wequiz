@@ -3,7 +3,6 @@ package com.chatty.chatty.config.minio;
 import static com.chatty.chatty.config.minio.exception.MinioExceptionType.IGNORE_CERT_CHECK_FAILED;
 
 import com.chatty.chatty.config.minio.exception.MinioException;
-import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;

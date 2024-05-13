@@ -9,4 +9,5 @@ public record CreateQuizResponse(
 
         Long quizDocId
 ) {
+
 }

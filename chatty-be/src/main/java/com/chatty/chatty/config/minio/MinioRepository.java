@@ -6,7 +6,6 @@ import static com.chatty.chatty.config.minio.exception.MinioExceptionType.FAILED
 
 import com.chatty.chatty.common.util.Sha256Encrypt;
 import com.chatty.chatty.config.minio.exception.MinioException;
-import com.chatty.chatty.user.entity.User;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;

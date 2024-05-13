@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class ScoreRepository {
+
     private static final Map<Long, ScoreData> scoreDataMap = new ConcurrentHashMap<>();
     private final PlayersStatusRepository playersStatusRepository;
 
