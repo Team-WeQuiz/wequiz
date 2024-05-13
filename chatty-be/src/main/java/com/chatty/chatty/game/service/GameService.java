@@ -4,6 +4,7 @@ import static com.chatty.chatty.game.domain.Phase.COUNTDOWN;
 import static com.chatty.chatty.game.domain.Phase.RESULT;
 
 import com.chatty.chatty.common.util.ThreadSleep;
+import com.chatty.chatty.config.GlobalMessagingTemplate;
 import com.chatty.chatty.game.controller.dto.CountDownResponse;
 import com.chatty.chatty.game.controller.dto.DescriptionResponse;
 import com.chatty.chatty.game.controller.dto.QuizReadyResponse;
@@ -65,7 +66,7 @@ public class GameService {
     private final ScoreRepository scoreRepository;
     private final DynamoDBService dynamoDBService;
     private final ModelService modelService;
-    private final SimpMessagingTemplate template;
+    private final GlobalMessagingTemplate template;
     private final PhaseRepository phaseRepository;
     private final UserService userService;
 
@@ -135,13 +136,10 @@ public class GameService {
     public void sendQuizReady(Long roomId, Long userId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
         initQuiz(quizData);
-        template.convertAndSendToUser(
-                userId.toString(),
-                "/queue/rooms/" + roomId + "/quizReady",
-                QuizReadyResponse.builder()
-                        .isReady(true)
-                        .build()
-        );
+        QuizReadyResponse response = QuizReadyResponse.builder()
+                .isReady(true)
+                .build();
+        template.publishQuizReady(userId, roomId, response);
     }
 
     /*
@@ -155,11 +153,7 @@ public class GameService {
                 .description(description)
                 .build();
         log.info("디스크립션: {}", descriptionResponse);
-        template.convertAndSendToUser(
-                userId.toString(),
-                "/queue/rooms/" + roomId + "/description",
-                descriptionResponse
-        );
+        template.publishDescription(userId, roomId, descriptionResponse);
     }
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
@@ -243,8 +237,7 @@ public class GameService {
         Integer seconds = QUIZ_COUNT_SECONDS;
         while (seconds >= 0) {
             log.info("Countdown: {}", seconds);
-            template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
-                    buildCountDownResponse(seconds));
+            template.publishQuizCount(roomId, buildCountDownResponse(seconds));
             ThreadSleep.sleep(1000L);
             seconds--;
         }
@@ -267,16 +260,14 @@ public class GameService {
         if (phaseRepository.getPhase(roomId) == RESULT) {
             return;
         }
-        template.convertAndSend("/sub/rooms/" + roomId + "/quizCount",
-                buildCountDownResponse(seconds));
+        template.publishQuizCount(roomId, buildCountDownResponse(seconds));
         log.info("Countdown: {}", seconds);
     }
 
     private void scoreCountDown(Long roomId) {
         Integer seconds = SCORE_COUNT_SECONDS;
         do {
-            template.convertAndSend("/sub/rooms/" + roomId + "/scoreCount",
-                    buildCountDownResponse(seconds));
+            template.publishScoreCount(roomId, buildCountDownResponse(seconds));
             ThreadSleep.sleep(1000L);
             seconds--;
         }
@@ -290,11 +281,12 @@ public class GameService {
     }
 
     private void sendPlayersSubmitStatus(Long roomId, Boolean isMajority, UsersSubmitStatus status) {
-        template.convertAndSend("/sub/rooms/" + roomId + "/submit", SubmitAnswerResponse.builder()
+        SubmitAnswerResponse response = SubmitAnswerResponse.builder()
                 .isMajority(isMajority)
                 .timestamp(LocalDateTime.now())
                 .submitStatuses(status.usersSubmitStatus())
-                .build());
+                .build();
+        template.publishSubmitStatus(roomId, response);
     }
 
     private List<AnswerDTO> getAnswers(Map<Long, PlayerAnswerData> playerAnswers) {
@@ -337,23 +329,12 @@ public class GameService {
         QuizResponse quizResponse = sendQuiz(roomId);
         switch (currentPhase) {
             case QUIZ_SOLVING, COUNTDOWN -> {
-                template.convertAndSendToUser(
-                        userId.toString(),
-                        "/queue/rooms/" + roomId + "/quiz",
-                        quizResponse
-                );
-                template.convertAndSend(
-                        "/sub/rooms/" + roomId + "/submit",
-                        getSubmitAnswerResponse(roomId)
-                );
+                template.publishQuiz(userId, roomId, quizResponse);
+                template.publishSubmitStatus(roomId, getSubmitAnswerResponse(roomId));
             }
             case RESULT -> {
                 ScoreResponse scoreResponse = sendScore(roomId);
-                template.convertAndSendToUser(
-                        userId.toString(),
-                        "/queue/rooms/" + roomId + "/score",
-                        scoreResponse
-                );
+                template.publishScore(userId, roomId, scoreResponse);
             }
         }
     }
