@@ -54,7 +54,7 @@ class QuizGenerator():
             if len(option_list) <= 1:
                 raise QuizGenerationException(f"Generated options insufficient. length: {len(option_list)}")
 
-        return type, option_list, correct
+        return type, option_list, correct.strip()
     
     def generate(self, keyword, question_number):
         retry = 0
