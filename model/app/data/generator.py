@@ -98,7 +98,7 @@ class Marker():
     
     def mark(self, answer, user):
         if user.strip() == '':
-            return 'false'
+            return False
         else:
             response = self.marker_chain.mark(answer, user)
             return 'true' in response['text'].lower()
