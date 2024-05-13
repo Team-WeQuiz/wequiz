@@ -24,6 +24,7 @@ export const Default: Story = {
             playerAnswer: 'test',
             marking: true,
             correction: true,
+            profileImage: null
           },
           {
             playerId: 2,
@@ -31,6 +32,7 @@ export const Default: Story = {
             playerAnswer: 'test',
             marking: false,
             correction: false,
+            profileImage: null
           },
         ],
         correctRate: 45,
