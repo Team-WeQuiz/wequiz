@@ -105,7 +105,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   // 중간 점수 구독
   const subscribeScore = (roomId: number) => {
     stompClient.subscribe(
-      `/user/${userId}/queue/rooms/${roomId}/score`,
+      `/sub/rooms/${roomId}/score`,
       (scoreStatus) => {
         const scoreData = JSON.parse(scoreStatus.body);
         console.log('점수: ', scoreData);
@@ -125,11 +125,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         const countData = JSON.parse(count.body);
         setCount(countData.second);
         console.log('카운트: ', countData);
-        // if (countData.second === 0) {
-        //   if (!isAnswered) {
-        //     submitQuiz(params.id);
-        //   }
-        // }
         if (countData.second === -1) {
           getQuiz(params.id);
           setCount(null);
