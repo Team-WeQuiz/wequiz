@@ -152,7 +152,7 @@ public class GameService {
                 .description(description)
                 .build();
         log.info("디스크립션: {}", descriptionResponse);
-        template.publishDescription(userId, roomId, descriptionResponse);
+        template.publishDescription(roomId, userId, descriptionResponse);
     }
 
     private QuizResponse buildQuizResponse(QuizData quizData) {
