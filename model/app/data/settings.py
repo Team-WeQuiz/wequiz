@@ -20,4 +20,5 @@ VECTOR_CHUNK_OVERLAP = 30
 # generator.py
 QUIZ_GENERATE_RETRY = 3
 QUIZ_LENGTH_MIN_LIMIT = 6
-YES_LIST= ['yes', 'YES', 'yes!', 'YES!', 'y', 'o', 'O', '예', '네', '그렇다', '맞다', '옳음', '옳다', '맞음']
+YES_LIST= ['yes', 'YES', 'yes!', 'YES!', 'Yes', 'y', 'o', 'O', 'True', '예', '네', '그렇다', '맞다', '옳음', '옳다', '맞음']
+NO_LIST = ['no', 'NO', 'no!', 'NO!', 'No', 'n', 'x', 'X', 'False', '아니요', '아니오', '그렇지않다', '그렇지 않다', '틀리다', '틀림', '아님', '아니다', '옳지않음', '옳지 않다', '옳지 않음']
