@@ -27,8 +27,8 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         Long userId = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
-        Long roomId = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("roomId");
-        if (headerAccessor.getCommand() == StompCommand.DISCONNECT) {
+        Long roomId = (Long) headerAccessor.getSessionAttributes().get("roomId");
+        if (headerAccessor.getCommand() == StompCommand.DISCONNECT && roomId != null) {
             if (quizRoomService.getQuizRoom(roomId).getStatus() != Status.STARTED) {
                 PlayersStatusDTO playersStatusDTO = gameService.leaveRoom(roomId, userId);
                 log.info("User {} disconnected from room {}", userId, roomId);
