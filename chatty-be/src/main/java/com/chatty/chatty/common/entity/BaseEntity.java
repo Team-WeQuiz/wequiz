@@ -20,7 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class BaseEntity {
-  
+
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Column(updatable = false, nullable = false)
@@ -42,6 +42,6 @@ public abstract class BaseEntity {
     }
 
     private LocalDateTime getCurrentDateTimeFormatted() {
-      return LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
+        return LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
     }
 }

@@ -1,6 +1,8 @@
 package com.chatty.chatty.auth.service;
 
-import static com.chatty.chatty.auth.exception.AuthExceptionType.*;
+import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_EMAIL;
+import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_PASSWORD;
+import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_TOKEN;
 import static com.chatty.chatty.user.exception.UserExceptionType.USER_NOT_FOUND;
 
 import com.chatty.chatty.auth.controller.dto.PasswordRequest;

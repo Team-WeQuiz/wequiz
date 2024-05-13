@@ -1,5 +1,6 @@
 package com.chatty.chatty.auth.service.oauth;
 
+import com.chatty.chatty.auth.controller.oauth.dto.GoogleAccessTokenRequest;
 import com.chatty.chatty.auth.controller.oauth.dto.GoogleLoginResponse;
 import com.chatty.chatty.auth.controller.oauth.dto.SocialAuthResponse;
 import com.chatty.chatty.auth.controller.oauth.dto.SocialUserResponse;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.chatty.chatty.auth.controller.oauth.dto.GoogleAccessTokenRequest;
 
 @Service
 @Slf4j

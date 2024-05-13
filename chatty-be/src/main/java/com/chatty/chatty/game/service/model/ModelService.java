@@ -20,7 +20,7 @@ import org.springframework.web.client.RestClient;
 @Service
 @RequiredArgsConstructor
 public class ModelService {
-    
+
     @Value("${url.ml}")
     private String ML_URL;
 

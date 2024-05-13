@@ -43,7 +43,8 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<QuizDTO> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize) throws GameException {
+    public List<QuizDTO> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize)
+            throws GameException {
         int attempts = 0;
         List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
         while (rawQuizzes.size() < (currentRound + 1) * quizSize && attempts < POLLING_MAX_ATTEMPTS) {

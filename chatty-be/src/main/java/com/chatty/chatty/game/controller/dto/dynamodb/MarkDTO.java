@@ -13,6 +13,7 @@ public record MarkDTO(
         @JsonProperty("question_number")
         Integer quizNumber
 ) {
+
     public record Marked(
             Boolean marking,
 
@@ -22,5 +23,6 @@ public record MarkDTO(
             @JsonProperty("user_id")
             Long playerId
     ) {
+
     }
 }

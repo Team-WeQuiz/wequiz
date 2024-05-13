@@ -148,7 +148,6 @@ public class QuizRoomService {
                         .orElseThrow(() -> new PlayerException(PLAYER_NOT_FOUND))
                         .getNickname();
                 String profileImage = userService.getProfileImageUrl(marked.playerId());
-                minioRepository.getProfileImageUrl(profileImage);
                 playerAnswers.add(
                         new PlayerAnswer(marked.playerId(), nickname, profileImage, marked.playerAnswer(),
                                 marked.marking()));

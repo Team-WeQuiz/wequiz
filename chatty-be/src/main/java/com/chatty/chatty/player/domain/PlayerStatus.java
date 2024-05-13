@@ -10,7 +10,7 @@ public record PlayerStatus(
         Boolean isReady,
 
         String profileImage,
-        
+
         String nickname
 ) {
 
