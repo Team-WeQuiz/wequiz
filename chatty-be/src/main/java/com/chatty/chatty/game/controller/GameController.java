@@ -86,7 +86,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/score")
     public void sendScore(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         ScoreResponse scoreResponse = gameService.sendScore(roomId);
-        template.publishScore(getUserIdFromHeader(headerAccessor), roomId, scoreResponse);
+        template.publishScore(roomId, scoreResponse);
     }
 
     @MessageMapping("/rooms/{roomId}/phase")

@@ -25,7 +25,7 @@ public class GlobalMessagingTemplate {
     private static final String USER_DESCRIPTION_DESTINATION = "/queue/rooms/%d/description";
     private static final String USER_QUIZ_DESTINATION = "/queue/rooms/%d/quiz";
     private static final String USER_QUIZ_READY_DESTINATION = "/queue/rooms/%d/quizReady";
-    private static final String USER_SCORE_DESTINATION = "/queue/rooms/%d/score";
+    private static final String SCORE_DESTINATION = "/sub/rooms/%d/score";
     private static final String ROOM_LIST_DESTINATION = "/sub/rooms?page=%d";
 
     private final SimpMessagingTemplate template;
@@ -50,6 +50,13 @@ public class GlobalMessagingTemplate {
         template.convertAndSend(format(ROOM_LIST_DESTINATION, page), response);
     }
 
+    public void publishScore(Long roomId, ScoreResponse response) {
+        template.convertAndSend(
+                format(SCORE_DESTINATION, roomId),
+                response
+        );
+    }
+
     public void publishDescription(Long roomId, Long userId, DescriptionResponse response) {
         template.convertAndSendToUser(
                 userId.toString(),
@@ -70,14 +77,6 @@ public class GlobalMessagingTemplate {
         template.convertAndSendToUser(
                 userId.toString(),
                 format(USER_QUIZ_READY_DESTINATION, roomId),
-                response
-        );
-    }
-
-    public void publishScore(Long userId, Long roomId, ScoreResponse response) {
-        template.convertAndSendToUser(
-                userId.toString(),
-                format(USER_SCORE_DESTINATION, roomId),
                 response
         );
     }
