@@ -17,6 +17,7 @@ export const ModalBackground = style({
 export const Modal = style({
   display: 'flex',
   width: '80%',
+  maxWidth: 1480,
   height: '80%',
   borderRadius: 16,
   background: '#FFF',
@@ -38,7 +39,7 @@ export const Title = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: 16,
-  width: '50%',
+  width: '100%',
 });
 
 export const Number = style({
@@ -78,6 +79,7 @@ export const AnswerContainer = style({
 
 export const AnswerWrapper = style({
   display: 'flex',
+  alignItems: 'center',
   gap: 10,
 });
 
@@ -135,6 +137,19 @@ export const CorrectAnswerMark = style({
 
 export const ProfileWrapper = style({
   display: 'flex',
-  gap: 4,
+  gap: 8,
   padding: 2,
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
+export const ImageWrapper = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 40,
+  height: 40,
+  borderRadius: 100,
+  background: '#fff',
+  overflow: 'hidden',
 });

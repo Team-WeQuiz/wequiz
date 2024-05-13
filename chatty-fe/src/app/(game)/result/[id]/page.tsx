@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as styles from './page.css';
 import client from '@/app/_api/client';
 import useAuthStore from '@/app/_store/useAuthStore';
@@ -16,6 +16,7 @@ type PlayerAnswers = {
   playerAnswer: string;
   marking: boolean;
   correction: false;
+  profileImage: string;
 };
 
 type Results = {
@@ -33,6 +34,8 @@ export default function ResultPage({ params }: { params: { id: number } }) {
   const [currentQuizNumber, setCurrentQuizNumber] = useState<number | null>(
     null,
   );
+  const [containerHeight, setContainerHeight] = useState('100vh');
+  const contentsWrapperRef = useRef<HTMLDivElement>(null);
   const { accessToken } = useAuthStore();
   const { id } = useUserInfoStore();
 
@@ -55,31 +58,30 @@ export default function ResultPage({ params }: { params: { id: number } }) {
     fetchResultData();
   }, [accessToken]);
 
+  useEffect(() => {
+    if (contentsWrapperRef.current) {
+      const height = contentsWrapperRef.current.offsetHeight;
+      setContainerHeight(`calc(100px + ${height}px)`);
+      console.log(height);
+    }
+  }, [results]);
+
   const handleOpenModal = (quizNumber: number) => {
     setCurrentQuizNumber(quizNumber);
     openModal();
   };
 
   return (
-    <div className={styles.Container}>
-      {/* <div className={styles.SideBarWrapper}>
-        <div className={styles.SideBar}>
-          <QuestionProgess
-            questionNumber={results.length}
-            totalQuestions={results.length}
-            direction="column"
-          />
-        </div>
-      </div> */}
-      <div className={styles.ContentsContainer}>
+    <div className={styles.Container} style={{ height: containerHeight }}>
+      <div className={styles.Wrapper}>
         <div className={styles.ContentsBox}>
-          <div className={styles.ContentsWrapper}>
+          <div className={styles.ContentsWrapper} ref={contentsWrapperRef}>
             {results.map((result, index) => (
               <div className={styles.ContentsCard} key={index}>
                 <span className={styles.Number}>{result.quizNumber}</span>
                 <div className={styles.QuestionCard}>
                   <span className={styles.QuestionMark}>Q</span>
-                  {result.quiz}
+                  <span style={{ marginTop: 5 }}>{result.quiz}</span>
                 </div>
                 {result.playerAnswers
                   .filter((answer) => answer.playerId === id)
@@ -101,7 +103,9 @@ export default function ResultPage({ params }: { params: { id: number } }) {
                       >
                         A
                       </span>
-                      {answer.playerAnswer}
+                      <span style={{ marginTop: 5 }}>
+                        {answer.playerAnswer}
+                      </span>
                     </div>
                   ))}
                 <PercentageCircle percentage={result.correctRate} />
@@ -109,7 +113,7 @@ export default function ResultPage({ params }: { params: { id: number } }) {
                   className={styles.ModalButton}
                   onClick={() => handleOpenModal(result.quizNumber)}
                 >
-                  <span>상세보기</span>
+                  <span style={{ whiteSpace: 'nowrap' }}>상세보기</span>
                   <Image
                     src="/images/arrow_right.svg"
                     height={48}
