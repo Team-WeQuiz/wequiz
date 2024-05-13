@@ -10,7 +10,7 @@ type PlayerAnswers = {
   playerAnswer: string;
   marking: boolean;
   correction: boolean;
-  profileImage: string;
+  profileImage: string | null;
 };
 
 type Results = {
