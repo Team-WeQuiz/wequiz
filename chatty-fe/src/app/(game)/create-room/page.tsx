@@ -1,5 +1,5 @@
 'use client';
-import React, { Suspense, useState } from 'react';
+import React, { useState } from 'react';
 import * as styles from './page.css';
 import ContentsBox from './_components/ContentsBox';
 import TextInputField from '@/app/_components/TextInputField';
@@ -32,6 +32,9 @@ export default function CreateRoom() {
       alert('방 제목, 설명, 인원 수, 문제 수는 필수 입력 항목입니다.');
       return;
     }
+    if (isFileSizeBigger()) {
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await postRoom(
@@ -49,6 +52,15 @@ export default function CreateRoom() {
       alert(error.message);
     }
     setIsLoading(false);
+  };
+
+  const isFileSizeBigger = () => {
+    const MAX_FILE_SIZE = 100 * 1024 * 1024;
+    if (files.some((file) => file.size > MAX_FILE_SIZE)) {
+      alert('파일 크기는 100MB를 초과할 수 없습니다.');
+      return true;
+    }
+    return false;
   };
 
   return (
