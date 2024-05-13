@@ -6,7 +6,6 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.CODE_IN
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.NO_ROOM_FOUND_BY_CODE;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_READY;
-import static com.chatty.chatty.user.exception.UserExceptionType.USER_NOT_FOUND;
 
 import com.chatty.chatty.common.util.RandomCodeGenerator;
 import com.chatty.chatty.config.GlobalMessagingTemplate;
@@ -39,8 +38,7 @@ import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
-import com.chatty.chatty.user.exception.UserException;
-import com.chatty.chatty.user.repository.UserRepository;
+import com.chatty.chatty.user.service.UserService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,7 +68,7 @@ public class QuizRoomService {
     private final GlobalMessagingTemplate template;
     private final PlayerService playerService;
     private final PhaseRepository phaseRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public RoomListResponse getRooms(Integer page) {
         PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
@@ -149,9 +147,8 @@ public class QuizRoomService {
                 String nickname = playerRepository.findByUserIdAndQuizRoomId(marked.playerId(), roomId)
                         .orElseThrow(() -> new PlayerException(PLAYER_NOT_FOUND))
                         .getNickname();
-                String profileImage = userRepository.findById(marked.playerId())
-                        .orElseThrow(() -> new UserException(USER_NOT_FOUND))
-                        .getProfileImage();
+                String profileImage = userService.getProfileImageUrl(marked.playerId());
+                minioRepository.getProfileImageUrl(profileImage);
                 playerAnswers.add(
                         new PlayerAnswer(marked.playerId(), nickname, profileImage, marked.playerAnswer(),
                                 marked.marking()));
