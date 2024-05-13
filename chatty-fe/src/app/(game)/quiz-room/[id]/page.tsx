@@ -6,7 +6,7 @@ import * as styles from './page.css';
 import GradButton from '@/app/_components/GradButton';
 import UserGrid from './_components/UserGrid/UserGrid';
 import RoundProgress from './_components/RoundProgress/RoundProgress';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useAuthStore from '@/app/_store/useAuthStore';
 import stompClient from '../../_utils/stomp';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
@@ -44,6 +44,7 @@ type PlayerScore = {
 };
 
 const QuizRoom = ({ params }: { params: { id: number } }) => {
+  const [lastQuizSet, setLastQuizSet] = useState<QuizSet | null>(null);
   const [quizSet, setQuizSet] = useState<QuizSet | null>(null);
   const [count, setCount] = useState<number | null>(null);
   const [scoreCount, setScoreCount] = useState<number | null>(null);
@@ -54,24 +55,35 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [submitStatuses, setSubmitStatuses] = useState<SubmitStatuses | null>(
     null,
   );
-  const [isLastQuiz, setIsLastQuiz] = useState(false);
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
   const { openModal, closeModal, isOpen } = useModal();
   const router = useRouter();
+  const lastQuizSetRef = useRef(lastQuizSet);
+  lastQuizSetRef.current = lastQuizSet;
 
   const handleOptionChange = (option: string, index: number) => {
     setUserAnswer(option);
     setSelectedOption(index);
   };
 
-  const checkLastQuiz = () => {
-    return quizSet?.quizNumber === (quizSet?.totalRound ?? 0) * 5;
-  };
+  useEffect(() => {
+    if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
+      const lastQuiz = quizSet;
+      setLastQuizSet(lastQuiz);
+    }
+  }, [quizSet]);
+
+  useEffect(() => {
+    if (lastQuizSet) {
+      console.log('lastQuizSet: ', lastQuizSet);
+    }
+  }, [lastQuizSet]);
 
   useEffect(() => {
     console.log(isAnswered);
   }, [isAnswered]);
+
   // 퀴즈 구독
   const subscribeQuiz = (roomId: number) => {
     stompClient.subscribe(
@@ -80,7 +92,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         const quizData = JSON.parse(quiz.body);
         console.log('퀴즈: ', quizData);
         setQuizSet(quizData);
-        setIsLastQuiz(checkLastQuiz());
       },
       {
         Authorization: `Bearer ${accessToken}`,
@@ -125,6 +136,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       (count) => {
         const countData = JSON.parse(count.body);
         setCount(countData.second);
+
         console.log('카운트: ', countData);
         if (countData.second === -1) {
           getQuiz(params.id);
@@ -145,19 +157,17 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       (count) => {
         const countData = JSON.parse(count.body);
         setScoreCount(countData.second);
-        console.log('모달카운트: ', countData);
         if (!isOpen) {
           openModal();
         }
-        setCount(countData.second);
         if (countData.second === -1) {
-          if (isLastQuiz) {
-            closeModal();
-            router.push(`/result/${params.id}`);
+          if (lastQuizSetRef.current) {
+            console.log('끝났어');
+            router.push(`/result/${roomId}`);
           } else {
             closeModal();
             setScoreCount(null);
-            getQuiz(params.id);
+            getQuiz(roomId);
             setCount(null);
             setIsAnswered(false);
           }
@@ -305,7 +315,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         <ResultModal
           currentRound={quizSet?.currentRound || 0}
           users={scores.length > 0 ? scores : []}
-          count={scoreCount === null ? 0 : scoreCount}
+          count={scoreCount === -1 ? 0 : scoreCount}
         />
       ) : null}
     </div>

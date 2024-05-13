@@ -6,7 +6,7 @@ import Image from 'next/image';
 type ResultModalProps = {
   currentRound: number;
   users: PlayerScore[];
-  count: number;
+  count: number | null;
 };
 
 type PlayerScore = {
