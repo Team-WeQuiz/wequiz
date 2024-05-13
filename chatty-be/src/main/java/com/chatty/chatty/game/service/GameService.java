@@ -256,9 +256,6 @@ public class GameService {
         log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
         markAndUpdateScore(roomId, solvedQuiz, answerData);
         resetState(roomId, userId);
-        if (phaseRepository.getPhase(roomId) == RESULT) {
-            return;
-        }
         template.publishQuizCount(roomId, buildCountDownResponse(seconds));
         log.info("Countdown: {}", seconds);
     }
@@ -270,7 +267,7 @@ public class GameService {
             ThreadSleep.sleep(1000L);
             seconds--;
         }
-        while (seconds >= -1);
+        while (seconds >= 0);
     }
 
     private CountDownResponse buildCountDownResponse(Integer second) {
