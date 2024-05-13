@@ -50,7 +50,7 @@ class QuizGenerator():
                     raise QuizGenerationException(f"Generated quiz is shorter than threshold({QUIZ_LENGTH_MIN_LIMIT}). length: {len(question)}")
 
                 type = self.get_type(response["text"]["type"])
-                options, correct = self.set_optitons_correct(type, response["text"]["choices"], response["text"]["correct"])
+                options, correct = self.set_options_correct(type, response["text"]["choices"], response["text"]["correct"])
                 if type == "OX퀴즈": type = "객관식"    # ox퀴즈도 객관식으로 설정
                 if type is None:   # type이 None인 경우 예외처리
                     if len(options) == 0:
