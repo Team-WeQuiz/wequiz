@@ -81,8 +81,8 @@ public class UserService {
                 .toList();
 
         return ParticipatedQuizRoomListResponse.builder()
-                .totalPages(players.getTotalPages() + 1)
-                .currentPage(players.getNumber())
+                .totalPages(players.getTotalPages())
+                .currentPage(players.getNumber() + 1)
                 .rooms(roomDTOs)
                 .build();
     }

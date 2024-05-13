@@ -6,9 +6,9 @@ import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.CODE_IN
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.NO_ROOM_FOUND_BY_CODE;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_FOUND;
 import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_READY;
-import static com.chatty.chatty.quizroom.exception.QuizRoomExceptionType.ROOM_NOT_STARTED;
 
 import com.chatty.chatty.common.util.RandomCodeGenerator;
+import com.chatty.chatty.config.GlobalMessagingTemplate;
 import com.chatty.chatty.config.minio.MinioRepository;
 import com.chatty.chatty.game.controller.dto.dynamodb.MarkDTO;
 import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
@@ -38,6 +38,7 @@ import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.exception.FileException;
 import com.chatty.chatty.quizroom.exception.QuizRoomException;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
+import com.chatty.chatty.user.service.UserService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,7 +46,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +55,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class QuizRoomService {
 
     private static final Integer DEFAULT_PAGE_SIZE = 10;
-    private static final String BROADCAST_URL = "/sub/rooms?page=%d";
 
     private final QuizRoomRepository quizRoomRepository;
     private final GameRepository gameRepository;
@@ -66,9 +65,10 @@ public class QuizRoomService {
     private final MinioRepository minioRepository;
     private final PlayersStatusRepository playersStatusRepository;
     private final UserSubmitStatusRepository userSubmitStatusRepository;
-    private final SimpMessagingTemplate template;
+    private final GlobalMessagingTemplate template;
     private final PlayerService playerService;
     private final PhaseRepository phaseRepository;
+    private final UserService userService;
 
     public RoomListResponse getRooms(Integer page) {
         PageRequest pageRequest = PageRequest.of(page - 1, DEFAULT_PAGE_SIZE);
@@ -147,8 +147,11 @@ public class QuizRoomService {
                 String nickname = playerRepository.findByUserIdAndQuizRoomId(marked.playerId(), roomId)
                         .orElseThrow(() -> new PlayerException(PLAYER_NOT_FOUND))
                         .getNickname();
+                String profileImage = userService.getProfileImageUrl(marked.playerId());
+                minioRepository.getProfileImageUrl(profileImage);
                 playerAnswers.add(
-                        new PlayerAnswer(marked.playerId(), nickname, marked.playerAnswer(), marked.marking()));
+                        new PlayerAnswer(marked.playerId(), nickname, profileImage, marked.playerAnswer(),
+                                marked.marking()));
             }
             log.info("playerAnswers: {}", playerAnswers);
 
@@ -250,12 +253,8 @@ public class QuizRoomService {
     public void broadcastUpdatedRoomList() {
         long totalPages = quizRoomRepository.countByStatus(Status.READY) / DEFAULT_PAGE_SIZE + 1;
         for (int page = 1; page <= totalPages; page++) {
-            template.convertAndSend(buildRoomListTopic(page), getRooms(page));
+            template.publishRoomList(page, getRooms(page));
         }
-    }
-
-    private String buildRoomListTopic(int page) {
-        return String.format(BROADCAST_URL, page);
     }
 
     private List<String> uploadFilesToStorage(CreateRoomRequest request, LocalDateTime time, Long userId) {

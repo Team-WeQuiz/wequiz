@@ -12,12 +12,15 @@ public record QuizResultDTO(
         List<PlayerAnswer> playerAnswers,
         Integer correctRate
 ) {
+
     @Builder
     public record PlayerAnswer(
             Long playerId,
             String nickname,
+            String profileImage,
             String playerAnswer,
             Boolean marking
     ) {
+
     }
 }
