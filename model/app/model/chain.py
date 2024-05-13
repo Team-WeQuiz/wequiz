@@ -183,12 +183,13 @@ class MarkChain():
     def __init__(self):
         self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
     
-    def mark(self, answer, user):
+    async def mark(self, answer, user):
         prompt = PromptTemplate(
             template=MARK_TEMPLATE,
             input_variables=["answer", "user"],
         )
 
         chain = LLMChain(llm=self.llm, prompt=prompt)
+        output = await chain.ainvoke({"answer": answer, "user": user})
 
-        return chain.invoke({"answer": answer, "user": user})
+        return output

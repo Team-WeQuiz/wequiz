@@ -43,7 +43,7 @@ async def mark(mark_request: MarkRequest):
     try:
         # 채점 및 답변 리스트 생성
         for answer in mark_request.answers:
-            marking = marker.mark(mark_request.correct, answer.user)
+            marking = await marker.mark(mark_request.correct, answer.user)
             data = {
                 "user_id": answer.user_id,
                 "user": answer.user,
