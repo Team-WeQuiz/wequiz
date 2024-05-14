@@ -246,11 +246,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   return (
     <div className={styles.Main}>
       <div className={styles.MainContainer}>
-        <RoundProgress
-          round={quizSet?.currentRound || 0}
-          totalRounds={quizSet?.totalRound || 0}
-        />
-
         <div className={styles.Container}>
           <div className={styles.ContentsWrapper}>
             <div className={styles.Navigation}>
