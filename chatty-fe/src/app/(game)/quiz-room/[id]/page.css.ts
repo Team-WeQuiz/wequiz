@@ -74,6 +74,7 @@ export const UserContainer = style({
 
 export const StatusWrapper = style({
   display: 'flex',
+  minHeight: '150px',
   flexDirection: 'column',
   justifyContent: 'flex-end',
   alignItems: 'center',
