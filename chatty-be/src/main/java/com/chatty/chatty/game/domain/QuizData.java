@@ -15,7 +15,6 @@ public class QuizData {
 
     private final Queue<QuizDTO> quizDTOQueue = new ConcurrentLinkedQueue<>();
     private final String quizDocId;
-    private final String timestamp;
     private final Integer totalRound;
     private Integer currentRound;
 

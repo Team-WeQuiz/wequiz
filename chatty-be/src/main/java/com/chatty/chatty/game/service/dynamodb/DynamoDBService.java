@@ -29,13 +29,13 @@ public class DynamoDBService {
     private final DynamoDBRepository dynamoDBRepository;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public String pollDescription(String itemId, String timestamp) {
+    public String pollDescription(String quizDocId) {
         int attempts = 0;
-        String description = dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
+        String description = dynamoDBRepository.getDescriptionFromDB(quizDocId);
         while (description.isEmpty() && attempts < POLLING_MAX_ATTEMPTS / 2) {
             sleep(DESCRIPTION_POLLING_SLEEP_TIME);
             attempts++;
-            description = dynamoDBRepository.getDescriptionFromDB(itemId, timestamp);
+            description = dynamoDBRepository.getDescriptionFromDB(quizDocId);
         }
         if (description.isEmpty()) {
             throw new GameException(FAILED_TO_FETCH_DESCRIPTION);
@@ -43,14 +43,14 @@ public class DynamoDBService {
         return description;
     }
 
-    public List<QuizDTO> pollQuizzes(String itemId, String timestamp, Integer currentRound, Integer quizSize)
+    public List<QuizDTO> pollQuizzes(String quizDocId, Integer currentRound, Integer quizSize)
             throws GameException {
         int attempts = 0;
-        List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
+        List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(quizDocId);
         while (rawQuizzes.size() < (currentRound + 1) * quizSize && attempts < POLLING_MAX_ATTEMPTS) {
             sleep(QUIZ_POLLING_SLEEP_TIME);
             attempts++;
-            rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
+            rawQuizzes = dynamoDBRepository.getQuizFromDB(quizDocId);
             log.info("polling...");
         }
         if (rawQuizzes.size() < (currentRound + 1) * quizSize) {
@@ -60,13 +60,13 @@ public class DynamoDBService {
         return convertToQuizDTO(rawQuizzes);
     }
 
-    public List<QuizDTO> getAllQuiz(String itemId, String timestamp) {
-        List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(itemId, timestamp);
+    public List<QuizDTO> getAllQuiz(String quizDocId) {
+        List<Map<String, Object>> rawQuizzes = dynamoDBRepository.getQuizFromDB(quizDocId);
         return convertToQuizDTO(rawQuizzes);
     }
 
-    public List<MarkDTO> getMark(String itemId) {
-        return convertToMarkDTO(dynamoDBRepository.getMarkFromDB(itemId));
+    public List<MarkDTO> getMark(String markDocId) {
+        return convertToMarkDTO(dynamoDBRepository.getMarkFromDB(markDocId));
     }
 
     private List<QuizDTO> convertToQuizDTO(List<Map<String, Object>> listMap) {

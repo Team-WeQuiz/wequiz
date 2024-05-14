@@ -9,7 +9,6 @@ import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
-import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.chatty.chatty.quizroom.controller.dto.ExistQuizListResponse.ExistQuiz;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ public class DynamoDBRepository {
     private static final String HASH_KEY = "id";
     private static final String RANGE_KEY = "timestamp";
     private static final String QUIZ = "questions";
-    private static final String TIMESTAMP = "timestamp";
     private static final String DESCRIPTION = "description";
     private static final String NUMBER_OF_QUIZ = "num_of_quiz";
     private static final String ANSWERS = "answers";
@@ -63,38 +61,21 @@ public class DynamoDBRepository {
         return existQuizList;
     }
 
-    public String getTimeStampFromDB(String quizDocId) {
-        Table table = dynamoDB.getTable(QUIZ_TABLE_NAME);
-
-        QuerySpec querySpec = new QuerySpec()
-                .withKeyConditionExpression("#pk = :pk")
-                .withNameMap(new NameMap().with("#pk", HASH_KEY))
-                .withValueMap(new ValueMap().with(":pk", quizDocId));
-        //.withProjectionExpression(TIMESTAMP);
-
-        Item item = table.query(querySpec).iterator().next();
-        log.info("Item: {}", item);
-
-        return item.getString(TIMESTAMP);
-    }
-
-    public String getDescriptionFromDB(String itemId, String timestamp) {
-        log.info("Getting description from DB for itemId: {} and timestamp: {}", itemId, timestamp);
+    public String getDescriptionFromDB(String quizDocId) {
         Table table = dynamoDB.getTable(QUIZ_TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
-                .withPrimaryKey(HASH_KEY, itemId, RANGE_KEY, timestamp)
+                .withPrimaryKey(HASH_KEY, quizDocId)
                 .withProjectionExpression(DESCRIPTION);
 
         Item item = table.getItem(spec);
-        log.info("Item: {}", item);
 
         return item.getString(DESCRIPTION);
     }
 
-    public List<Map<String, Object>> getQuizFromDB(String quizDocId, String timestamp) {
+    public List<Map<String, Object>> getQuizFromDB(String quizDocId) {
         Table table = dynamoDB.getTable(QUIZ_TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
-                .withPrimaryKey(HASH_KEY, quizDocId, RANGE_KEY, timestamp)
+                .withPrimaryKey(HASH_KEY, quizDocId)
                 .withProjectionExpression(QUIZ);
 
         Item item = table.getItem(spec);

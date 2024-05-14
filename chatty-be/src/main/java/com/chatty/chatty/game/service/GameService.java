@@ -115,8 +115,7 @@ public class GameService {
 
     private void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
-        List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
-                currentRound, QUIZ_SIZE);
+        List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), currentRound, QUIZ_SIZE);
         List<QuizDTO> currentQuizzes = quizDTOList.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.fillQuiz(currentQuizzes);
         log.info("filled queue: {}", quizData.getQuizDTOQueue());
@@ -147,7 +146,7 @@ public class GameService {
     @Async
     public void sendDescription(Long roomId, Long userId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        String description = dynamoDBService.pollDescription(quizData.getQuizDocId(), quizData.getTimestamp());
+        String description = dynamoDBService.pollDescription(quizData.getQuizDocId());
         DescriptionResponse descriptionResponse = DescriptionResponse.builder()
                 .description(description)
                 .build();

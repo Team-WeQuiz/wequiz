@@ -134,8 +134,7 @@ public class QuizRoomService {
 
     public RoomResultResponse getTotalResult(Long roomId) {
         QuizRoom quizRoom = getQuizRoom(roomId);
-        List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId(),
-                quizRoom.getCreatedAt().toString());
+        List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId());
         List<MarkDTO> markDTOList = dynamoDBService.getMark(quizRoom.getMarkDocId());
 
         List<QuizResultDTO> quizResultDTOList = new ArrayList<>();
