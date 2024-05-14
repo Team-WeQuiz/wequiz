@@ -3,7 +3,7 @@ package com.chatty.chatty.quizroom.controller;
 import com.chatty.chatty.auth.support.AuthUser;
 import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.ExistQuizIdResponse;
+import com.chatty.chatty.quizroom.controller.dto.ExistQuizListResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
@@ -44,8 +44,8 @@ public class QuizRoomController {
     }
 
     @GetMapping("/existQuiz")
-    public ResponseEntity<ExistQuizIdResponse> getExistQuizIdList(@AuthUser Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getExistQuizIdList(userId));
+    public ResponseEntity<ExistQuizListResponse> getExistQuizList(@AuthUser Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getExistQuizList(userId));
     }
 
     @GetMapping("/{roomId}")

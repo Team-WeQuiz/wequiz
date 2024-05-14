@@ -26,7 +26,7 @@ import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.player.service.PlayerService;
 import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
-import com.chatty.chatty.quizroom.controller.dto.ExistQuizIdResponse;
+import com.chatty.chatty.quizroom.controller.dto.ExistQuizListResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO.PlayerAnswer;
@@ -111,8 +111,8 @@ public class QuizRoomService {
                 .build();
     }
 
-    public ExistQuizIdResponse getExistQuizIdList(Long userId) {
-        return new ExistQuizIdResponse(dynamoDBRepository.getExistQuizIdList(userId));
+    public ExistQuizListResponse getExistQuizList(Long userId) {
+        return new ExistQuizListResponse(dynamoDBRepository.getExistQuizList(userId));
     }
 
     public QuizRoom getQuizRoom(Long roomId) {
