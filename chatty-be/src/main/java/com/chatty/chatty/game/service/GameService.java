@@ -39,7 +39,6 @@ import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import com.chatty.chatty.user.service.UserService;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -282,7 +281,6 @@ public class GameService {
     private void sendPlayersSubmitStatus(Long roomId, Boolean isMajority, UsersSubmitStatus status) {
         SubmitAnswerResponse response = SubmitAnswerResponse.builder()
                 .isMajority(isMajority)
-                .timestamp(LocalDateTime.now())
                 .submitStatuses(status.usersSubmitStatus())
                 .build();
         template.publishSubmitStatus(roomId, response);
@@ -313,16 +311,6 @@ public class GameService {
                 .build();
     }
 
-    private SubmitAnswerResponse getSubmitAnswerResponse(Long roomId) {
-        AnswerData answerData = answerRepository.getAnswerData(roomId);
-        UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.findByRoomId(roomId);
-        return SubmitAnswerResponse.builder()
-                .isMajority(answerData.checkSubmitStatus())
-                .timestamp(LocalDateTime.now())
-                .submitStatuses(usersSubmitStatus.usersSubmitStatus())
-                .build();
-    }
-
     public void getPhase(Long roomId, Long userId) {
         Phase currentPhase = phaseRepository.getPhase(roomId);
         QuizResponse quizResponse = sendQuiz(roomId);
@@ -331,7 +319,8 @@ public class GameService {
                 if (quizResponse != null) {
                     template.publishQuiz(userId, roomId, quizResponse);
                 }
-                template.publishSubmitStatus(roomId, getSubmitAnswerResponse(roomId));
+                Boolean isMajority = answerRepository.getAnswerData(roomId).checkSubmitStatus();
+                sendPlayersSubmitStatus(roomId, isMajority, userSubmitStatusRepository.findByRoomId(roomId));
             }
             case RESULT -> {
                 ScoreResponse scoreResponse = sendScore(roomId);
