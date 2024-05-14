@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as styles from './page.css';
 import client from '@/app/_api/client';
 import useAuthStore from '@/app/_store/useAuthStore';
-import QuestionProgess from '../../quiz-room/[id]/_components/QuestionProgress/QuestionProgess';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import PercentageCircle from './_components/PercentageCircle/PercentageCircle';
 import Image from 'next/image';
@@ -15,7 +14,6 @@ type PlayerAnswers = {
   nickname: string;
   playerAnswer: string;
   marking: boolean;
-  correction: false;
   profileImage: string;
 };
 
@@ -89,14 +87,14 @@ export default function ResultPage({ params }: { params: { id: number } }) {
                     <div
                       key={id}
                       className={
-                        answer.playerAnswer === result.correct
+                        answer.marking
                           ? styles.CorrectAnswerCard
                           : styles.WrongAnswerCard
                       }
                     >
                       <span
                         className={
-                          answer.playerAnswer === result.correct
+                          answer.marking
                             ? styles.CorrectAnswerMark
                             : styles.WrongAnswerMark
                         }
