@@ -9,7 +9,6 @@ type PlayerAnswers = {
   nickname: string;
   playerAnswer: string;
   marking: boolean;
-  correction: boolean;
   profileImage: string | null;
 };
 
@@ -134,7 +133,7 @@ export default function ResultPageModal({
                 <div
                   key={index}
                   className={
-                    answer.correction
+                    answer.marking
                       ? styles.CorrectAnswerCard
                       : styles.WrongAnswerCard
                   }
