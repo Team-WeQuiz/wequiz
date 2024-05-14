@@ -23,7 +23,6 @@ export const Default: Story = {
             nickname: 'test',
             playerAnswer: 'test',
             marking: true,
-            correction: true,
             profileImage: null
           },
           {
@@ -31,7 +30,6 @@ export const Default: Story = {
             nickname: 'test',
             playerAnswer: 'test',
             marking: false,
-            correction: false,
             profileImage: null
           },
         ],
