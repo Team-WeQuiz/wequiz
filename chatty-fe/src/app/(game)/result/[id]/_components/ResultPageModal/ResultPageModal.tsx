@@ -2,6 +2,7 @@ import useUserInfoStore from '@/app/_store/useUserInfoStore';
 import React, { useEffect, useState } from 'react';
 import * as styles from './ResultPageModal.css';
 import useModal from '@/app/_hooks/useModal';
+import Image from 'next/image';
 
 type PlayerAnswers = {
   playerId: number;
@@ -9,6 +10,7 @@ type PlayerAnswers = {
   playerAnswer: string;
   marking: boolean;
   correction: boolean;
+  profileImage: string | null;
 };
 
 type Results = {
@@ -66,6 +68,7 @@ export default function ResultPageModal({
       // answer 상태를 업데이트
       setAnswer({ ...data, playerAnswers: updatedPlayerAnswers });
     }
+    console.log(answer);
   }, [currentQuizNumber, results]);
 
   return (
@@ -117,7 +120,7 @@ export default function ResultPageModal({
                   >
                     A
                   </span>
-                  <span style={{ fontSize: '24px' }}>{findMyAnswer()}</span>
+                  <span>{findMyAnswer()}</span>
                 </div>
               </div>
             </div>
@@ -137,12 +140,18 @@ export default function ResultPageModal({
                   }
                 >
                   <div className={styles.ProfileWrapper}>
+                    <div className={styles.ImageWrapper}>
+                      <Image
+                        src={answer.profileImage || '/images/logo.svg'}
+                        alt="profile"
+                        width={40}
+                        height={40}
+                      />
+                    </div>
                     <span>{answer.nickname}</span>
                   </div>
 
-                  <span style={{ fontSize: '24px' }}>
-                    {answer.playerAnswer}
-                  </span>
+                  <span>{answer.playerAnswer}</span>
                 </div>
               ))}
             </div>

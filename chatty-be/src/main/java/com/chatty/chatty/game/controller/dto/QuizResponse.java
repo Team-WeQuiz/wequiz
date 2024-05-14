@@ -18,4 +18,5 @@ public record QuizResponse(
 
         List<String> options
 ) {
+
 }

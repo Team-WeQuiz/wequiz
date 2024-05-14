@@ -20,7 +20,6 @@ public class AuthenticationContext {
     }
 
     public Long getPrincipal() {
-        log.info("userId: {}", userId);
         if (Objects.isNull(userId)) {
             throw new AuthException(UNAUTHORIZED);
         }

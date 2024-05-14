@@ -1,12 +1,12 @@
 package com.chatty.chatty.auth.controller;
 
+import com.chatty.chatty.auth.controller.dto.PasswordRequest;
 import com.chatty.chatty.auth.controller.dto.RefreshTokenRequest;
 import com.chatty.chatty.auth.controller.dto.SignInRequest;
 import com.chatty.chatty.auth.controller.dto.SignUpRequest;
 import com.chatty.chatty.auth.controller.dto.TokenResponse;
 import com.chatty.chatty.auth.service.AuthService;
 import com.chatty.chatty.auth.support.AuthUser;
-import com.chatty.chatty.auth.controller.dto.PasswordRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

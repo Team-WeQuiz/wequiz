@@ -18,7 +18,8 @@ public class DynamoDBConfig {
     public AmazonDynamoDB amazonDynamoDB() {
         return AmazonDynamoDBClientBuilder.standard()
                 .withCredentials(
-                        new AWSStaticCredentialsProvider(new BasicAWSCredentials(awsKey.getAccessKey(), awsKey.getSecretKey())))
+                        new AWSStaticCredentialsProvider(
+                                new BasicAWSCredentials(awsKey.getAccessKey(), awsKey.getSecretKey())))
                 .withRegion(awsKey.getRegion())
                 .build();
     }

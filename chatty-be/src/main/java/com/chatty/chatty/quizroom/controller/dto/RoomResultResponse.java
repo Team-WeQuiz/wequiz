@@ -7,4 +7,5 @@ import lombok.Builder;
 public record RoomResultResponse(
         List<QuizResultDTO> results
 ) {
+
 }

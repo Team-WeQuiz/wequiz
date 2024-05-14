@@ -5,7 +5,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 from model.chain import QuizPipeline
-from data.settings import QUIZ_GENERATE_RETRY, QUIZ_LENGTH_MIN_LIMIT
+from data.settings import *
 from utils.logger import *
 from utils.exception import *
 # 로깅 설정
@@ -29,11 +29,32 @@ class QuizGenerator():
         elif '3' in text.lower() or ('yes' in text.lower() and 'no' in text.lower()):
             return "OX퀴즈"
     
-    def set_options(self, type, option_list):
+    def adjust_result(self, type, option_list, correct):
+        log("warning", f"[generator.py > quiz] set type({type}), options({option_list}), correct({correct}) ")
+        if type == "단답형":
+            if (correct.strip().lower() in NO_LIST) or (correct.strip().lower() in YES_LIST):
+                type = "OX퀴즈"
         if type == "OX퀴즈":
-            return ["YES", "NO"]
-        else:
-            return option_list
+            option_list = ["YES", "NO"]
+            if correct.strip().lower() in YES_LIST:
+                correct = 'YES'
+            elif correct.strip().lower() in NO_LIST:
+                correct = 'NO'
+            else:
+                raise QuizGenerationException(f'correct({correct}) does not belong anywhere.')
+        
+        if type == "OX퀴즈": type = "객관식"    # ox퀴즈도 객관식으로 설정
+        if type is None:   # type이 None인 경우 예외처리
+            if len(option_list) == 0:
+                type = "단답형"
+            else:
+                type = "객관식"
+        
+        if type == "객관식":
+            if len(option_list) <= 1:
+                raise QuizGenerationException(f"Generated options insufficient. length: {len(option_list)}")
+
+        return type, option_list, correct.strip()
     
     def generate(self, keyword, question_number):
         retry = 0
@@ -46,18 +67,11 @@ class QuizGenerator():
                 if len(question) <= QUIZ_LENGTH_MIN_LIMIT:
                     raise QuizGenerationException(f"Generated quiz is shorter than threshold({QUIZ_LENGTH_MIN_LIMIT}). length: {len(question)}")
 
-                type = self.get_type(response["text"]["type"])
-                options = self.set_options(type, response["text"]["choices"])
-                if type == "OX퀴즈": type = "객관식"    # ox퀴즈도 객관식으로 설정
-                if type is None:   # type이 None인 경우 예외처리
-                    if len(options) == 0:
-                        type = "단답형"
-                    else:
-                        type = "객관식"
-                
-                if type == "객관식":
-                    if len(options) <= 1:
-                        raise QuizGenerationException(f"Generated options insufficient. length: {len(options)}")
+                type, options, correct = self.adjust_result(
+                    self.get_type(response["text"]["type"]), 
+                    response["text"]["choices"], 
+                    response["text"]["correct"]
+                )
 
                 data = {
                     "id": f'quiz-{uuid.uuid4()}',
@@ -65,7 +79,7 @@ class QuizGenerator():
                     "type": type,
                     "question": question,
                     "options": options,
-                    "correct": response["text"]["correct"]
+                    "correct": correct,
                 }
                 break
             except KeyError:
@@ -93,10 +107,15 @@ class Marker():
     def __init__(self):
         self.marker_chain = MarkChain()
     
-    def mark(self, answer, user):
-        response = self.marker_chain.mark(answer, user)
-        
-        return 'true' in response['text'].lower()
+    async def mark(self, answer, user):
+        if user.strip() == '':
+            return False
+        else:
+            response = await self.marker_chain.mark(answer, user)
+            if isinstance(response, dict) and 'text' in response:
+                return 'true' in response['text'].lower()
+            else:
+                raise ValueError("Unexpected response format from marker_chain.mark()")
 
 
 ########################################################################################

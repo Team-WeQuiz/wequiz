@@ -4,38 +4,26 @@ import { style } from '@vanilla-extract/css';
 export const Container = style({
   display: 'flex',
   width: '100%',
-});
-
-export const SideBarWrapper = style({
-  width: 80,
-  height: '100%',
-  flexShrink: 0,
-  //   boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
-});
-
-export const SideBar = style({
-  display: 'inline-flex',
-  flexDirection: 'column',
   justifyContent: 'center',
-  padding: '0px 11px',
-  gap: 30,
+  alignItems: 'stretch',
 });
 
-export const ContentsContainer = style({
-  display: 'flex',
-  justifyContent: 'center',
-  padding: 20,
-  paddingTop: 0,
+export const Wrapper = style({
+  width: '80%',
+  minHeight: '100vh',
+  maxWidth: 1480,
 });
 
 export const ContentsBox = style({
   display: 'flex',
-  flex: 1,
   flexDirection: 'column',
   alignItems: 'center',
   gap: 60,
   borderRadius: 20,
   backgroundColor: globals.color.blue_7,
+  minHeight: '100vh',
+  padding: '40px 0',
+  overflow: 'visible',
 });
 
 export const ContentsWrapper = style({
@@ -72,6 +60,7 @@ export const QuestionCard = style({
   backgroundColor: '#fff',
   borderRadius: 20,
   fontSize: 20,
+  wordBreak: 'keep-all',
 });
 
 export const QuestionMark = style({

@@ -7,10 +7,12 @@ public record MarkResponse(
         String quiz_id,
         List<Mark> answers
 ) {
+
     public record Mark(
             Long user_id,
             String user,
             Boolean marking
     ) {
+
     }
 }
