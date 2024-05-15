@@ -65,8 +65,8 @@ public class DynamoDBService {
         return convertToQuizDTO(rawQuizzes);
     }
 
-    public List<MarkDTO> getMark(String markDocId) {
-        return convertToMarkDTO(dynamoDBRepository.getMarkFromDB(markDocId));
+    public List<MarkDTO> getMark(String markDocId, String timestamp) {
+        return convertToMarkDTO(dynamoDBRepository.getMarkFromDB(markDocId, timestamp));
     }
 
     private List<QuizDTO> convertToQuizDTO(List<Map<String, Object>> listMap) {

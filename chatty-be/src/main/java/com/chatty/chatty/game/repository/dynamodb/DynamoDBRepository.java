@@ -84,10 +84,10 @@ public class DynamoDBRepository {
         return item.getList(QUIZ);
     }
 
-    public List<Map<String, Object>> getMarkFromDB(String markDocId) {
+    public List<Map<String, Object>> getMarkFromDB(String markDocId, String timestamp) {
         Table table = dynamoDB.getTable(MARK_TABLE_NAME);
         GetItemSpec spec = new GetItemSpec()
-                .withPrimaryKey(HASH_KEY, markDocId)
+                .withPrimaryKey(HASH_KEY, markDocId, RANGE_KEY, timestamp)
                 .withProjectionExpression(ANSWERS);
 
         Item item = table.getItem(spec);

@@ -6,6 +6,7 @@ import lombok.Builder;
 @Builder
 public record MarkRequest(
         String id,
+        String timestamp,
         String quiz_id,
         Integer question_number,
         String correct,

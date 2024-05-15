@@ -196,15 +196,12 @@ public class GameService {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
         MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
                 .id(quizRoom.getQuizDocId())
+                .timestamp(quizRoom.getCreatedAt().toString())
                 .quiz_id(solvedQuiz.id())
                 .question_number(answerData.getQuizNum())
                 .correct(solvedQuiz.correct())
                 .answers(getAnswers(answerData.getPlayerAnswers()))
                 .build());
-        if (quizRoom.getMarkDocId() == null) {
-            quizRoom.setMarkDocId(markResponse.id());
-            quizRoomRepository.save(quizRoom);
-        }
 
         // 점수 갱신
         ScoreData scoreData = scoreRepository.getScoreData(roomId);
