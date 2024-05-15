@@ -112,11 +112,18 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
            <td align='center'>배준형</td>
          </tr>
          <tr>
+           <td align='center'>🤖</td>
+           <td align='center'>⚙️</td>
+           <td align='center'>⚙️</td>
+           <td align='center'>🎨</td>
+           <td align='center'>🎨</td>
+         </tr>
+         <tr>
            <td align='center'>ML</td>
-           <td align='center'>BE</td>
-           <td align='center'>BE</td>
-           <td align='center'>FE</td>
-           <td align='center'>FE</td>
+           <td align='center'>Back-end</td>
+           <td align='center'>Back-end</td>
+           <td align='center'>Front-end</td>
+           <td align='center'>Front-end</td>
          </tr>
     </tbody>
 </table>
