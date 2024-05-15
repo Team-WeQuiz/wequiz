@@ -74,7 +74,7 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
             <td align='center'>전체 아키텍처</td>
           </tr>
           <tr>
-            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/27122e88-768e-4ced-9925-b9e40c739a3b"></td>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/6cf28f69-7307-47f2-8fc8-3a6eaef7bab7"></td>
           </tr>
           <tr>
             <td align='center'>CI / CD</td>
@@ -85,6 +85,9 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
     </tbody>
 </table>
 
+
+## 🎮 Demo
+준비 중...
 
 ## 🚀 Team
 
