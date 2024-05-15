@@ -7,65 +7,43 @@
 
 ## Architecture
 
-### Generate Summary
-
-```mermaid
-graph LR;
-    pdf-->|parsing|documents;
-    documents-->|split|chunk_0-->|summarize|chunk_summary_0-->|combine|combined_chunk_summary;
-    documents-->|split|chunk_1-->|summarize|chunk_summary_1-->|combine|combined_chunk_summary;
-    documents-->|split|chunk_2-->|summarize|chunk_summary_2-->|combine|combined_chunk_summary;
-    combined_chunk_summary-->|summarize|summary;
-```
-
-### Generate Quiz
-to be continued...
-
-### Generate Mark
-
-```mermaid
-graph LR;
-    user_answer-->|mark|marked_answer-->|rule_based_process|marked_result;
-```
-
-## Skills
-- Langchain
-- FastAPI
+<table>
+    <tbody>
+        <tr>
+          <tr>
+            <td align='center'>퀴즈, 문서 요약 생성 과정</td>
+          </tr>
+          <tr>
+            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/04cbcb16-0f92-4149-8e9c-41371df247cf"></td>
+          </tr>
+    </tbody>
+</table>
 
 ## Usage
 
-### local
-가상 환경 activate
-```
-source ./.env/bin/activate
-```
-
-필요한 패키지 다운로드
-```
-pip install -r requirements.txt
-```
-
-app 폴더로 이동
-```
-cd app
-```
-
-API 앱 실행
-```
-uvicorn app:app --reload
-```
-
-### Docker
-
 build
 ```shell
-sudo docker build -t wequiz-model .
+make build
 ```
 
 run
 ```shell
-sudo docker run -p 8000:8000 --name wequiz-model wequiz-model
-sudo docker run -e AWS_ACCESS_KEY_ID=your_access_key_id -e AWS_SECRET_ACCESS_KEY=your_secret_access_key -p 8000:8000 --name wequiz-model wequiz-model
+make run
+```
+
+log
+```shell
+make log
+```
+
+exec
+```shell
+make exec
+```
+
+stop and remove container
+```shell
+make stop
 ```
 
   
