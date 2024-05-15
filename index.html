@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/gh/dheereshagrwal/colored-icons@1.7.3/src/app/ci.min.css"
+		/>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<nav class="nav">
+			<ul>
+				<li><a href="#about">About Wequiz</a></li>
+				<li><a href="#tech-stack">Tech Stack</a></li>
+				<li><a href="#architecture">Architecture</a></li>
+				<li><a href="#team">Team</a></li>
+				<li><a href="#poster">Poster</a></li>
+			</ul>
+		</nav>
+		<main class="main--container">
+			<div class="main--wrapper">
+				<img
+					class="main--image"
+					src="/chatty-fe/public/images/logo_main.png"
+					alt="placeholder image"
+				/>
+				<a href="#about">
+					<i class="fa-solid fa-arrow-down fa-2xl" style="color: #2692ff"></i>
+				</a>
+			</div>
+		</main>
+		<section class="about--section" id="about">
+			<div class="about about--description">
+				<h1>문제 만들기</h1>
+				<h2>
+					문제의 내용이 담긴 자료를 직접 업로드 하거나,<br />
+					이미 만들어진 문제를 선택할 수 있어요!
+				</h2>
+			</div>
+			<img
+				class="about description-image"
+				src="/assets/create-room.png"
+				alt="create-room"
+			/>
+		</section>
+		<section
+			class="about--section"
+			style="background-color: var(--sixth-color)"
+		>
+			<img
+				class="about description-image"
+				src="/assets/waiting-room.png"
+				alt="waiting-room"
+			/>
+			<div class="about about--description">
+				<h1>친구 초대하기</h1>
+				<h2>코드를 통해 친구를 초대하고,<br />자유롭게 소통하세요.</h2>
+			</div>
+		</section>
+		<section class="about--section">
+			<div class="about about--description">
+				<h1>실시간 퀴즈 게임</h1>
+				<h2>
+					생성된 퀴즈를 친구들과 함께 실시간으로 풀고, 대결하세요.<br /><br />
+					라운드가 끝나면, 중간 결과를 확인할 수 있어요.
+				</h2>
+			</div>
+			<img
+				class="about description-image"
+				src="/assets/quiz-room.png"
+				alt="quiz-room"
+			/>
+		</section>
+		<section
+			class="about--section"
+			style="background-color: var(--sixth-color)"
+		>
+			<img
+				class="about description-image"
+				src="/assets/result.png"
+				alt="result"
+			/>
+			<div class="about about--description">
+				<h1>결과 확인하기</h1>
+				<h2>
+					푼 퀴즈의 정답, 내가 쓴 답, 친구의 풀이를 확인해보세요!<br /><br />결과는
+					마이페이지에서 언제든지 확인할 수 있어요.
+				</h2>
+			</div>
+		</section>
+		<section class="tech-stack-section" id="tech-stack">
+			<h1>Tech Stack</h1>
+			<div class="tech-stack-container">
+				<div class="tech-stack-contents">
+					<h1>Frontend</h1>
+					<ul>
+						<li>Next.js</li>
+						<li>Typescript</li>
+						<li>Vanilla-Extract</li>
+						<li>Zustand</li>
+						<li>WebSocket</li>
+					</ul>
+				</div>
+				<div class="tech-stack-contents">
+					<h1>Backend</h1>
+					<ul>
+						<li>Spring Boot</li>
+						<li>MySQL</li>
+						<li>DynamoDB</li>
+						<li>WebSocket</li>
+						<li>MinIO</li>
+					</ul>
+				</div>
+				<div class="tech-stack-contents">
+					<h1>ML</h1>
+					<ul>
+						<li>FAST API</li>
+						<li>Lang Chain</li>
+						<li>MinIO</li>
+					</ul>
+				</div>
+				<div class="tech-stack-contents">
+					<h1>ETC</h1>
+					<ul>
+						<li>EC2</li>
+						<li>Docker</li>
+						<li>AWS Secret Manager</li>
+						<li>Git Actions</li>
+						<li>Portainer</li>
+						<li>Docker Hub</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		<section class="architecture-section" id="architecture">
+			<h1>Architecture</h1>
+			<div class="architecture-image-wrapper">
+				<img
+					class="architecture-image"
+					src="/assets/architecture.png"
+					alt="architecture"
+				/>
+			</div>
+		</section>
+		<section class="team-section" id="team">
+			<h1>Team</h1>
+			<div class="team-container">
+				<div class="our-team">
+					<div class="picture">
+						<img class="img-fluid" src="/assets/김우.jpeg" />
+					</div>
+					<div class="team-content">
+						<h3 class="name">김우림</h3>
+						<h4 class="title">Frontend Developer</h4>
+					</div>
+					<ul class="social">
+						<li>
+							<i class="fa-brands fa-linkedin"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-github"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-instagram"></i>
+						</li>
+					</ul>
+				</div>
+
+				<div class="our-team">
+					<div class="picture">
+						<img class="img-fluid" src="/assets/배준.jpeg" />
+					</div>
+					<div class="team-content">
+						<h3 class="name">배준형</h3>
+						<h4 class="title">Frontend Developer</h4>
+					</div>
+					<ul class="social">
+						<li>
+							<i class="fa-brands fa-linkedin"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-github"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-instagram"></i>
+						</li>
+					</ul>
+				</div>
+
+				<div class="our-team">
+					<div class="picture">
+						<img class="img-fluid" src="/assets/재민.jpeg" />
+					</div>
+					<div class="team-content">
+						<h3 class="name">심재민</h3>
+						<h4 class="title">Backend Developer</h4>
+					</div>
+					<ul class="social">
+						<li>
+							<i class="fa-brands fa-linkedin"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-github"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-instagram"></i>
+						</li>
+					</ul>
+				</div>
+
+				<div class="our-team">
+					<div class="picture">
+						<img class="img-fluid" src="/assets/금장.jpeg" />
+					</div>
+					<div class="team-content">
+						<h3 class="name">안금장</h3>
+						<h4 class="title">Backend Developer</h4>
+					</div>
+					<ul class="social">
+						<li>
+							<i class="fa-brands fa-linkedin"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-github"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-instagram"></i>
+						</li>
+					</ul>
+				</div>
+				<div class="our-team">
+					<div class="picture">
+						<img class="img-fluid" src="/assets/규연.jpeg" />
+					</div>
+					<div class="team-content">
+						<h3 class="name">박규연</h3>
+						<h4 class="title">ML Engineer</h4>
+					</div>
+					<ul class="social">
+						<li>
+							<i class="fa-brands fa-linkedin"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-github"></i>
+						</li>
+						<li>
+							<i class="fa-brands fa-instagram"></i>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		<section class="poster" id="poster">
+			<h1>Poster</h1>
+			<img class="poster" src="/assets/poster.png" alt="poster" />
+		</section>
+	</body>
+	<script>
+		window.onscroll = function () {
+			if (window.scrollY > 50) {
+				document.querySelector('.nav').classList.add('visible');
+			} else {
+				document.querySelector('.nav').classList.remove('visible');
+			}
+		};
+
+		document.addEventListener('DOMContentLoaded', function () {
+			const observer = new IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						if (entry.isIntersecting) {
+							entry.target.classList.add('visible');
+						} else {
+							entry.target.classList.remove('visible');
+						}
+					});
+				},
+				{
+					threshold: 0.5,
+				}
+			);
+
+			document.querySelectorAll('.about').forEach((section) => {
+				observer.observe(section);
+			});
+		});
+	</script>
+</html>
