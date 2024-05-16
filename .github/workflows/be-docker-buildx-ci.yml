@@ -1,10 +1,11 @@
 name: be-docker-buildx-ci
 
 on:
-  workflow_run:
-    workflows: ["be-test"]
-    types:
-      - completed
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'chatty-be/**'
 
 jobs:
   docker:
