@@ -31,6 +31,7 @@ export const contentsContainer = style({
   gap: 10,
   backgroundColor: globals.color.blue_6,
   borderRadius: 20,
+  boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
 });
 
 export const contentsWrapper = style({
