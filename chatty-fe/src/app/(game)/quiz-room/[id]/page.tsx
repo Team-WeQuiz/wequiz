@@ -13,6 +13,7 @@ import BarSpinner from '@/app/_components/BarSpinner/BarSpinner';
 import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
 import { useRouter } from 'next/navigation';
+import useBgmStore from '@/app/_store/useBgmStore';
 
 type QuizSet = {
   totalRound: number;
@@ -43,6 +44,7 @@ type PlayerScore = {
 };
 
 const QuizRoom = ({ params }: { params: { id: number } }) => {
+  const { setBgm } = useBgmStore();
   const [lastQuizSet, setLastQuizSet] = useState<QuizSet | null>(null);
   const [quizSet, setQuizSet] = useState<QuizSet | null>(null);
   const [count, setCount] = useState<number | null>(null);
@@ -66,6 +68,10 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     setUserAnswer(option);
     setSelectedOption(index);
   };
+
+  useEffect(() => {
+    setBgm('/bgm/quiz.mp3');
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
