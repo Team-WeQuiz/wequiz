@@ -6,14 +6,14 @@ type BgmState = {
 };
 
 type BgmAction = {
-  setIsPlaying: (isPlaying: boolean) => void;
+  setIsPlaying: () => void;
   setBgm: (bgm: string) => void;
 };
 
 const useBgmStore = create<BgmState & BgmAction>((set) => ({
   bgm: '/bgm/main.mp3',
-  isPlaying: false,
-  setIsPlaying: (isPlaying) => set({ isPlaying }),
+  isPlaying: true,
+  setIsPlaying: () => set((state) => ({ isPlaying: !state.isPlaying })),
   setBgm: (bgm) => set({ bgm }),
 }));
 

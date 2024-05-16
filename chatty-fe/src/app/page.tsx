@@ -5,24 +5,15 @@ import Image from 'next/image';
 import * as styles from './page.css';
 import Sparkles from './_components/Sparkles/Sparkles';
 import GradButton from './_components/GradButton';
+import Link from 'next/link';
 import Cookies from 'js-cookie';
 import useBgmStore from './_store/useBgmStore';
-import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(false);
-  const router = useRouter();
-  const { setIsPlaying } = useBgmStore();
-  const handleStart = () => {
-    setIsPlaying(true);
-    if (isLogin) {
-      router.push('/main-lobby');
-    } else {
-      router.push('/sign-in');
-    }
-  };
   useEffect(() => {
     const token = Cookies.get('refreshToken');
+    //console.log(token);
     if (token) setIsLogin(true);
   }, []);
   return (
@@ -40,9 +31,11 @@ export default function Home() {
             />
           </div>
           <div className={styles.buttonWrapper}>
-            <GradButton onClick={handleStart} rounded fullWidth>
-              <div className={styles.buttonText}>시작!</div>
-            </GradButton>
+            <Link href={isLogin ? '/main-lobby' : '/sign-in'}>
+              <GradButton rounded fullWidth>
+                <div className={styles.buttonText}>시작!</div>
+              </GradButton>
+            </Link>
           </div>
         </div>
       </div>
