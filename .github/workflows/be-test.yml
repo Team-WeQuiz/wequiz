@@ -10,6 +10,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: chatty-be
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -29,7 +32,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./chatty-be/gradlew
+        run: chmod +x gradlew
 
       - name: Run tests
-        run: ./chatty-be/gradlew test
+        run: ./gradlew test
