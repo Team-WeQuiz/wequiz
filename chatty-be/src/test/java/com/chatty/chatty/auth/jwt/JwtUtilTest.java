@@ -70,5 +70,4 @@ class JwtUtilTest {
     private Date expiration(Long refreshExpiration) {
         return new Date(System.currentTimeMillis() + refreshExpiration);
     }
-
 }
