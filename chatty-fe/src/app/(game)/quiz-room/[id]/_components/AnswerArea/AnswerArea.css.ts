@@ -55,22 +55,33 @@ export const RadioButton = style({
   padding: 0,
 });
 
-export const SelectedButton = style({
-  display: 'flex',
-  justifyContent: 'center',
-  width: 22,
-  height: 22,
-  stroke: globals.color.blue_main,
-  border: `1px solid ${globals.color.blue_main}`,
-  borderRadius: '50%',
-  flexShrink: 0,
-  background: globals.color.blue_main,
-  color: 'white',
-  fontSize: 16,
-  fontWeight: 400,
-  margin: 0,
-  padding: 0,
-});
+export const SelectedButton = style([
+  RadioButton,
+  {
+    stroke: globals.color.blue_main,
+    border: `1px solid ${globals.color.blue_main}`,
+    background: globals.color.blue_main,
+    color: 'white',
+  },
+]);
+
+export const SelectedDisabledButton = style([
+  SelectedButton,
+  {
+    background: globals.color.blue_2,
+    border: `1px solid ${globals.color.blue_2}`,
+    color: 'white',
+  },
+]);
+
+export const DisabledButton = style([
+  RadioButton,
+  {
+    background: '#ccc',
+    border: `1px solid #ccc`,
+    color: 'white',
+  },
+]);
 
 export const SelectedLabel = style({
   color: globals.color.blue_main,
