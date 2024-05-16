@@ -5,7 +5,6 @@ import AnswerArea from './_components/AnswerArea/AnswerArea';
 import * as styles from './page.css';
 import GradButton from '@/app/_components/GradButton';
 import UserGrid from './_components/UserGrid/UserGrid';
-import RoundProgress from './_components/RoundProgress/RoundProgress';
 import { useEffect, useRef, useState } from 'react';
 import useAuthStore from '@/app/_store/useAuthStore';
 import stompClient from '../../_utils/stomp';
@@ -55,6 +54,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   const [submitStatuses, setSubmitStatuses] = useState<SubmitStatuses | null>(
     null,
   );
+  const [unableSubmit, setUnableSubmit] = useState(false);
   const { accessToken } = useAuthStore();
   const { id: userId } = useUserInfoStore();
   const { openModal, closeModal, isOpen } = useModal();
@@ -66,6 +66,27 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
     setUserAnswer(option);
     setSelectedOption(index);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === 'Enter' &&
+        !unableSubmit &&
+        (userAnswer || selectedOption)
+      ) {
+        submitQuiz(params.id);
+        console.log('enter');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [unableSubmit, params.id, userAnswer, selectedOption]);
+
+  useEffect(() => {
+    setUnableSubmit(count === 0 || isAnswered);
+  }, [count, isAnswered]);
 
   useEffect(() => {
     if (quizSet?.quizNumber === (quizSet?.totalRound || 0) * 5) {
@@ -250,7 +271,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           <div className={styles.ContentsWrapper}>
             <div className={styles.Navigation}>
               <div className={styles.RoundWrapper}>
-                Round {quizSet?.currentRound || 0}
+                Round {quizSet?.currentRound || 0} / {quizSet?.totalRound || 0}
               </div>
               <QuestionProgess
                 questionNumber={
@@ -271,6 +292,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
                 selectedOption={selectedOption}
                 setAnswer={setUserAnswer}
                 handleOptionChange={handleOptionChange}
+                unableSubmit={unableSubmit}
               />
             </div>
           </div>
@@ -298,7 +320,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
               color={'primary'}
               fullWidth
               onClick={() => submitQuiz(params.id)}
-              disabled={isAnswered}
+              disabled={unableSubmit}
             >
               {isAnswered ? '완료' : '제출'}
             </GradButton>
