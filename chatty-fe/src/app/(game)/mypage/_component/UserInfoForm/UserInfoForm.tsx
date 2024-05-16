@@ -44,6 +44,10 @@ const UserInfoForm = () => {
     ) {
       try {
         await changePassword(originalPassword, newPassword, accessToken);
+        alert('비밀번호가 변경되었습니다.');
+        setOriginalPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
       } catch (error: any) {
         alert(error.message);
       }

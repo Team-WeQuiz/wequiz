@@ -28,6 +28,11 @@ export const profileButton = style({
   padding: 0,
 });
 
+export const profileImage = style({
+  borderRadius: '50%',
+  border: `1px solid ${globals.color.blue_7}`,
+});
+
 export const dropdownMenu = style({
   position: 'absolute',
   top: 56,

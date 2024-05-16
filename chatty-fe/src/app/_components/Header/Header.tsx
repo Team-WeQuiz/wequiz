@@ -15,7 +15,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useRouter();
   const { deleteTokens } = useAuthStore();
-  const { deleteUserInfo } = useUserInfoStore();
+  const { profileImage, deleteUserInfo } = useUserInfoStore();
   const { isPlaying, setIsPlaying } = useBgmStore();
 
   const handleLogoClick = () => {
@@ -59,10 +59,11 @@ export default function Header() {
                 className={styles.mainButton}
               >
                 <Image
-                  src="/images/person.svg"
+                  src={profileImage || '/images/person.svg'}
                   height={48}
                   width={48}
                   alt="profile"
+                  className={styles.profileImage}
                 />
               </button>
               <div className={styles.dropdownMenu}>
