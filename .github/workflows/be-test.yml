@@ -17,6 +17,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Assume IAM role
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
