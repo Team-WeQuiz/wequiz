@@ -39,11 +39,9 @@ class JwtUtilTest {
                 .id(1L)
                 .build();
         String token = jwtUtil.createAccessToken(user);
-
-        // when
+        
         Long userId = jwtUtil.getUserIdFromToken(token);
 
-        // then
         assertThat(userId).isEqualTo(user.getId());
     }
 
