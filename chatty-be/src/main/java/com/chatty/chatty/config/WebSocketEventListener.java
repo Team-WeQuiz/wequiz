@@ -36,7 +36,6 @@ public class WebSocketEventListener {
                 }
                 template.publishPlayersStatus(roomId, playersStatusDTO);
                 quizRoomService.broadcastUpdatedRoomList();
-
             }
         }
     }
