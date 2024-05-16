@@ -8,7 +8,7 @@ on:
       - 'chatty-be/**'
 
 jobs:
-  test:
+  be-test-when-pull-request:
     runs-on: ubuntu-latest
     services:
       mysql:
