@@ -6,6 +6,8 @@ on:
       - 'main'
     paths:
       - 'chatty-be/**'
+    paths-ignore:
+      - 'chatty-be/src/test/**'
 
 jobs:
   docker:
