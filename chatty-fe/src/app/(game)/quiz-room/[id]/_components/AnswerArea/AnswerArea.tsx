@@ -10,6 +10,7 @@ export type AnswerAreaProps = {
   setAnswer: (answer: string | null) => void;
   selectedOption: number | null;
   handleOptionChange: (option: string, index: number) => void;
+  unableSubmit: boolean;
 };
 
 export default function AnswerArea({
@@ -19,6 +20,7 @@ export default function AnswerArea({
   setAnswer,
   selectedOption,
   handleOptionChange,
+  unableSubmit,
 }: AnswerAreaProps) {
   return (
     <div className={styles.Container}>
@@ -30,22 +32,29 @@ export default function AnswerArea({
             onChange={(e) => setAnswer(e.target.value)}
             placeholder="답변을 작성해주세요."
             borderRadius={12}
+            disabled={unableSubmit}
           />
         ) : (
           <div className={styles.RadioButtonWrapper}>
             {options?.map((option, index) => {
               const isSelected = index === selectedOption;
+              const inputClassName = isSelected
+                ? unableSubmit
+                  ? styles.SelectedDisabledButton // 선택되었고 비활성화 상태
+                  : styles.SelectedButton // 선택되었고 활성화 상태
+                : unableSubmit
+                  ? styles.DisabledButton // 선택되지 않았고 비활성화 상태
+                  : styles.RadioButton; // 선택되지 않았고 활성화 상태
               return (
                 <div className={styles.LabelWrapper} key={index}>
                   <input
-                    className={
-                      isSelected ? styles.SelectedButton : styles.RadioButton
-                    }
+                    className={inputClassName}
                     type="button"
                     value={index + 1}
                     onClick={() => handleOptionChange(option, index)}
                     name="option"
                     id={option}
+                    disabled={unableSubmit}
                   />
                   <label
                     className={isSelected ? styles.SelectedLabel : styles.Label}

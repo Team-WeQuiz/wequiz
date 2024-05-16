@@ -42,6 +42,7 @@ export const MultipleChoice: Story = {
     selectedOption: null,
     setAnswer: (answer: string | null) => {}, // 예시로 빈 함수를 넣음
     handleOptionChange: (option: string, index: number) => {}, // 예시로 빈 함수를 넣음
+    unableSubmit: false,
   },
 };
 
