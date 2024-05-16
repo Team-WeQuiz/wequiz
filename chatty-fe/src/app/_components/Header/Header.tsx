@@ -41,7 +41,10 @@ export default function Header() {
         <Image src="/images/logo.svg" height={52} width={112} alt="logo" />
       </button>
       <div className={styles.buttonsWrapper}>
-        <button className={styles.musicPlayButton} onClick={setIsPlaying}>
+        <button
+          className={styles.musicPlayButton}
+          onClick={() => setIsPlaying(!isPlaying)}
+        >
           <Image
             src={
               isPlaying ? '/images/volume_max.svg' : '/images/volume_mute.svg'
