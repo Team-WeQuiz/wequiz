@@ -7,10 +7,10 @@ import Sparkles from './_components/Sparkles/Sparkles';
 import GradButton from './_components/GradButton';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
+import useBgmStore from './_store/useBgmStore';
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(false);
-
   useEffect(() => {
     const token = Cookies.get('refreshToken');
     //console.log(token);

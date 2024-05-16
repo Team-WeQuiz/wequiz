@@ -8,6 +8,7 @@ import DropdownMenu from '../DropDownMenu/DropdownMenu';
 import Cookies from 'js-cookie';
 import useAuthStore from '@/app/_store/useAuthStore';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
+import useBgmStore from '@/app/_store/useBgmStore';
 
 export default function Header() {
   const pathName = usePathname();
@@ -15,7 +16,7 @@ export default function Header() {
   const navigate = useRouter();
   const { deleteTokens } = useAuthStore();
   const { deleteUserInfo } = useUserInfoStore();
-  const [isMusicOn, setIsMusicOn] = useState(true);
+  const { isPlaying, setIsPlaying } = useBgmStore();
 
   const handleLogoClick = () => {
     navigate.push('/main-lobby');
@@ -34,24 +35,20 @@ export default function Header() {
     navigate.push('/');
   };
 
-  const handleMusicPlay = () => {
-    setIsMusicOn(!isMusicOn);
-  };
-
   return (
     <header className={styles.container}>
       <button onClick={handleLogoClick} className={styles.mainButton}>
         <Image src="/images/logo.svg" height={52} width={112} alt="logo" />
       </button>
       <div className={styles.buttonsWrapper}>
-        <button className={styles.musicPlayButton} onClick={handleMusicPlay}>
+        <button className={styles.musicPlayButton} onClick={setIsPlaying}>
           <Image
             src={
-              isMusicOn ? '/images/volume_max.svg' : '/images/volume_mute.svg'
+              isPlaying ? '/images/volume_max.svg' : '/images/volume_mute.svg'
             }
             height={36}
             width={36}
-            alt={isMusicOn ? 'music_on' : 'music_off'}
+            alt={isPlaying ? 'music_on' : 'music_off'}
           />
         </button>
         {!pathName.includes('/waiting-room') &&
