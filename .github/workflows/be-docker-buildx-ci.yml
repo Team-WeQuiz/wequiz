@@ -5,9 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'chatty-be/**'
-    paths-ignore:
-      - 'chatty-be/src/test/**'
+      - 'chatty-be/src/main/**'
 
 jobs:
   docker:
