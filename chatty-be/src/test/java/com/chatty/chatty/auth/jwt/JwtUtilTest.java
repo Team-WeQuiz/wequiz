@@ -39,7 +39,7 @@ class JwtUtilTest {
                 .id(1L)
                 .build();
         String token = jwtUtil.createAccessToken(user);
-        
+
         Long userId = jwtUtil.getUserIdFromToken(token);
 
         assertThat(userId).isEqualTo(user.getId());
@@ -70,4 +70,5 @@ class JwtUtilTest {
     private Date expiration(Long refreshExpiration) {
         return new Date(System.currentTimeMillis() + refreshExpiration);
     }
+
 }
