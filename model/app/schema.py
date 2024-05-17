@@ -4,15 +4,17 @@ from typing import List
 class GenerateRequest(BaseModel):
     timestamp: str
     user_id: int
-    numOfQuiz: int
+    num_of_quiz: int
 
 class Answer(BaseModel):
     user_id: int # user_id
-    user: str # 유저가 작성한 답안
+    user_answer: str # 유저가 작성한 답안
 
 class MarkRequest(BaseModel):
-    id: str  # quiz_set id
-    quiz_id: str # quiz_id
-    question_number: int # 퀴즈방 내에서의 quiz number
-    correct: str # 답안
-    answers: List[Answer]
+    id: str  # **quiz_set** id
+    timestamp: str # quiz방 생성 시간
+    quiz_id: str 
+    quiz_num: int
+    quiz_type: str
+    correct_answer: str  # 답안
+    submit_answers: List[Answer]  # 제출 답안

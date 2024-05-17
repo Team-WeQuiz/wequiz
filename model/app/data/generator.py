@@ -107,7 +107,7 @@ class Marker():
     def __init__(self):
         self.marker_chain = MarkChain()
     
-    async def mark(self, answer, user):
+    async def mark(self, answer, user, type):
         if user.strip() == '':
             return False
         else:

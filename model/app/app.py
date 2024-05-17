@@ -42,11 +42,11 @@ async def mark(mark_request: MarkRequest):
 
     try:
         # 채점 및 답변 리스트 생성
-        for answer in mark_request.answers:
-            marking = await marker.mark(mark_request.correct, answer.user)
+        for answer in mark_request.submit_answers:
+            marking = await marker.mark(mark_request.correct_answer, answer.user_answer, mark_request.quiz_type)
             data = {
                 "user_id": answer.user_id,
-                "user": answer.user,
+                "user_answer": answer.user_answer,
                 "marking": marking
             }
             answers.append(data)
@@ -57,11 +57,11 @@ async def mark(mark_request: MarkRequest):
     # DynamoDB에 채점 결과 업데이트
     marked_item = {
         "id": {"S": str(mark_request.quiz_id)},
-        "question_number": {"N": str(mark_request.question_number)},
-        "correct": {"S": mark_request.correct},
+        "quiz_num": {"N": str(mark_request.quiz_num)},
+        "correct_answer": {"S": mark_request.correct_answer},
         "markeds": {"L": [{"M": {
             "user_id": {"N": str(answer['user_id'])},
-            "user": {"S": answer['user']},
+            "user_answer": {"S": answer['user_answer']},
             "marking": {"BOOL": answer['marking']}
         }} for answer in answers]}
     }
@@ -72,7 +72,7 @@ async def mark(mark_request: MarkRequest):
                 # mark_request.id가 있는지 확인
                 table = await dynamodb.get_item(
                     TableName=MARK_TABLE,
-                    Key={'id': {'S': str(mark_request.id)}}
+                    Key={'id': {'S': str(mark_request.id)}, 'timestamp': {'S': mark_request.timestamp}}
                 )
 
                 # mark_request.id가 테이블에 없는 경우
@@ -80,13 +80,13 @@ async def mark(mark_request: MarkRequest):
                     # 새로운 아이템 추가
                     await dynamodb.put_item(
                         TableName=MARK_TABLE,
-                        Item={"id": {"S": str(mark_request.id)}, "answers": {"L": [{"M": marked_item}]}}
+                        Item={"id": {"S": str(mark_request.id)}, 'timestamp': {'S': mark_request.timestamp}, "answers": {"L": [{"M": marked_item}]}}
                     )
                 else:
                     # 이미 존재하는 아이템 업데이트
                     await dynamodb.update_item(
                         TableName=MARK_TABLE,
-                        Key={'id': {'S': str(mark_request.id)}},
+                        Key={'id': {'S': str(mark_request.id)}, 'timestamp': {'S': mark_request.timestamp}},
                         UpdateExpression="SET #answers = list_append(#answers, :new_answer)",
                         ExpressionAttributeNames={"#answers": "answers"},
                         ExpressionAttributeValues={":new_answer": {"L": [{"M": marked_item}]}}
@@ -105,7 +105,7 @@ async def mark(mark_request: MarkRequest):
     res = {
         "id": mark_request.id,
         "quiz_id": mark_request.quiz_id,
-        "answers": answers
+        "marked_answers": answers
     }
     log('info', f'[app.py > mark] Marking is generated: {res}')
     return res
@@ -120,7 +120,8 @@ async def create_id(generate_request):
             "timestamp": {"S": generate_request.timestamp},
             "user_id": {"N": str(generate_request.user_id)},
             "questions": {"L": []},
-            "description": {"S": ''}
+            "description": {"S": ''},
+            "num_of_quiz": {"N": str(generate_request.num_of_quiz)}
         }
         
         async with aioboto3.Session().client('dynamodb', region_name=REGION_NAME, config=config) as dynamodb:
@@ -151,7 +152,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
             try:
                 await dynamodb.update_item(
                     TableName=QUIZ_TABLE,
-                    Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+                    Key={'id': {"S": id}},
                     UpdateExpression='SET description = :val, version = if_not_exists(version, :zero)',
                     ExpressionAttributeValues={':val': {'S': summary}, ':zero': {'N': '0'}}
                 )
@@ -160,7 +161,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 quiz_generator = QuizGenerator(vector_split_docs)
 
                 async def generate_question(idx, i):
-                    max_attempts = generate_request.numOfQuiz
+                    max_attempts = generate_request.num_of_quiz
                     for _ in range(max_attempts):
                         try:
                             keyword = keywords[i % len(keywords)]
@@ -185,19 +186,19 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                 questions = []
                 idx = 0
                 i = 0
-                while idx < generate_request.numOfQuiz:
+                while idx < generate_request.num_of_quiz:
                     question, i = await generate_question(idx, i)
                     questions.append(question)
                     idx += 1
 
                     # 5문제가 생성되었거나 마지막 문제인 경우 DynamoDB에 업데이트
-                    if idx % 5 == 0 or idx == generate_request.numOfQuiz:
+                    if idx % 5 == 0 or idx == generate_request.num_of_quiz:
                         log('info', f'[app.py > quiz] cur idx: {idx} - quiz batch is ready to push. {questions}')
                         while True:
                             try:
                                 response = await dynamodb.get_item(
                                     TableName=QUIZ_TABLE,
-                                    Key={'id': {'S': id}, 'timestamp': {'S': generate_request.timestamp}}
+                                    Key={'id': {'S': id}}
                                 )
                                 item = response.get('Item', {})
                                 existing_questions = item.get('questions', {'L': []})['L']
@@ -207,7 +208,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                                 # Update item in DynamoDB with optimistic locking
                                 await dynamodb.update_item(
                                     TableName=QUIZ_TABLE,
-                                    Key={'id': {"S": id}, 'timestamp': {'S': generate_request.timestamp}},
+                                    Key={'id': {"S": id}},
                                     UpdateExpression='SET questions = :val, version = :new_version',
                                     ConditionExpression='version = :current_version',
                                     ExpressionAttributeValues={
@@ -251,7 +252,7 @@ async def generate(generate_request: GenerateRequest):
         res = results[1]
 
         # keyword 추출
-        keywords = extract_keywords(keyword_split_docs, top_n=generate_request.numOfQuiz * 2)  # 키워드는 개수를 여유롭게 생성합니다.
+        keywords = extract_keywords(keyword_split_docs, top_n=generate_request.num_of_quiz * 2)  # 키워드는 개수를 여유롭게 생성합니다.
         log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
 
         # quiz 생성 (비동기)
