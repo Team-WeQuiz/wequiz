@@ -38,6 +38,7 @@ public class AnswerRepository {
                 .majorityNum((quizRoom.getPlayerNum() + 1) / 2)
                 .quizId(quizData.getQuiz().id())
                 .quizNum(quizData.getQuiz().questionNumber())
+                .quizType(quizData.getQuiz().type())
                 .correct(quizData.getQuiz().correct())
                 .startedTime(LocalDateTime.now())
                 .build();

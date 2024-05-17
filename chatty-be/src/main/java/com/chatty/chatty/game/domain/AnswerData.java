@@ -26,6 +26,7 @@ public class AnswerData {
     private final Integer majorityNum;
     private final String quizId;
     private final Integer quizNum;
+    private final String quizType;
     private final String correct;
     private final LocalDateTime startedTime;
 

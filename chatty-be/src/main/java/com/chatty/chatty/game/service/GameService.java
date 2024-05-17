@@ -191,15 +191,16 @@ public class GameService {
         }
     }
 
-    private void markAndUpdateScore(Long roomId, Long userId, QuizDTO solvedQuiz, AnswerData answerData) {
+    private void markAndUpdateScore(Long roomId, Long userId, AnswerData answerData) {
         // ML에 플레이어들 답안 넘겨서 채점 요청 후 채점 문서 id 저장
         QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
         MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
                 .id(quizRoom.getQuizDocId())
                 .timestamp(quizRoom.getCreatedAt().toString())
-                .quiz_id(solvedQuiz.id())
+                .quiz_id(answerData.getQuizId())
                 .quiz_number(answerData.getQuizNum())
-                .correct_answer(solvedQuiz.correct())
+                .quiz_type(answerData.getQuizType())
+                .correct_answer(answerData.getCorrect())
                 .submit_answers(getAnswers(answerData.getPlayerAnswers()))
                 .build());
 
@@ -251,9 +252,8 @@ public class GameService {
                     userSubmitStatus.submit();
                 });
         // 퀴즈 끝났으면 다음 퀴즈 반환 준비
-        QuizDTO solvedQuiz = gameRepository.getQuizData(roomId).getQuiz();
         log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
-        markAndUpdateScore(roomId, userId, solvedQuiz, answerData);
+        markAndUpdateScore(roomId, userId, answerData);
         resetState(roomId);
         template.publishQuizCount(roomId, buildCountDownResponse(seconds));
         log.info("Countdown: {}", seconds);
