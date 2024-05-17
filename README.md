@@ -5,10 +5,24 @@
 <h3>.</h3>
 <h3>.</h3>
 <a href='https://github.com/Team-WeQuiz/wequiz'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/60bbbb34-284f-43a5-b3d5-4332ed856a9a"></a>
+
 </div>
+</br>
+</br>
+</br>
 
 ## 🤔 Overview
 AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
+
+</br>
+</br>
+</br>
+
+## 📝 Documents
+- [포스터](https://github.com/Team-WeQuiz/wequiz/blob/main/docs/poster.png)
+- [수행결과 보고서]()
+- [최종 보고서]()
+- [발표 자료]()
 
 ## 🖱️ Usage
 **1. PDF 자료를 퀴즈로 변환**  
@@ -28,6 +42,9 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 > 퀴즈가 모두 끝난 후, 최종 성적표가 제공됩니다.  
 > 사용자는 서로가 작성한 답을 공유할 수 있으며, 이에 대한 토론을 나눌 수 있습니다.  
  
+</br>
+</br>
+</br>
 
 
 ## 🎨 User Interface
@@ -58,14 +75,11 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
     </tbody>
 </table>
 
+</br>
+</br>
+</br>
 
 ## 🛠️ Architecture
-### 🎨 Front-end
-`NEXT.JS`
-### ⚙️ Back-end
-`Spring boot`, `MySQL`
-### 🤖 ML
-`LangChain`, `FastAPI`
 
 <table>
     <tbody>
@@ -85,9 +99,16 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
     </tbody>
 </table>
 
+</br>
+</br>
+</br>
 
 ## 🎮 Demo
 준비 중...
+
+</br>
+</br>
+</br>
 
 ## 🚀 Team
 
@@ -132,6 +153,10 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 </table>
 
 </div> 
+
+</br>
+</br>
+</br>
 
 ---
 
