@@ -61,7 +61,7 @@ class QuizGenerator():
         while retry < QUIZ_GENERATE_RETRY:
             try:
                 response = self.chain.generate_quiz(keyword)["quiz"]
-                log("info", f'[generator.py > quiz] quiz generated. {response}')
+                log("info", f'[generator.py > quiz] quiz about {keyword} generated. {response}')
 
                 question = response["text"]["question"]
                 if len(question) <= QUIZ_LENGTH_MIN_LIMIT:
