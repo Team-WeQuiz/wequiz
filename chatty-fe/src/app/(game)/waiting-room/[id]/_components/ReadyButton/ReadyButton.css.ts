@@ -8,6 +8,11 @@ export const readyContainer = style({
   alignItems: 'center',
   justifyContent: 'flex-end',
   width: '100%',
+  '@media': {
+    '(max-width: 768px)': {
+      flexDirection: 'row',
+    },
+  },
 });
 
 export const readyStatus = style({
@@ -20,6 +25,15 @@ export const readyStatus = style({
   backgroundClip: 'text',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
+  '@media': {
+    '(max-width: 768px)': {
+      // writingMode: 'vertical-rl',
+      // textOrientation: 'upright', 
+      // whiteSpace: 'nowrap',
+      // width: "100%",
+      // marginLeft: '50vw',
+    },
+  },
 });
 
 const blinkingText = keyframes({
@@ -38,6 +52,7 @@ export const buttonText = style({
   fontSize: 30,
   fontWeight: 600,
   lineHeight: '44px',
+  minWidth: 70,
   '@media': {
     '(max-width: 768px)': {
       fontSize: 15,

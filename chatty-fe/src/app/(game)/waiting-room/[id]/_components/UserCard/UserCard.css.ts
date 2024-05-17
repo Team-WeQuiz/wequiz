@@ -4,22 +4,22 @@ import { globals } from '@/app/globals.css';
 
 export const cardContainer = style({
   display: 'flex',
-  padding: '16px 0',
+  height: '100%',
+  width: '100%',
+  padding: '8px 0 16px 0',
   flexDirection: 'column',
   justifyContent: 'flex-end',
-  width: '100%',
-  height: '100%',
   alignItems: 'center',
   gap: 16,
   backgroundColor: globals.color.blue_5,
   borderRadius: 20,
   border: '2px solid #fff',
   position: 'relative',
-  overflow: 'hidden',
+  // overflow: 'hidden',
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
   '@media': {
     '(max-width: 768px)': {
-      padding: '8px 0px',
+      padding: '0 0 12px 0',
     },
   },
 });
@@ -84,13 +84,13 @@ export const chatMessage = style({
 });
 
 export const profileImage = style({
-  position: 'relative',
-  top: 50,
   display: 'flex',
+  position: 'relative',
+  top: "5%",
   justifyContent: 'center',
   '@media': {
     '(max-width: 768px)': {
-      top: 0,
+      // top: '0',
     },
   },
 });
@@ -98,6 +98,7 @@ export const profileImage = style({
 export const userInfo = style({
   width: '100%',
   zIndex: 6,
+  overflow: 'hidden',
 });
 
 export const line = style({
@@ -110,17 +111,19 @@ export const userName = style({
   display: 'flex',
   flexWrap: 'wrap',
   width: '100%',
-  height: 45,
+  padding: '8px 0',
   color: globals.color.black,
   backgroundColor: globals.color.blue_4,
   fontSize: 24,
   fontWeight: 600,
   justifyContent: 'center',
   alignContent: 'center',
+  overflow: 'hidden',
   '@media': {
     '(max-width: 768px)': {
-      height: 30,
-      fontSize: 14,
+      padding: '4px 0',
+      fontSize: '3vw',
+
     },
   },
 });
