@@ -8,7 +8,7 @@ public record MarkRequest(
         String id,
         String timestamp,
         String quiz_id,
-        Integer quiz_number,
+        Integer quiz_num,
         String quiz_type,
         String correct_answer,
         List<AnswerDTO> submit_answers

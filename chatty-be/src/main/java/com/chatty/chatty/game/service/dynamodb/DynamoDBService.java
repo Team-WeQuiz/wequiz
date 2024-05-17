@@ -82,9 +82,9 @@ public class DynamoDBService {
         return listMap.stream()
                 .map(map -> {
                     String id = (String) map.get("id");
-                    String correct = (String) map.get("correct");
+                    String correct = (String) map.get("correct_answer");
                     List<Map<String, Object>> markedsListMap = (List<Map<String, Object>>) map.get("markeds");
-                    Integer quizNumber = ((BigDecimal) map.get("question_number")).intValue();
+                    Integer quizNumber = ((BigDecimal) map.get("quiz_num")).intValue();
 
                     List<Marked> markeds = new ArrayList<>();
                     for (Map<String, Object> value : markedsListMap) {

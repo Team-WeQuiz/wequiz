@@ -198,7 +198,7 @@ public class GameService {
                 .id(quizRoom.getQuizDocId())
                 .timestamp(quizRoom.getCreatedAt().toString())
                 .quiz_id(answerData.getQuizId())
-                .quiz_number(answerData.getQuizNum())
+                .quiz_num(answerData.getQuizNum())
                 .quiz_type(answerData.getQuizType())
                 .correct_answer(answerData.getCorrect())
                 .submit_answers(getAnswers(answerData.getPlayerAnswers()))
@@ -206,7 +206,7 @@ public class GameService {
 
         // 점수 갱신
         ScoreData scoreData = scoreRepository.getScoreData(roomId);
-        scoreData.addScore(answerData, markResponse.answers());
+        scoreData.addScore(answerData, markResponse.marked_answers());
         log.info("Updated Score");
 
         // 직전 문제 삭제
