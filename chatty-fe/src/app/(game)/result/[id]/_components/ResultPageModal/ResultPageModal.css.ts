@@ -33,6 +33,7 @@ export const Container = style({
   background: globals.color.blue_6,
   borderRadius: 16,
   padding: 30,
+  overflowY: 'scroll',
 });
 
 export const Title = style({

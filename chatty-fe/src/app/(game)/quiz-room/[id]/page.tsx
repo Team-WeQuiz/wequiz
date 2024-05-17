@@ -91,6 +91,24 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   }, [unableSubmit, params.id, userAnswer, selectedOption]);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === 'Enter' &&
+        !unableSubmit &&
+        (userAnswer || selectedOption)
+      ) {
+        // event.preventDefault();
+        submitQuiz(params.id);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [unableSubmit, params.id, userAnswer, selectedOption]);
+
+  useEffect(() => {
     setUnableSubmit(count === 0 || isAnswered);
   }, [count, isAnswered]);
 
