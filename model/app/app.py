@@ -91,9 +91,6 @@ async def mark(mark_request: MarkRequest):
                         ExpressionAttributeNames={"#answers": "answers"},
                         ExpressionAttributeValues={":new_answer": {"L": [{"M": marked_item}]}}
                     )
-            except aioboto3.exceptions.NoCredentialsError:
-                log('error', '[app.py > mark] No valid credentials found.')
-                raise HTTPException(status_code=500, detail="No valid credentials found.")
             except Exception as e:
                 log('error', f'[app.py > mark] Error occurred while validating credentials: {str(e)}')
                 raise HTTPException(status_code=500, detail="Error occurred while validating credentials.")
@@ -248,12 +245,14 @@ async def generate(generate_request: GenerateRequest):
 
         # parse와 create_id를 병렬로 실행하고 결과 기다리기
         results = await asyncio.gather(parse_task, create_id_task)
-        keyword_split_docs, summary_split_docs, vector_split_docs = results[0]
+        keyword_split_docs, summary_split_docs, vector_split_docs, sentences = results[0]
         res = results[1]
 
         # keyword 추출
-        keywords = extract_keywords(keyword_split_docs, top_n=generate_request.num_of_quiz * 2)  # 키워드는 개수를 여유롭게 생성합니다.
+        keywords = extract_keywords(keyword_split_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
         log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
+        # queries = extract_concept_relationships(sentences, keywords, min(generate_request.num_of_quiz * 2, len(sentences) - 1))
+        # log('info', f'[app.py > quiz] Extracted Seed Queries: {len(queries)}')
 
         # quiz 생성 (비동기)
         asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))
