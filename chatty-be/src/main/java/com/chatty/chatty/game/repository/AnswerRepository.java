@@ -35,7 +35,7 @@ public class AnswerRepository {
 
         return AnswerData.builder()
                 .playerNum(quizRoom.getPlayerNum())
-                .majorityNum((quizRoom.getPlayerNum() + 1) / 2)
+                .majorityNum(quizRoom.getPlayerNum() / 2 + 1)
                 .quizId(quizData.getQuiz().id())
                 .quizNum(quizData.getQuiz().questionNumber())
                 .quizType(quizData.getQuiz().type())
