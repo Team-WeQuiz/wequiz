@@ -30,7 +30,6 @@ class RetrievalChain(Chain):
     def _call(self, inputs: Dict[str, Any]) -> Dict[str, str]:
         message = inputs["message"]
         relevant_docs = self.retriever.invoke(message)
-        log('error', f'"{message}", len: {relevant_docs}')
         context = " ".join([doc.page_content for doc in relevant_docs])
         if len(context) < VECTOR_CHUNK_SIZE * 0.3:
             log('error', f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
