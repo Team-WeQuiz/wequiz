@@ -24,16 +24,15 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
     containerHeight: number,
     numCards: number,
   ) => {
-    const containerRatio = containerWidth / containerHeight;
-    const targetRatio = 6 / 7;
+    const cardAspectRatio = 6 / 7;
     let numRows = 1;
     let numCols = numCards;
 
     // 가로 길이가 더 긴 경우
-    if (containerRatio > targetRatio) {
+    if (containerWidth / containerHeight > cardAspectRatio) {
       numRows = Math.ceil(
         Math.sqrt(
-          numCards * (containerHeight / containerWidth) * targetRatio ** 2,
+          numCards * (containerHeight / containerWidth) * (cardAspectRatio ** 2),
         ),
       );
       numCols = Math.ceil(numCards / numRows);
@@ -41,7 +40,7 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
       // 세로 길이가 더 긴 경우
       numCols = Math.ceil(
         Math.sqrt(
-          (numCards * (containerWidth / containerHeight)) / targetRatio ** 2,
+          (numCards * (containerWidth / containerHeight)) / (cardAspectRatio ** 2),
         ),
       );
       numRows = Math.ceil(numCards / numCols);
@@ -49,8 +48,14 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
 
     if (numCols < 3) numCols = 3;
 
-    const cardWidth = containerWidth / numCols;
-    const cardHeight = containerHeight / numRows;
+    let cardWidth = containerWidth / numCols;
+    let cardHeight = cardWidth / cardAspectRatio;
+
+    // 카드의 높이가 컨테이너의 높이를 초과하지 않도록 조정
+    if (cardHeight * numRows > containerHeight) {
+      cardHeight = containerHeight / numRows;
+      cardWidth = cardHeight * cardAspectRatio;
+    }
 
     return {
       width: cardWidth,
@@ -79,6 +84,7 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
         containerSize.height - 49,
         userStatuses.length + 1,
       );
+      console.log(calculatedSize);  
       setCardSize(calculatedSize);
     }
   }, [containerSize, userStatuses.length]);
@@ -102,7 +108,11 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
         style={{ width: cardSize.width, height: cardSize.height }}
         className={styles.cardArea}
       >
-        <UserCard userStatus={botStatus} />
+        <UserCard
+          userStatus={botStatus}
+          cardWidth={cardSize.width}
+          cardHeight={cardSize.height}
+        />
       </div>
       {userStatuses &&
         userStatuses.map(
@@ -113,7 +123,11 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
                 style={{ width: cardSize.width, height: cardSize.height }}
                 className={styles.cardArea}
               >
-                <UserCard userStatus={user} />
+                <UserCard
+                  userStatus={user}
+                  cardWidth={cardSize.width}
+                  cardHeight={cardSize.height}
+                />
               </div>
             ),
         )}

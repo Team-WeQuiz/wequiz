@@ -30,7 +30,7 @@ const BlockingModal = ({
             width={32}
             height={32}
           />
-          <span>방이 다 챴습니다!</span>
+          <span>방이 다 찼습니다!</span>
           <Image
             src={'/images/Cancel_fill.svg'}
             alt={'cancel'}

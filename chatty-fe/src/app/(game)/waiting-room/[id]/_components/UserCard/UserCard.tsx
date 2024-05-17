@@ -4,23 +4,28 @@ import Image from 'next/image';
 import * as styles from './UserCard.css';
 import { UserStatus } from '@/app/_types/WaitingStatus';
 
-const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
+const UserCard = ({
+  userStatus,
+  cardWidth,
+  cardHeight,
+}: {
+  userStatus: UserStatus;
+  cardWidth: number;
+  cardHeight: number;
+}) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [showMessage, setShowMessage] = useState<boolean>(false);
-  const [profileSize, setProfileSize] = useState<number>(80);
+  const [profileSize, setProfileSize] = useState<number>(20);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (cardRef.current) {
-        const cardHeight = cardRef.current.offsetHeight;
-        setProfileSize(cardHeight * 0.75);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    console.log('cardHeight', cardHeight);
+    if (cardHeight > 350) {
+      setProfileSize(350 * 0.54);
+    } else if (cardHeight < 150) {
+      console.log('profileSize', cardHeight * 0.4);
+      setProfileSize(cardHeight * 0.4);
+    } else setProfileSize(cardHeight * 0.54);
+  }, [cardHeight]);
 
   useEffect(() => {
     if (userStatus.message) {
@@ -48,16 +53,13 @@ const UserCard = ({ userStatus }: { userStatus: UserStatus }) => {
             </div>
           )}
           <Image
-            src={
-              userStatus.profileImage !== null
-                ? userStatus.profileImage
-                : `/images/Empty_profile.svg`
-            }
+            src={userStatus.userId === -1 ? `/images/Empty_profile.svg` : userStatus.profileImage || `/images/Empty_profile.svg`}
             alt="avatar"
-            width={profileSize}
-            height={profileSize}
+            width={profileSize || 4}
+            height={profileSize || 4}
             style={{
               borderRadius: '50%',
+              border: '2px solid #fff',
             }}
           />
         </div>

@@ -11,10 +11,21 @@ export const mainContainer = style({
   backgroundColor: globals.color.blue_6,
   overflowY: 'auto',
   alignContent: 'flex-start',
+  '@media': {
+    '(max-width: 768px)': {
+      padding: '12px',
+    },
+  },
+
 });
 
 export const cardArea = style({
   maxWidth: 300,
   maxHeight: 350,
   padding: 5,
+  "@media": {
+    "(max-width: 768px)": {
+      padding: 2,
+    },
+  },
 });
