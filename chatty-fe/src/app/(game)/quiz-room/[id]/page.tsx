@@ -80,23 +80,6 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         !unableSubmit &&
         (userAnswer || selectedOption)
       ) {
-        submitQuiz(params.id);
-        console.log('enter');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [unableSubmit, params.id, userAnswer, selectedOption]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === 'Enter' &&
-        !unableSubmit &&
-        (userAnswer || selectedOption)
-      ) {
         event.preventDefault();
         submitQuiz(params.id);
       }
