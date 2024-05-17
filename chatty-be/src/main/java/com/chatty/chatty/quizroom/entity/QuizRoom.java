@@ -55,7 +55,4 @@ public class QuizRoom extends BaseEntity {
 
     @Column
     private String quizDocId;
-
-    @Column
-    private String markDocId;
 }

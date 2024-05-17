@@ -5,12 +5,12 @@ import java.util.List;
 public record MarkResponse(
         String id,
         String quiz_id,
-        List<Mark> answers
+        List<Mark> marked_answers
 ) {
 
     public record Mark(
             Long user_id,
-            String user,
+            String user_answer,
             Boolean marking
     ) {
 

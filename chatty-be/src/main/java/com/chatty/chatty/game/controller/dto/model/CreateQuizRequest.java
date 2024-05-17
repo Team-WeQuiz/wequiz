@@ -8,7 +8,7 @@ public record CreateQuizRequest(
 
         String timestamp,
 
-        Integer numOfQuiz
+        Integer num_of_quiz
 ) {
 
 }

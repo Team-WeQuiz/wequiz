@@ -15,6 +15,7 @@ import com.chatty.chatty.game.controller.dto.dynamodb.QuizDTO;
 import com.chatty.chatty.game.repository.GameRepository;
 import com.chatty.chatty.game.repository.PhaseRepository;
 import com.chatty.chatty.game.repository.UserSubmitStatusRepository;
+import com.chatty.chatty.game.repository.dynamodb.DynamoDBRepository;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.game.service.dynamodb.DynamoDBService;
 import com.chatty.chatty.game.service.model.ModelService;
@@ -25,6 +26,7 @@ import com.chatty.chatty.player.repository.PlayersStatusRepository;
 import com.chatty.chatty.player.service.PlayerService;
 import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
+import com.chatty.chatty.quizroom.controller.dto.ExistQuizListResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizDocIdMLResponse;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO;
 import com.chatty.chatty.quizroom.controller.dto.QuizResultDTO.PlayerAnswer;
@@ -61,6 +63,7 @@ public class QuizRoomService {
     private final GameService gameService;
     private final ModelService modelService;
     private final DynamoDBService dynamoDBService;
+    private final DynamoDBRepository dynamoDBRepository;
     private final PlayerRepository playerRepository;
     private final MinioRepository minioRepository;
     private final PlayersStatusRepository playersStatusRepository;
@@ -108,6 +111,10 @@ public class QuizRoomService {
                 .build();
     }
 
+    public ExistQuizListResponse getExistQuizList(Long userId) {
+        return new ExistQuizListResponse(dynamoDBRepository.getExistQuizList(userId));
+    }
+
     public QuizRoom getQuizRoom(Long roomId) {
         return quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
@@ -127,9 +134,8 @@ public class QuizRoomService {
 
     public RoomResultResponse getTotalResult(Long roomId) {
         QuizRoom quizRoom = getQuizRoom(roomId);
-        List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId(),
-                quizRoom.getCreatedAt().toString());
-        List<MarkDTO> markDTOList = dynamoDBService.getMark(quizRoom.getMarkDocId());
+        List<QuizDTO> quizDTOList = dynamoDBService.getAllQuiz(quizRoom.getQuizDocId());
+        List<MarkDTO> markDTOList = dynamoDBService.getMark(quizRoom.getQuizDocId(), quizRoom.getCreatedAt().toString());
 
         List<QuizResultDTO> quizResultDTOList = new ArrayList<>();
         for (int quizIndex = 0; quizIndex < markDTOList.size(); quizIndex++) {
@@ -189,12 +195,18 @@ public class QuizRoomService {
                         .build()
         );
 
-        // minio에 파일(들) 업로드
-        List<String> fileNames = uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
+        log.info(request.existQuizDocId());
+        // 기존 퀴즈로 진행하는 경우
+        if (request.existQuizDocId() != null) {
+            savedQuizRoom.setQuizDocId(request.existQuizDocId());
+        } else {
+            // minio에 파일(들) 업로드
+            List<String> fileNames = uploadFilesToStorage(request, savedQuizRoom.getCreatedAt(), userId);
 
-        // QuizDocId 저장
-        QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom, fileNames);
-        savedQuizRoom.setQuizDocId(mlResponse.id());
+            // QuizDocId 저장
+            QuizDocIdMLResponse mlResponse = modelService.requestQuizDocId(userId, savedQuizRoom, fileNames);
+            savedQuizRoom.setQuizDocId(mlResponse.id());
+        }
         quizRoomRepository.save(savedQuizRoom);
 
         return RoomIdResponse.builder()

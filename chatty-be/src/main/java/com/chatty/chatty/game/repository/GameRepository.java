@@ -30,11 +30,11 @@ public class GameRepository {
     private QuizData initQuizData(Long roomId) {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
-        log.info("Init Quiz Data: roomId: {}", roomId);
+        String quizDocId = quizRoom.getQuizDocId();
+        Integer numOfQuiz = quizRoom.getNumOfQuiz();
         return QuizData.builder()
-                .quizDocId(quizRoom.getQuizDocId())
-                .timestamp(quizRoom.getCreatedAt().toString())
-                .totalRound(quizRoom.getNumOfQuiz() / QUIZ_PER_ROUND)
+                .quizDocId(quizDocId)
+                .totalRound(numOfQuiz / QUIZ_PER_ROUND)
                 .currentRound(DEFAULT_ROUND)
                 .build();
     }

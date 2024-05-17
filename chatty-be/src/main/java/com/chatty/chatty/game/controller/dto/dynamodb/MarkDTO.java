@@ -6,18 +6,19 @@ import java.util.List;
 public record MarkDTO(
         String id,
 
+        @JsonProperty("correct_answer")
         String correct,
 
         List<Marked> markeds,
 
-        @JsonProperty("question_number")
+        @JsonProperty("quiz_num")
         Integer quizNumber
 ) {
 
     public record Marked(
             Boolean marking,
 
-            @JsonProperty("user")
+            @JsonProperty("user_answer")
             String playerAnswer,
 
             @JsonProperty("user_id")

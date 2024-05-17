@@ -39,7 +39,6 @@ import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
 import com.chatty.chatty.quizroom.repository.QuizRoomRepository;
 import com.chatty.chatty.user.service.UserService;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -115,8 +114,7 @@ public class GameService {
 
     private void fillQuiz(QuizData quizData) {
         Integer currentRound = quizData.getCurrentRound();
-        List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), quizData.getTimestamp(),
-                currentRound, QUIZ_SIZE);
+        List<QuizDTO> quizDTOList = dynamoDBService.pollQuizzes(quizData.getQuizDocId(), currentRound, QUIZ_SIZE);
         List<QuizDTO> currentQuizzes = quizDTOList.subList(currentRound * QUIZ_SIZE, (currentRound + 1) * QUIZ_SIZE);
         quizData.fillQuiz(currentQuizzes);
         log.info("filled queue: {}", quizData.getQuizDTOQueue());
@@ -147,7 +145,7 @@ public class GameService {
     @Async
     public void sendDescription(Long roomId, Long userId) {
         QuizData quizData = gameRepository.getQuizData(roomId);
-        String description = dynamoDBService.pollDescription(quizData.getQuizDocId(), quizData.getTimestamp());
+        String description = dynamoDBService.pollDescription(quizData.getQuizDocId());
         DescriptionResponse descriptionResponse = DescriptionResponse.builder()
                 .description(description)
                 .build();
@@ -193,24 +191,22 @@ public class GameService {
         }
     }
 
-    private void markAndUpdateScore(Long roomId, Long userId, QuizDTO solvedQuiz, AnswerData answerData) {
+    private void markAndUpdateScore(Long roomId, Long userId, AnswerData answerData) {
         // ML에 플레이어들 답안 넘겨서 채점 요청 후 채점 문서 id 저장
         QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
         MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
                 .id(quizRoom.getQuizDocId())
-                .quiz_id(solvedQuiz.id())
-                .question_number(answerData.getQuizNum())
-                .correct(solvedQuiz.correct())
-                .answers(getAnswers(answerData.getPlayerAnswers()))
+                .timestamp(quizRoom.getCreatedAt().toString())
+                .quiz_id(answerData.getQuizId())
+                .quiz_num(answerData.getQuizNum())
+                .quiz_type(answerData.getQuizType())
+                .correct_answer(answerData.getCorrect())
+                .submit_answers(getAnswers(answerData.getPlayerAnswers()))
                 .build());
-        if (quizRoom.getMarkDocId() == null) {
-            quizRoom.setMarkDocId(markResponse.id());
-            quizRoomRepository.save(quizRoom);
-        }
 
         // 점수 갱신
         ScoreData scoreData = scoreRepository.getScoreData(roomId);
-        scoreData.addScore(answerData, markResponse.answers());
+        scoreData.addScore(answerData, markResponse.marked_answers());
         log.info("Updated Score");
 
         // 직전 문제 삭제
@@ -256,9 +252,8 @@ public class GameService {
                     userSubmitStatus.submit();
                 });
         // 퀴즈 끝났으면 다음 퀴즈 반환 준비
-        QuizDTO solvedQuiz = gameRepository.getQuizData(roomId).getQuiz();
         log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
-        markAndUpdateScore(roomId, userId, solvedQuiz, answerData);
+        markAndUpdateScore(roomId, userId, answerData);
         resetState(roomId);
         template.publishQuizCount(roomId, buildCountDownResponse(seconds));
         log.info("Countdown: {}", seconds);
@@ -283,7 +278,6 @@ public class GameService {
     private void sendPlayersSubmitStatus(Long roomId, Boolean isMajority, UsersSubmitStatus status) {
         SubmitAnswerResponse response = SubmitAnswerResponse.builder()
                 .isMajority(isMajority)
-                .timestamp(LocalDateTime.now())
                 .submitStatuses(status.usersSubmitStatus())
                 .build();
         template.publishSubmitStatus(roomId, response);
@@ -293,7 +287,7 @@ public class GameService {
         return playerAnswers.entrySet().stream()
                 .map(entry -> AnswerDTO.builder()
                         .user_id(entry.getKey())
-                        .user(entry.getValue().playerAnswer())
+                        .user_answer(entry.getValue().playerAnswer())
                         .build())
                 .toList();
     }
@@ -314,16 +308,6 @@ public class GameService {
                 .build();
     }
 
-    private SubmitAnswerResponse getSubmitAnswerResponse(Long roomId) {
-        AnswerData answerData = answerRepository.getAnswerData(roomId);
-        UsersSubmitStatus usersSubmitStatus = userSubmitStatusRepository.findByRoomId(roomId);
-        return SubmitAnswerResponse.builder()
-                .isMajority(answerData.checkSubmitStatus())
-                .timestamp(LocalDateTime.now())
-                .submitStatuses(usersSubmitStatus.usersSubmitStatus())
-                .build();
-    }
-
     public void getPhase(Long roomId, Long userId) {
         Phase currentPhase = phaseRepository.getPhase(roomId);
         QuizResponse quizResponse = sendQuiz(roomId);
@@ -332,7 +316,8 @@ public class GameService {
                 if (quizResponse != null) {
                     template.publishQuiz(userId, roomId, quizResponse);
                 }
-                template.publishSubmitStatus(roomId, getSubmitAnswerResponse(roomId));
+                Boolean isMajority = answerRepository.getAnswerData(roomId).checkSubmitStatus();
+                sendPlayersSubmitStatus(roomId, isMajority, userSubmitStatusRepository.findByRoomId(roomId));
             }
             case RESULT -> {
                 ScoreResponse scoreResponse = sendScore(roomId);

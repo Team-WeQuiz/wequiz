@@ -3,6 +3,7 @@ package com.chatty.chatty.quizroom.controller;
 import com.chatty.chatty.auth.support.AuthUser;
 import com.chatty.chatty.quizroom.controller.dto.CodeRequestDTO;
 import com.chatty.chatty.quizroom.controller.dto.CreateRoomRequest;
+import com.chatty.chatty.quizroom.controller.dto.ExistQuizListResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomDetailResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomIdResponse;
 import com.chatty.chatty.quizroom.controller.dto.RoomListResponse;
@@ -40,6 +41,11 @@ public class QuizRoomController {
         RoomIdResponse response = quizRoomService.createRoom(request, userId);
         quizRoomService.broadcastUpdatedRoomList();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/existQuiz")
+    public ResponseEntity<ExistQuizListResponse> getExistQuizList(@AuthUser Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizRoomService.getExistQuizList(userId));
     }
 
     @GetMapping("/{roomId}")
