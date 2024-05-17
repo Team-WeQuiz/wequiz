@@ -31,6 +31,8 @@ RUN python3.10 -m pip install konlpy JPype1-py3
 RUN bash mecab_install.sh
 RUN python3.10 -m pip install mecab-python3
 
+RUN pip install spacy
+
 # Install AWS CLI
 RUN pip install awscli
 
