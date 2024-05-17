@@ -9,8 +9,8 @@ from langchain.schema import BaseRetriever
 from typing import List, Dict, Any
 
 from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE, GENERATE_QUIZ_TEMPLATE, JSON_FORMAT_TEMPLATE
-from data.settings import VECTOR_CHUNK_SIZE
-from model.schema import ChoiceOutput, ShortOutput, QuizOutput
+from data.settings import *
+from model.schema import QuizOutput
 from utils.logger import *
 # 로깅 설정
 setup_logging()
@@ -30,10 +30,13 @@ class RetrievalChain(Chain):
     def _call(self, inputs: Dict[str, Any]) -> Dict[str, str]:
         message = inputs["message"]
         relevant_docs = self.retriever.invoke(message)
+        log('error', f'"{message}", len: {relevant_docs}')
         context = " ".join([doc.page_content for doc in relevant_docs])
         if len(context) < VECTOR_CHUNK_SIZE * 0.3:
             log('error', f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
             raise ValueError(f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
+        if len(context) > VECTOR_CHUNK_SIZE * K:
+            context = context[:VECTOR_CHUNK_SIZE * K]
         return {"context": context}
 
 # 문제 생성 체인
@@ -90,7 +93,7 @@ class JSONFormatterChain(Chain):
 class QuizPipeline:
     def __init__(self, indices: object):
         self.indices = indices
-        self.retriever = self.indices.as_retriever(search_kwargs=dict(k=2))  # 인덱스 객체로부터 retriever 초기화
+        self.retriever = self.indices.as_retriever(search_kwargs=dict(k=K))  # 인덱스 객체로부터 retriever 초기화
         self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
         self.question_templates = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
         # self.output_schemas = [ChoiceOutput, ShortOutput]
