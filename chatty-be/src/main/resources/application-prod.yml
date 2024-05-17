@@ -6,7 +6,7 @@ spring:
         show_sql: false
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   datasource:
     url: ${DATASOURCE_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver

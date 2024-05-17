@@ -14,11 +14,11 @@ import com.chatty.chatty.auth.entity.RefreshToken;
 import com.chatty.chatty.auth.exception.AuthException;
 import com.chatty.chatty.auth.jwt.JwtUtil;
 import com.chatty.chatty.auth.repository.RefreshTokenRepository;
+import com.chatty.chatty.auth.support.BCryptPasswordEncoder;
 import com.chatty.chatty.user.entity.User;
 import com.chatty.chatty.user.exception.UserException;
 import com.chatty.chatty.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +96,7 @@ public class AuthService {
     }
 
     private String encoded(String password) {
-        return new BCryptPasswordEncoder().encode(password);
+        return BCryptPasswordEncoder.encode(password);
     }
 
     private void validateSignInRequest(Long userId, String password) {
@@ -121,7 +121,7 @@ public class AuthService {
 
     private boolean isPasswordValid(Long userId, String password) {
         User user = findUserById(userId);
-        return new BCryptPasswordEncoder().matches(password, user.getPassword());
+        return BCryptPasswordEncoder.matches(password, user.getPassword());
     }
 
     public User findUserById(Long userId) {
