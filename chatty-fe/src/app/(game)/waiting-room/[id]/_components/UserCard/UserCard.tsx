@@ -53,7 +53,7 @@ const UserCard = ({
             </div>
           )}
           <Image
-            src={userStatus.userId === -1 ? `/images/Empty_profile.svg` : userStatus.profileImage || `/images/Empty_profile.svg`}
+            src={userStatus.profileImage || `/images/Empty_profile.svg`}
             alt="avatar"
             width={profileSize || 4}
             height={profileSize || 4}
