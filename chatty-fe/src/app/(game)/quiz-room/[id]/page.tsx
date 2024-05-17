@@ -97,7 +97,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         !unableSubmit &&
         (userAnswer || selectedOption)
       ) {
-        // event.preventDefault();
+        event.preventDefault();
         submitQuiz(params.id);
       }
     };
