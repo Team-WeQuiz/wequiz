@@ -126,7 +126,7 @@ class Parser():
                 total_text = await self.get_parsed_docs_async(parser, loader, minio_files)
 
                 textsplitter = TextSplitter()
-                sentences = textsplitter.split_sentences(total_text)
+                sentences = await textsplitter.split_sentences_async(total_text)
 
                 # 병렬 처리 실행
                 keyword_docs_task = asyncio.create_task(textsplitter.split_docs_async(sentences, KEYWORD_CHUNK_SIZE, KEYWORD_SENTENCE_OVERLAP))
@@ -225,6 +225,10 @@ class TextSplitter():
 
         log('info', f'[preprocessor.py > TextSplitter] splitted_chunks: {len(chunks)}')
         return chunks
+    
+    async def split_sentences_async(self, total_text):
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self.split_sentences, total_text)
     
     async def split_docs_async(self, sentences, chunk_size, chunk_overlap):
         loop = asyncio.get_running_loop()
