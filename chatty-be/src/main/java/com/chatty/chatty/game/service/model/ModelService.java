@@ -38,7 +38,7 @@ public class ModelService {
                 .body(CreateQuizRequest.builder()
                         .user_id(userId)
                         .timestamp(quizRoom.getCreatedAt().toString())
-                        .numOfQuiz(quizRoom.getNumOfQuiz())
+                        .num_of_quiz(quizRoom.getNumOfQuiz())
                         .build()
                 )
                 .retrieve()

@@ -8,15 +8,16 @@ public record MarkRequest(
         String id,
         String timestamp,
         String quiz_id,
-        Integer question_number,
-        String correct,
-        List<AnswerDTO> answers
+        Integer quiz_number,
+        String quiz_type,
+        String correct_answer,
+        List<AnswerDTO> submit_answers
 ) {
 
     @Builder
     public record AnswerDTO(
             Long user_id,
-            String user
+            String user_answer
     ) {
 
     }

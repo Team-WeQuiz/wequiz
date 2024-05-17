@@ -198,9 +198,9 @@ public class GameService {
                 .id(quizRoom.getQuizDocId())
                 .timestamp(quizRoom.getCreatedAt().toString())
                 .quiz_id(solvedQuiz.id())
-                .question_number(answerData.getQuizNum())
-                .correct(solvedQuiz.correct())
-                .answers(getAnswers(answerData.getPlayerAnswers()))
+                .quiz_number(answerData.getQuizNum())
+                .correct_answer(solvedQuiz.correct())
+                .submit_answers(getAnswers(answerData.getPlayerAnswers()))
                 .build());
 
         // 점수 갱신
@@ -287,7 +287,7 @@ public class GameService {
         return playerAnswers.entrySet().stream()
                 .map(entry -> AnswerDTO.builder()
                         .user_id(entry.getKey())
-                        .user(entry.getValue().playerAnswer())
+                        .user_answer(entry.getValue().playerAnswer())
                         .build())
                 .toList();
     }
