@@ -32,10 +32,11 @@ public class AnswerRepository {
         QuizRoom quizRoom = quizRoomRepository.findById(roomId)
                 .orElseThrow(() -> new QuizRoomException(ROOM_NOT_FOUND));
         QuizData quizData = gameRepository.getQuizData(roomId);
+        int majorityNum = (quizRoom.getPlayerNum() == 2) ? 1 : (quizRoom.getPlayerNum() / 2 + 1);
 
         return AnswerData.builder()
                 .playerNum(quizRoom.getPlayerNum())
-                .majorityNum(quizRoom.getPlayerNum() / 2 + 1)
+                .majorityNum(majorityNum)
                 .quizId(quizData.getQuiz().id())
                 .quizNum(quizData.getQuiz().questionNumber())
                 .quizType(quizData.getQuiz().type())
