@@ -4,7 +4,6 @@ import com.chatty.chatty.config.GlobalMessagingTemplate;
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
-import com.chatty.chatty.game.controller.dto.ScoreResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.service.GameService;
 import com.chatty.chatty.player.controller.dto.NicknameRequest;
@@ -48,7 +47,7 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor,
-            NicknameRequest request) {
+                                     NicknameRequest request) {
         headerAccessor.getSessionAttributes().put("roomId", roomId);
         PlayersStatusDTO response = gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
         quizRoomService.broadcastUpdatedRoomList();
@@ -68,25 +67,18 @@ public class GameController {
     @MessageMapping("/rooms/{roomId}/quiz")
     public void sendQuiz(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
         QuizResponse quizResponse = gameService.sendQuiz(roomId);
+        if (quizResponse == null) {
+            return;
+        }
         template.publishQuiz(getUserIdFromHeader(headerAccessor), roomId, quizResponse);
     }
 
     @MessageMapping("/rooms/{roomId}/submit")
     public void submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
-            SimpMessageHeaderAccessor headerAccessor) {
+                             SimpMessageHeaderAccessor headerAccessor) {
         log.info("Submit request: {}", request);
         log.info("Submit userId: {}", getUserIdFromHeader(headerAccessor));
         gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));
-    }
-
-    /*
-    publication URL : /pub/rooms/{roomId}/score
-    subscription URL : /user/{userId}/queue/rooms/{roomId}/score
-     */
-    @MessageMapping("/rooms/{roomId}/score")
-    public void sendScore(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor) {
-        ScoreResponse scoreResponse = gameService.sendScore(roomId);
-        template.publishScore(roomId, scoreResponse);
     }
 
     @MessageMapping("/rooms/{roomId}/phase")
