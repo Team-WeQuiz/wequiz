@@ -111,7 +111,7 @@ class Marker():
         if user.strip() == '':
             return False
         else:
-            response = await self.marker_chain.mark(answer, user)
+            response = await self.marker_chain.mark(answer.strip().lower(), user.strip().lower())
             if isinstance(response, dict) and 'text' in response:
                 return 'true' in response['text'].lower()
             else:
