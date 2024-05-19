@@ -123,7 +123,7 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
            <td align='center'><a href="https://github.com/ryanbae94"><img src="https://avatars.githubusercontent.com/u/122738447?v=4" width="100" height="100"></td>
          </tr>
          <tr>
-           <td align='center'>박규연</td>
+           <td align='center'>박규연(팀장)</td>
            <td align='center'>심재민</td>
            <td align='center'>안금장</td>
            <td align='center'>김우림</td>
@@ -137,11 +137,11 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
            <td align='center'>🎨</td>
          </tr>
          <tr>
-           <td align='center'>ML</td>
-           <td align='center'>Back-end</td>
-           <td align='center'>Back-end</td>
-           <td align='center'>Front-end</td>
-           <td align='center'>Front-end</td>
+           <td align='center'>ML Engineer</td>
+           <td align='center'>Back-end Developer</td>
+           <td align='center'>Back-end Developer</td>
+           <td align='center'>Front-end Developer</td>
+           <td align='center'>Front-end Developer</td>
          </tr>
     </tbody>
 </table>
