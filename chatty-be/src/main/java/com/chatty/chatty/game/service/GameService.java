@@ -105,6 +105,9 @@ public class GameService {
     }
 
     public QuizResponse sendQuiz(Long roomId) {
+        if (phaseRepository.getPhase(roomId) == RESULT) {
+            return null;
+        }
         QuizData quizData = gameRepository.getQuizData(roomId);
         initQuiz(quizData);
         log.info("Send: Quiz: {}", gameRepository.getQuizData(roomId).getQuiz());
@@ -187,52 +190,11 @@ public class GameService {
         if (submitCount == answerData.getMajorityNum()) {
             phaseRepository.update(roomId, COUNTDOWN);
             log.info("Phase UPDATED: COUNTDOWN");
-            quizCountDown(roomId, userId);
+            quizCountDown(roomId);
         }
     }
 
-    private void markAndUpdateScore(Long roomId, Long userId, AnswerData answerData) {
-        // ML에 플레이어들 답안 넘겨서 채점 요청 후 채점 문서 id 저장
-        QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
-        MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
-                .id(quizRoom.getQuizDocId())
-                .timestamp(quizRoom.getCreatedAt().toString())
-                .quiz_id(answerData.getQuizId())
-                .quiz_num(answerData.getQuizNum())
-                .quiz_type(answerData.getQuizType())
-                .correct_answer(answerData.getCorrect())
-                .submit_answers(getAnswers(answerData.getPlayerAnswers()))
-                .build());
-
-        // 점수 갱신
-        ScoreData scoreData = scoreRepository.getScoreData(roomId);
-        scoreData.addScore(answerData, markResponse.marked_answers());
-        log.info("Updated Score");
-
-        // 직전 문제 삭제
-        removeQuiz(roomId);
-        QuizData quizData = gameRepository.getQuizData(roomId);
-        if (quizData.isQueueEmpty()) {
-            phaseRepository.update(roomId, RESULT);
-            log.info("Phase UPDATED: RESULT");
-            getPhase(roomId, userId);
-            scoreCountDown(roomId);
-        } else {
-            phaseRepository.update(roomId, Phase.QUIZ_SOLVING);
-            log.info("Phase UPDATED: QUIZ_SOLVING");
-        }
-    }
-
-    private void resetState(Long roomId) {
-        // 플레이어 제출 상태, 답안 맵 초기화
-        PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
-        userSubmitStatusRepository.init(players, roomId);
-        sendPlayersSubmitStatus(roomId, false, userSubmitStatusRepository.findByRoomId(roomId));
-        answerRepository.clearAnswerData(roomId);
-        log.info("Reset");
-    }
-
-    private void quizCountDown(Long roomId, Long userId) {
+    private void quizCountDown(Long roomId) {
         Integer seconds = QUIZ_COUNT_SECONDS;
         while (seconds >= 0) {
             log.info("Countdown: {}", seconds);
@@ -251,22 +213,74 @@ public class GameService {
                             SubmitAnswerRequest.builder().playerAnswer("").build());
                     userSubmitStatus.submit();
                 });
-        // 퀴즈 끝났으면 다음 퀴즈 반환 준비
         log.info("Answer All Submitted: PlayerAnswers: {}", answerData.getPlayerAnswers());
-        markAndUpdateScore(roomId, userId, answerData);
+        // 퀴즈 끝났으면 다음 퀴즈 반환 준비
+        AnswerData clonedAnswerData = answerData.clone();
         resetState(roomId);
-        template.publishQuizCount(roomId, buildCountDownResponse(seconds));
-        log.info("Countdown: {}", seconds);
+        // 라운드 별 마지막 문제인지 확인
+        if (gameRepository.getQuizData(roomId).isQueueEmpty()) {
+            markAndUpdateScore(roomId, clonedAnswerData);
+            phaseRepository.update(roomId, RESULT);
+            log.info("Phase UPDATED: RESULT");
+            template.publishQuizCount(roomId, buildCountDownResponse(seconds));
+            sendScore(roomId);
+        } else {
+            phaseRepository.update(roomId, Phase.QUIZ_SOLVING);
+            log.info("Phase UPDATED: QUIZ_SOLVING");
+            template.publishQuizCount(roomId, buildCountDownResponse(seconds));
+            markAndUpdateScore(roomId, clonedAnswerData);
+        }
+        log.info("Quiz Countdown: {}", seconds);
+    }
+
+    private void markAndUpdateScore(Long roomId, AnswerData answerData) {
+        // ML에 플레이어들 답안 넘겨서 채점 요청 후 채점 문서 id 저장
+        QuizRoom quizRoom = quizRoomRepository.findById(roomId).get();
+        MarkResponse markResponse = modelService.requestMark(MarkRequest.builder()
+                .id(quizRoom.getQuizDocId())
+                .timestamp(quizRoom.getCreatedAt().toString())
+                .quiz_id(answerData.getQuizId())
+                .quiz_num(answerData.getQuizNum())
+                .quiz_type(answerData.getQuizType())
+                .correct_answer(answerData.getCorrect())
+                .submit_answers(getAnswers(answerData.getPlayerAnswers()))
+                .build());
+
+        // 점수 갱신
+        ScoreData scoreData = scoreRepository.getScoreData(roomId);
+        scoreData.addScore(answerData, markResponse.marked_answers());
+        log.info("Updated Score");
+    }
+
+    private void resetState(Long roomId) {
+        // 직전 문제 삭제
+        removeQuiz(roomId);
+        // 플레이어 제출 상태, 답안 맵 초기화
+        PlayersStatus players = playersStatusRepository.findByRoomId(roomId).get();
+        userSubmitStatusRepository.init(players, roomId);
+        sendPlayersSubmitStatus(roomId, false, userSubmitStatusRepository.findByRoomId(roomId));
+        answerRepository.clearAnswerData(roomId);
+        log.info("Reset");
+    }
+
+    private void sendScore(Long roomId) {
+        ScoreResponse scoreResponse = convertScoreDTO(roomId);
+        template.publishScore(roomId, scoreResponse);
+        scoreCountDown(roomId);
     }
 
     private void scoreCountDown(Long roomId) {
-        Integer seconds = SCORE_COUNT_SECONDS;
-        do {
+        int seconds = SCORE_COUNT_SECONDS;
+        while (seconds >= 0) {
             template.publishScoreCount(roomId, buildCountDownResponse(seconds));
             ThreadSleep.sleep(1000L);
             seconds--;
         }
-        while (seconds >= -1);
+        if (seconds == -1) {
+            phaseRepository.update(roomId, Phase.QUIZ_SOLVING);
+            log.info("Phase UPDATED: QUIZ_SOLVING");
+            template.publishScoreCount(roomId, buildCountDownResponse(seconds));
+        }
     }
 
     private CountDownResponse buildCountDownResponse(Integer second) {
@@ -292,7 +306,7 @@ public class GameService {
                 .toList();
     }
 
-    public ScoreResponse sendScore(Long roomId) {
+    public ScoreResponse convertScoreDTO(Long roomId) {
         ScoreData scoreData = scoreRepository.getScoreData(roomId);
         List<PlayerScoreDTO> scores = scoreData.getPlayersScore().entrySet().stream()
                 .map(entry -> PlayerScoreDTO.builder()
@@ -320,7 +334,7 @@ public class GameService {
                 sendPlayersSubmitStatus(roomId, isMajority, userSubmitStatusRepository.findByRoomId(roomId));
             }
             case RESULT -> {
-                ScoreResponse scoreResponse = sendScore(roomId);
+                ScoreResponse scoreResponse = convertScoreDTO(roomId);
                 template.publishScore(roomId, scoreResponse);
             }
         }

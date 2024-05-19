@@ -50,4 +50,25 @@ public class AnswerData {
         }
         return false;
     }
+
+    public AnswerData clone() {
+        AnswerData clonedAnswerData = AnswerData.builder()
+                .playerNum(playerNum)
+                .majorityNum(majorityNum)
+                .quizId(quizId)
+                .quizNum(quizNum)
+                .quizType(quizType)
+                .correct(correct)
+                .startedTime(startedTime)
+                .build();
+        
+        for (Map.Entry<Long, PlayerAnswerData> entry : playerAnswers.entrySet()) {
+            PlayerAnswerData clonedData = PlayerAnswerData.builder()
+                    .playerAnswer(entry.getValue().playerAnswer())
+                    .submittedTime(entry.getValue().submittedTime())
+                    .build();
+            clonedAnswerData.playerAnswers.put(entry.getKey(), clonedData);
+        }
+        return clonedAnswerData;
+    }
 }
