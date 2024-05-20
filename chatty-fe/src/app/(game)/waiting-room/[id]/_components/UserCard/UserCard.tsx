@@ -18,11 +18,11 @@ const UserCard = ({
   const [profileSize, setProfileSize] = useState<number>(20);
 
   useEffect(() => {
-    console.log('cardHeight', cardHeight);
+    // console.log('cardHeight', cardHeight);
     if (cardHeight > 350) {
       setProfileSize(350 * 0.54);
     } else if (cardHeight < 150) {
-      console.log('profileSize', cardHeight * 0.4);
+      // console.log('profileSize', cardHeight * 0.4);
       setProfileSize(cardHeight * 0.4);
     } else setProfileSize(cardHeight * 0.54);
   }, [cardHeight]);
