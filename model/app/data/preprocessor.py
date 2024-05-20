@@ -155,13 +155,16 @@ class Parser():
 
 
 class TextSplitter():
+    def __init__(self):
+        self.okt = Okt()
+        self.nlp = spacy.blank("en")
+        self.nlp.add_pipe('sentencizer')
+
     def split_sentences(self, total_text):
         lang = detect(total_text[:100])
         if lang == "ko":
             # Okt로 total_text를 형태소 단위로 분석
-            okt = Okt()
-            morphs = okt.morphs(total_text, stem=True)
-            
+            morphs = self.okt.morphs(total_text, stem=True)
             # 형태소 분석 결과를 바탕으로 문장 분리
             sentences = []
             current_sentence = []
@@ -174,55 +177,45 @@ class TextSplitter():
                 sentences.append(' '.join(current_sentence))
         else:
             # Spacy로 total_text를 문장 단위 분리
-            nlp = spacy.blank(lang)
-            nlp.add_pipe('sentencizer')
-            doc = nlp(total_text)
+            doc = self.nlp(total_text)
             sentences = [sent.text.strip() for sent in doc.sents]
-        
         log('info', f'[preprocessor.py > TextSplitter] splitted_sentences: {len(sentences)}')
+        
         return sentences
 
     def split_docs(self, sentences, chunk_size, sentence_overlap):
         chunks = []
         current_chunk = []
         current_chunk_length = 0
-
         for sentence in sentences:
             # 문장 전처리
             sentence = remove_urls(sentence)
             sentence, is_valid = is_valid_doc(sentence)
-
             # is_valid_doc 함수에서 invalids 키워드가 발견되면 청크 생성 중단
             if not is_valid:
                 break
-
             # 현재 청크에 문장 추가
             if len(sentence.strip()) > MIN_SENTENCE_LENGTH:
                 sentence_length = len(sentence.strip())
-
                 # 현재 청크 길이와 새로운 문장 길이의 합이 chunk_size를 초과하는 경우
                 if current_chunk_length + sentence_length > chunk_size:
                     # 현재 청크를 chunks에 추가
                     chunk = " ".join(current_chunk)
                     chunks.append(Document(chunk))
-
                     # 새로운 청크 시작
                     if sentence_overlap > 0:
                         current_chunk = current_chunk[-sentence_overlap:]
                     else:
                         current_chunk = []
                     current_chunk_length = sum(len(s) for s in current_chunk)
-
                 # 문장을 현재 청크에 추가
                 current_chunk.append(sentence)
                 current_chunk_length += sentence_length
-
         # 마지막 청크 추가
         if current_chunk:
             chunk = " ".join(current_chunk)
             if len(chunk.strip()) > 3:
                 chunks.append(Document(chunk))
-
         log('info', f'[preprocessor.py > TextSplitter] splitted_chunks: {len(chunks)}')
         return chunks
     
