@@ -21,6 +21,15 @@ export default function CreateRoom() {
 
   const router = useRouter();
 
+  const isFileSizeBigger = () => {
+    const MAX_FILE_SIZE = 100 * 1024 * 1024;
+    if (files.some((file) => file.size > MAX_FILE_SIZE)) {
+      alert('파일 크기는 100MB를 초과할 수 없습니다.');
+      return true;
+    }
+    return false;
+  };
+
   const onSubmit = async () => {
     if (
       !title ||
@@ -52,15 +61,6 @@ export default function CreateRoom() {
       alert(error.message);
     }
     setIsLoading(false);
-  };
-
-  const isFileSizeBigger = () => {
-    const MAX_FILE_SIZE = 100 * 1024 * 1024;
-    if (files.some((file) => file.size > MAX_FILE_SIZE)) {
-      alert('파일 크기는 100MB를 초과할 수 없습니다.');
-      return true;
-    }
-    return false;
   };
 
   return (
