@@ -63,9 +63,11 @@ export const name = style({
 export const nameText = style({
   position: 'relative',
   zIndex: 1,
+  padding: '0 25px',
   '@media': {
     '(max-width: 768px)': {
       fontSize: 12,
+      padding: 0,
     },
   },
 });
@@ -122,6 +124,7 @@ export const detailBlock = style({
   fontWeight: 400,
   backgroundColor: globals.color.blue_7,
   borderRadius: 16,
+  overflow: 'scroll',
   '@media': {
     '(max-width: 768px)': {
       fontSize: 10,
@@ -158,7 +161,7 @@ export const numText = style({
   lineHeight: 1.2,
   '@media': {
     '(max-width: 768px)': {
-      fontSize: 12,
+      fontSize: 10,
     },
   },
 });

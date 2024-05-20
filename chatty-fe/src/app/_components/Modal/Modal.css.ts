@@ -52,3 +52,7 @@ export const closeButton = style({
   fontSize: 16,
   fontWeight: '400',
 });
+
+export const closeIconButton = style({
+  cursor: 'pointer',
+});

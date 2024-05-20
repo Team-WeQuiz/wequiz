@@ -110,6 +110,7 @@ export default function FileUploadBox({ setFiles }: FileUploadBoxProps) {
           </div>
           <input
             type="file"
+            accept="application/pdf"
             ref={fileInputRef}
             onChange={handleFileInputChange}
             className={styles.fileInput}

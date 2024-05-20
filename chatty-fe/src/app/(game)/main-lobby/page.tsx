@@ -8,35 +8,19 @@ import GradButton from '@/app/_components/GradButton';
 import GameListGrid from './_components/GameListGrid/GameListGrid';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import CodeInput from './_components/CodeInput/CodeInput';
 
 const MainLobby = () => {
   const router = useRouter();
-  const [search, setSearch] = useState('');
+  const [code, setCode] = useState('');
 
   return (
     <Suspense>
       <div className={styles.lobbyContainer}>
         <div className={styles.centerContainer}>
           <div className={styles.toolBar}>
-            <div className={styles.searchInput}>
-              <TextInputField
-                value={search}
-                placeholder="검색"
-                borderRadius={12}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                }}
-                endAdornment={
-                  <SolidButton shadowExist={false}>
-                    <Image
-                      src="/images/Search.svg"
-                      alt="search"
-                      width={24}
-                      height={24}
-                    /> 
-                  </SolidButton>
-                }
-              />
+            <div className={styles.codeInput}>
+              <CodeInput />
             </div>
             <div className={styles.createButton}>
               <GradButton

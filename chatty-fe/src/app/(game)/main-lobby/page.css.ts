@@ -26,13 +26,15 @@ export const toolBar = style({
   gap: 30,
 });
 
-export const searchInput = style({
-  width: 360,
+export const codeInput = style({
+  width: 300,
+  padding: 1,
 });
 
 export const createButton = style({
   width: 168,
   maxHeight: 60,
+  padding: 1,
 });
 
 export const buttonText = style({
