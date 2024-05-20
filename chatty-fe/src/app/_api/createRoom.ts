@@ -32,3 +32,15 @@ export const postRoom = async (
     else throw new Error('오류가 발생했습니다.');
   }
 };
+
+export const getExistQuiz = async () => {
+  try {
+    const response = await client.get('/rooms/existQuiz');
+    console.log(response.data);
+    return response.data;
+  } catch (error: any) {
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('오류가 발생했습니다.');
+  }
+};
