@@ -1,4 +1,5 @@
 import string
+import asyncio
 from langdetect import detect
 from konlpy.tag import Mecab
 from nltk.tokenize import word_tokenize
@@ -53,3 +54,8 @@ def extract_keywords(split_doc_list, top_n):
         raise e
     except Exception as e:
         raise Exception(f"An unexpected error occurred during keyword extraction: {str(e)}")
+
+
+async def extract_keywords_async(split_doc_list, top_n):
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, extract_keywords, split_doc_list, top_n)

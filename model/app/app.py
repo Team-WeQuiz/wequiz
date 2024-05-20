@@ -249,7 +249,7 @@ async def generate(generate_request: GenerateRequest):
         res = results[1]
 
         # keyword 추출
-        keywords = extract_keywords(keyword_split_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
+        keywords = await extract_keywords_async(keyword_split_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
         log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
         # queries = extract_concept_relationships(sentences, keywords, min(generate_request.num_of_quiz * 2, len(sentences) - 1))
         # log('info', f'[app.py > quiz] Extracted Seed Queries: {len(queries)}')
