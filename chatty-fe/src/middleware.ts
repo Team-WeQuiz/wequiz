@@ -5,16 +5,16 @@ export const config = {
 };
 
 const protectedPatterns = [
-  new URLPattern({ pathname: '/main-lobby' }),
-  new URLPattern({ pathname: '/create-room' }),
-  new URLPattern({ pathname: '/waiting-room/:id' }),
-];
+  '/main-lobby',
+  '/create-room',
+  '/waiting-room/:id',
+].map((path) => new URLPattern({ pathname: path }));
+
 const publicRoutes = ['/sign-in', '/sign-up'];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('refreshToken');
   const currentPath = request.nextUrl.pathname;
-  //console.log(token);
 
   const isProtectedRoute = protectedPatterns.some((pattern) =>
     pattern.test(request.nextUrl),
