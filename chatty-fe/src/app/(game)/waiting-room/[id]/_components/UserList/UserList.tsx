@@ -15,8 +15,10 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
   const [botStatus, setBotStatus] = useState<UserStatus>({
     userId: -1,
     isReady: isQuizReady,
-    nickname: '문제 생성 확인 봇',
-    profileImage: null,
+    nickname: '퀴즈 생성 AI',
+    profileImage: isQuizReady === true
+      ? '/images/bot_ready.svg'
+      : '/images/bot_not_ready.svg',
   });
 
   const calculateCardSize = (
@@ -32,7 +34,7 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
     if (containerWidth / containerHeight > cardAspectRatio) {
       numRows = Math.ceil(
         Math.sqrt(
-          numCards * (containerHeight / containerWidth) * (cardAspectRatio ** 2),
+          numCards * (containerHeight / containerWidth) * cardAspectRatio ** 2,
         ),
       );
       numCols = Math.ceil(numCards / numRows);
@@ -40,7 +42,8 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
       // 세로 길이가 더 긴 경우
       numCols = Math.ceil(
         Math.sqrt(
-          (numCards * (containerWidth / containerHeight)) / (cardAspectRatio ** 2),
+          (numCards * (containerWidth / containerHeight)) /
+            cardAspectRatio ** 2,
         ),
       );
       numRows = Math.ceil(numCards / numCols);
@@ -84,7 +87,6 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
         containerSize.height - 49,
         userStatuses.length + 1,
       );
-      console.log(calculatedSize);  
       setCardSize(calculatedSize);
     }
   }, [containerSize, userStatuses.length]);
@@ -95,7 +97,7 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
         userId: -1,
         isReady: isQuizReady,
         message: '나도 준비 완료!',
-        nickname: '문제 생성 확인 봇',
+        nickname: '퀴즈 생성 AI',
         profileImage: null,
       });
     }

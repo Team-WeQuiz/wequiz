@@ -14,14 +14,17 @@ const initialData: QuizInfo = {
   description: '',
   numOfQuiz: 0,
   isFull: false,
+  code: '',
 };
 
 const QuizInfoCard = ({
   roomId,
   isSubscribed,
+  setRoomCode,
 }: {
   roomId: number;
   isSubscribed: boolean;
+  setRoomCode: (code: string) => void;
 }) => {
   const [data, setData] = useState<QuizInfo>(initialData);
   const { accessToken } = useAuthStore();
@@ -33,6 +36,7 @@ const QuizInfoCard = ({
       try {
         const response: QuizInfo = await getQuizInfo(roomId, accessToken);
         setData(response);
+        setRoomCode(response.code);
         if (userStatuses.length >= response.maxPlayers) {
           alert('방이 다 찼습니다. 로비로 이동합니다.');
           router.push('/main-lobby');
@@ -45,9 +49,10 @@ const QuizInfoCard = ({
           description: '',
           numOfQuiz: 0,
           isFull: false,
+          code: '',
         });
         alert(error.message);
-        router.push('/main-lobby');
+        // router.push('/main-lobby');
       }
     };
     if (accessToken && isSubscribed) {

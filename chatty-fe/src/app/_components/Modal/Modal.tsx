@@ -73,7 +73,10 @@ const Modal = ({
                   <span>{timer}</span>
                 </button>
               ) : (
-                <button onClick={handleClose}>
+                <button
+                  onClick={handleClose}
+                  className={styles.closeIconButton}
+                >
                   <Image
                     src={'/images/CloseButton.svg'}
                     alt="close"

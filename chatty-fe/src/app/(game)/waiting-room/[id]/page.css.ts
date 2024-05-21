@@ -1,4 +1,5 @@
-import { style } from '@vanilla-extract/css';
+import { style, keyframes } from '@vanilla-extract/css';
+import { globals } from '@/app/globals.css';
 
 export const roomContainer = style({
   display: 'flex',
@@ -6,6 +7,7 @@ export const roomContainer = style({
   maxWidth: 1830,
   gap: 30,
   height: '100%',
+  position: 'relative',
   '@media': {
     '(max-width: 768px)': {
       position: 'relative',
@@ -26,6 +28,7 @@ export const wideArea = style({
       maxWidth: 768,
       width: '100%',
       position: 'absolute',
+      gap: 12,
       top: 170,
       left: 0,
       zIndex: 10,
@@ -91,7 +94,47 @@ export const buttonWrapper = style({
       position: 'absolute',
       right: 0,
       width: 80,
-      padding: 5,
+      height: "100%",
     },
   },
+});
+
+export const readyStatus = style({
+  position: 'absolute',
+  top: 'calc(40% - 15px)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  height: 120,
+  background:
+    'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.4) 15%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0.7) 60%, rgba(255,255,255,0.4) 85%, rgba(255,255,255,0.2) 100%)',
+  zIndex: 10,
+});
+
+const blinkingText = keyframes({
+  '0%': {
+    opacity: 0,
+  },
+  '50%': {
+    opacity: 1,
+  },
+  '100%': {
+    opacity: 0,
+  },
+});
+export const blinking = style({
+  animation: `${blinkingText} 2s infinite`,
+});
+
+export const readyStatusText = style({
+  fontSize: 38,
+  fontFamily: 'var(--bagel-font)',
+  fontWeight: 400,
+  WebkitTextStrokeColor: globals.color.sub,
+  WebkitTextStrokeWidth: 2,
+  background: `linear-gradient(180deg, #FFF 30%, ${globals.color.sub} 100%)`,
+  backgroundClip: 'text',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
 });

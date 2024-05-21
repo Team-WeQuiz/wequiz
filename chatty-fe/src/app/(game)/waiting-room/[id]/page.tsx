@@ -12,6 +12,9 @@ import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
 import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { UserStatus } from '@/app/_types/WaitingStatus';
+import { startQuiz } from '@/app/_api/quiz';
+import { useRouter } from 'next/navigation';
 
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
@@ -21,11 +24,55 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { accessToken } = useAuthStore();
-  const { userStatuses, updateUsers, setMessage } = useWaitingStore();
+  const { userStatuses, updateUsers, setMessage, allUsersReady } =
+    useWaitingStore();
   // 퀴즈 요약
   const [quizSummary, setQuizSummary] = useState<string>('');
   // 퀴즈 생성 완료 체크
   const [isQuizReady, setIsQuizReady] = useState(false);
+
+  const [isReady, setIsReady] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<number>(3);
+  const router = useRouter();
+  const [toggleBlock, setToggleBlock] = useState<boolean>(false);
+  const [roomCode, setRoomCode] = useState<string>('');
+
+  useEffect(() => {
+    setIsReady(
+      userStatuses.find((user: UserStatus) => user.userId === userId)
+        ?.isReady || false,
+    );
+  }, [userStatuses]);
+
+  useEffect(() => {
+    setCountdown(3);
+    let timer: NodeJS.Timeout | null = null;
+    if (isQuizReady && allUsersReady) {
+      timer = setInterval(() => {
+        setCountdown((prevCount) => {
+          const nextCount = prevCount - 1;
+          if (nextCount === 0) {
+            setToggleBlock(true);
+            // userStatuses에서 내 userId가 min값이면 퀴즈 시작
+            const minUserId = userStatuses.reduce((prev, curr) =>
+              prev.userId < curr.userId ? prev : curr,
+            ).userId;
+            if (minUserId === userId) {
+              startQuiz(params.id, accessToken);
+            }
+          }
+          if (nextCount === -1) {
+            clearInterval(timer!);
+            router.push(`/quiz-room/${params.id}`);
+          }
+          return nextCount;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isQuizReady, allUsersReady]);
 
   useEffect(() => {
     const subscribeToStatus = (roomId: number) => {
@@ -129,18 +176,36 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         </div>
         <div className={styles.narrowArea}>
           <div className={styles.detailArea}>
-            <QuizInfoCard roomId={params.id} isSubscribed={isSubscribed} />
+            <QuizInfoCard
+              roomId={params.id}
+              isSubscribed={isSubscribed}
+              setRoomCode={setRoomCode}
+            />
             <QuizSummaryCard summary={quizSummary} />
           </div>
           <div className={styles.buttonWrapper}>
             <ReadyButton
               roomId={params.id}
               userId={userId}
-              isQuizReady={isQuizReady}
-              accessToken={accessToken}
+              isConnected={isConnected}
+              toggleBlock={toggleBlock}
+              code={roomCode}
             />
           </div>
         </div>
+        {isReady && (
+          <div className={styles.readyStatus}>
+            {isQuizReady && allUsersReady ? (
+              <span className={styles.readyStatusText}>
+                {countdown > 0 ? countdown : '퀴즈 시작 !'}
+              </span>
+            ) : (
+              <span className={`${styles.readyStatusText} ${styles.blinking}`}>
+                waiting
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

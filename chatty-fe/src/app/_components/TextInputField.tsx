@@ -10,12 +10,23 @@ type TextInputFiledProps = {
   required?: boolean;
   isChat?: boolean;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   endAdornment?: React.ReactNode;
   type?: string;
   autoComplete?: string;
   disabled?: boolean;
   maxLength?: number;
+  inputmode?:
+    | 'search'
+    | 'email'
+    | 'tel'
+    | 'text'
+    | 'url'
+    | 'none'
+    | 'numeric'
+    | 'decimal'
+    | undefined;
+  pattern?: string;
 };
 
 export default function TextInputField({
@@ -31,6 +42,8 @@ export default function TextInputField({
   autoComplete,
   disabled,
   maxLength,
+  inputmode,
+  pattern,
 }: TextInputFiledProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleChatDivClick = () => {
@@ -57,6 +70,8 @@ export default function TextInputField({
           type={type}
           disabled={disabled}
           maxLength={maxLength}
+          inputMode={inputmode}
+          pattern={pattern}
         />
         {endAdornment && (
           <>
@@ -89,6 +104,8 @@ export default function TextInputField({
             borderRadius: `${borderRadius}px`,
             backgroundColor: `${backgroundColor}`,
           }}
+          inputMode={inputmode}
+          pattern={pattern}
         />
         {endAdornment && (
           <div className={styles.endAdornment}>{endAdornment}</div>

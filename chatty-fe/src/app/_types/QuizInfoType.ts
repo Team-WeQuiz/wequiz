@@ -5,4 +5,5 @@ export type QuizInfo = {
   description: string;
   numOfQuiz: number;
   isFull: boolean;
+  code: string;
 };

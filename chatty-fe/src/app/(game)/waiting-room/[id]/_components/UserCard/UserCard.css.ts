@@ -81,6 +81,11 @@ export const chatMessage = style({
     borderColor: 'white transparent',
     zIndex: 5,
   },
+  "@media" : {
+    "(max-width: 768px)": {
+      fontSize: 10,
+    },
+  }
 });
 
 export const profileImage = style({
