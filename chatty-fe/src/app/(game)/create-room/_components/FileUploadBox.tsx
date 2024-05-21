@@ -4,7 +4,7 @@ import * as styles from './FileUploadBox.css';
 import Image from 'next/image';
 
 type FileUploadBoxProps = {
-  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  setFiles: React.Dispatch<React.SetStateAction<File[] | null>>;
 };
 
 export default function FileUploadBox({ setFiles }: FileUploadBoxProps) {

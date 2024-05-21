@@ -58,5 +58,9 @@ export default function AuthCheck({ children }: AuthCheckProps) {
     }
   }, [accessToken, id]);
 
+  useEffect(() => {
+    console.log('set token:', accessToken);
+  }, [accessToken]);
+
   return <>{children}</>;
 }
