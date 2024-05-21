@@ -1,27 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as styles from './DropBox.css';
 import Image from 'next/image';
+type ExistQuiz = {
+  quizDocId: string;
+  description: string;
+  numberOfQuiz: number;
+};
 
-const List = [
-  { id: 1, name: '1번 문제 리스트' },
-  { id: 2, name: '2번 문제 리스트' },
-  { id: 3, name: '3번 문제 리스트' },
-  { id: 4, name: '4번 문제 리스트' },
-  { id: 5, name: '5번 문제 리스트' },
-  { id: 6, name: '6번 문제 리스트' },
-  { id: 7, name: '7번 문제 리스트' },
-  { id: 8, name: '8번 문제 리스트' },
-];
-
-export default function DropBox() {
+type DropBoxProps = {
+  List: ExistQuiz[];
+  setNumberOfProblems: (numberOfProblems: number) => void;
+  selectedList: string | null;
+  setSelectedList: (selectedList: string | null) => void;
+};
+export default function DropBox({
+  List,
+  setNumberOfProblems,
+  selectedList,
+  setSelectedList,
+}: DropBoxProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState('');
+  const [quizList, setQuizList] = useState<ExistQuiz[]>([]);
+  useEffect(() => {
+    setQuizList(List);
+  }, []);
+  useEffect(() => {
+    console.log('quizList:', quizList);
+  }, [quizList]);
+  const handleSelected = (selected: string, numberOfProblems: number) => {
+    setSelectedList(selected);
+    setNumberOfProblems(numberOfProblems);
+  };
 
   return (
     <div className={styles.MainContainer}>
       <div className={styles.Container} onClick={() => setIsOpen(!isOpen)}>
-        <span className={selected === '' ? styles.NoneSelected : ''}>
-          {selected || '문제를 선택해주세요.'}
+        <span className={selectedList === '' ? styles.NoneSelected : ''}>
+          {selectedList || '문제를 선택해주세요.'}
         </span>
         <button className={styles.ButtonWrapper}>
           <Image
@@ -35,11 +50,11 @@ export default function DropBox() {
       <ul className={isOpen ? styles.List : styles.ListNone}>
         {List.map((item) => (
           <li
-            onClick={() => setSelected(item.name)}
+            onClick={() => handleSelected(item.quizDocId, item.numberOfQuiz)}
             className={styles.ListItem}
-            key={item.id}
+            key={item.quizDocId}
           >
-            {item.name}
+            {item.quizDocId}
           </li>
         ))}
       </ul>
