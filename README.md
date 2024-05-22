@@ -12,15 +12,6 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 </br>
 </br>
 
-## 📝 Documents
-- [포스터](https://github.com/Team-WeQuiz/wequiz/blob/main/docs/poster.png)
-- [수행결과 보고서]()
-- [최종 보고서]()
-- [발표 자료]()
-
-</br>
-</br>
-
 ## 🖱️ Usage
 **1. PDF 자료를 퀴즈로 변환**  
 > 유저가 pdf 파일을 입력하면 내용을 파싱 및 벡터화 하여 문서 내용을 기반으로 LLM이 퀴즈를 생성합니다.
@@ -99,6 +90,15 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 
 ## 🎮 Demo
 준비 중...
+
+</br>
+</br>
+
+## 📝 Documents
+- [포스터](https://github.com/Team-WeQuiz/wequiz/blob/main/docs/poster.svg)
+- [수행결과 보고서]()
+- [최종 보고서]()
+- [발표 자료]()
 
 </br>
 </br>
