@@ -14,7 +14,7 @@
             <td align='center'>퀴즈, 문서 요약 생성 과정</td>
           </tr>
           <tr>
-            <td align='center'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/04cbcb16-0f92-4149-8e9c-41371df247cf"></td>
+            <td align='center'><img src="assets/ml_architecture.svg"></td>
           </tr>
     </tbody>
 </table>
