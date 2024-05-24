@@ -301,10 +301,13 @@ img {
 .team-container {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-	justify-content: space-between;
+	justify-content: center;
+	align-items: center;
 	width: 100%;
 	gap: 10px;
 	background-color: var(--sixth-color);
+	max-width: 990px;
+	margin: 0 auto;
 }
 
 .our-team {
@@ -316,6 +319,7 @@ img {
 	overflow: hidden;
 	position: relative;
 	width: 100%;
+	margin: 0 auto;
 }
 
 .our-team .picture {
