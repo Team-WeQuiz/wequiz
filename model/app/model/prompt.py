@@ -82,6 +82,7 @@ Here is user's answer.
 USER ANSWER: '{user}'
 
 If the user answer is correct, return True or False.
+If the meaning is the same, treat it as correct.
 Please grade carefully. I'll give you a tip if you do. 
 
 YOUR ANSWER:"""
