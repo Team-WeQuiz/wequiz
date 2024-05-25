@@ -4,6 +4,15 @@ class QuizGenerationException(Exception):
 class InsufficientException(Exception):
     pass
 
+class InsufficientTokensException(Exception):
+    pass
+
+class TooManyTokensException(Exception):
+    pass
+
+class TooManyPagesException(Exception):
+    pass
+
 class MinioException(Exception):
     pass
 

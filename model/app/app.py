@@ -258,11 +258,19 @@ async def generate(generate_request: GenerateRequest):
         asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))
 
         return res
-
+    
+    except InsufficientTokensException as e:
+        log('error', str(e))
+        raise e
+    except TooManyTokensException as e:
+        log('error', str(e))
+        raise e
+    except TooManyPagesException as e:
+        log('error', str(e))
+        raise e
     except InsufficientException as e:
         log('error', str(e))
         raise QuizGenerationException(f"Quiz generation failed due to insufficient data: {str(e)}") from e
-
     except Exception as e:
         log('error', f'[app.py > quiz] Unexpected error occurred: {str(e)}')
         raise QuizGenerationException(f"Quiz generation failed due to an unexpected error: {str(e)}") from e
