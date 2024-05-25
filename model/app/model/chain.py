@@ -168,7 +168,7 @@ class SummaryChain():
             # 문서를 넣을 llm_chain의 변수 이름(map_template 에 정의된 변수명)
             document_variable_name="pages",
             # 출력에서 매핑 단계의 결과를 반환합니다.
-            return_intermediate_steps=True,
+            return_intermediate_steps=False,
         )
 
         output = await map_reduce_chain.ainvoke(split_docs)
