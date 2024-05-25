@@ -4,6 +4,9 @@ class QuizGenerationException(Exception):
 class InsufficientException(Exception):
     pass
 
+class NotAvailableFileException(Exception):
+    pass
+
 class InsufficientTokensException(Exception):
     pass
 

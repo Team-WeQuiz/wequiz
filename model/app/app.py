@@ -270,7 +270,7 @@ async def generate(generate_request: GenerateRequest):
         raise e
     except InsufficientException as e:
         log('error', str(e))
-        raise QuizGenerationException(f"Quiz generation failed due to insufficient data: {str(e)}") from e
+        raise NotAvailableFileException(f"Cannot create some quiz due to insufficient data: {str(e)}") from e
     except Exception as e:
         log('error', f'[app.py > quiz] Unexpected error occurred: {str(e)}')
         raise QuizGenerationException(f"Quiz generation failed due to an unexpected error: {str(e)}") from e
