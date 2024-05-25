@@ -98,6 +98,46 @@ a {
 	height: 35%;
 }
 
+.site--link {
+	position: relative;
+}
+
+.site--link.disabled {
+	cursor: not-allowed;
+}
+
+.site--link::after {
+	content: '사이트로 이동하기';
+	position: absolute;
+	left: 50%;
+	top: 100%;
+	transform: translateX(-50%);
+	padding: 5px 60px;
+	background-color: #333;
+	color: #fff;
+	white-space: nowrap;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.2s, visibility 0.2s;
+	margin-top: 5px;
+	border-radius: 3px;
+	z-index: 1000;
+}
+
+.site--link.disabled::after {
+	content: '현재 서버 작업 중으로 접속이 어려워요 😭';
+}
+
+.site--link:hover::after {
+	opacity: 1;
+	visibility: visible;
+}
+
+.site--link.disabled:hover::after {
+	opacity: 1;
+	visibility: visible;
+}
+
 .main--image {
 	width: 100%;
 	height: 100%;
