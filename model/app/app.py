@@ -244,21 +244,14 @@ async def generate(generate_request: GenerateRequest):
     try:
         # Parsing and split file
         parser = Parser()
+        keyword_split_docs, summary_split_docs, vector_split_docs, sentences = await parser.parse(generate_request.user_id, generate_request.timestamp)
         
-        # 비동기 작업 생성
-        parse_task = asyncio.create_task(parser.parse(generate_request.user_id, generate_request.timestamp))
-        create_id_task = asyncio.create_task(create_id(generate_request))
-
-        # parse와 create_id를 병렬로 실행하고 결과 기다리기
-        results = await asyncio.gather(parse_task, create_id_task)
-        keyword_split_docs, summary_split_docs, vector_split_docs, sentences = results[0]
-        res = results[1]
+        # create_id 실행
+        res = await create_id(generate_request)
 
         # keyword 추출
         keywords = await extract_keywords_async(keyword_split_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
         log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
-        # queries = extract_concept_relationships(sentences, keywords, min(generate_request.num_of_quiz * 2, len(sentences) - 1))
-        # log('info', f'[app.py > quiz] Extracted Seed Queries: {len(queries)}')
 
         # quiz 생성 (비동기)
         asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))
