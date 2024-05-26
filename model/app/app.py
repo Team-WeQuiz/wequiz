@@ -18,6 +18,12 @@ setup_logging()
 
 app = FastAPI()
 
+app.add_exception_handler(QuizGenerationException, quiz_generation_exception_handler)
+app.add_exception_handler(NotAvailableFileException, not_available_file_exception_handler)
+app.add_exception_handler(InsufficientTokensException, insufficient_tokens_exception_handler)
+app.add_exception_handler(TooManyTokensException, too_many_tokens_exception_handler)
+app.add_exception_handler(TooManyPagesException, too_many_pages_exception_handler)
+
 os.environ["OPENAI_API_KEY"] = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
 aws_credentials = json.loads(get_aws_access_key())
 os.environ["AWS_ACCESS_KEY_ID"] = aws_credentials["AWS_ACCESS_KEY_ID"]
