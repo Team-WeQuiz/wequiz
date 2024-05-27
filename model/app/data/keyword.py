@@ -7,9 +7,16 @@ from nltk.corpus import stopwords as en_stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from data.korean_stopwords import *
 from utils.exception import *
+from data.settings import *
 
 async def extract_keywords(split_doc_list, top_n):
     try:
+        text_data = []
+        for doc in split_doc_list:
+            content = doc.page_content.strip()
+            if len(content) > MIN_DETECT_LENGTH:
+                text_data.append(content)
+
         cleaned_text_data = []
         async for doc in split_doc_list:
             text = doc.page_content
