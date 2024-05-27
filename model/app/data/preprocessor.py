@@ -39,6 +39,22 @@ def is_valid_doc(text):
             is_valid = False
     return text, is_valid
 
+def preprocess(docs):
+    clean_docs = []
+
+    for doc in docs:
+        text_without_urls = remove_urls(doc.page_content)
+        valid_checked_text = is_valid_doc(text_without_urls)
+        if valid_checked_text != text_without_urls:
+            doc.page_content = valid_checked_text
+            clean_docs.append(doc)
+            break
+        else:
+            doc.page_content = text_without_urls
+            clean_docs.append(doc)
+
+    return clean_docs
+
 class Parser():
     def __init__(self):
         self.encoding = tiktoken.get_encoding("cl100k_base")
@@ -118,6 +134,19 @@ class Parser():
                 # retry 횟수에 따라 파서 선정
                 parser = self.parsers[retry%3]
                 total_text = await self.get_parsed_docs_async(parser, loader, minio_files)
+
+                textsplitter = TextSplitter()
+                sentences = await textsplitter.split_sentences_async(total_text)
+
+                # 병렬 처리 실행
+                keyword_docs_task = asyncio.create_task(textsplitter.split_docs_async(sentences, KEYWORD_CHUNK_SIZE, KEYWORD_SENTENCE_OVERLAP))
+                summary_docs_task = asyncio.create_task(textsplitter.split_docs_async(sentences, SUMMARY_CHUNK_SIZE, SUMMARY_SENTENCE_OVERLAP))
+                vector_docs_task = asyncio.create_task(textsplitter.split_docs_async(sentences, VECTOR_CHUNK_SIZE, VECTOR_SENTENCE_OVERLAP))
+
+                # 병렬 처리 결과 대기 및 반환
+                keyword_docs_list, summary_docs_list, vector_docs_list = await asyncio.gather(
+                    keyword_docs_task, summary_docs_task, vector_docs_task
+                )
                 
                 break
             except ParsingException as e:
@@ -129,7 +158,10 @@ class Parser():
         if retry == PARSING_RETRY:
             raise ParsingException(f"Failed to parse documents after {PARSING_RETRY} retries.")
         
-        return total_text
+        log('info', f'[preprocessor.py > Parser] 키워드 추출을 위한 {len(keyword_docs_list)}개의 문서 조각이 준비되었습니다.')
+        log('info', f'[preprocessor.py > Parser] 요약을 위한 {len(summary_docs_list)}개의 문서 조각이 준비되었습니다.')
+        log('info', f'[preprocessor.py > Parser] 벡터화를 위한 {len(vector_docs_list)}개의 문서 조각이 준비되었습니다.')
+        return keyword_docs_list, summary_docs_list, vector_docs_list, sentences
 
 
 class TextSplitter():
@@ -145,7 +177,7 @@ class TextSplitter():
             raise InsufficientException(f'[text splitter] there is too small total text.')
         if lang == "ko":
             # Okt로 total_text를 형태소 단위로 분석
-            morphs = self.okt.morphs(total_text, stem=False)
+            morphs = self.okt.morphs(total_text, stem=True)
             # 형태소 분석 결과를 바탕으로 문장 분리
             sentences = []
             current_sentence = []
@@ -164,7 +196,8 @@ class TextSplitter():
         
         return sentences
 
-    async def split_docs_generator(self, sentences, chunk_size, sentence_overlap):
+    def split_docs(self, sentences, chunk_size, sentence_overlap):
+        chunks = []
         current_chunk = []
         current_chunk_length = 0
         for sentence in sentences:
@@ -179,7 +212,9 @@ class TextSplitter():
                 sentence_length = len(sentence.strip())
                 # 현재 청크 길이와 새로운 문장 길이의 합이 chunk_size를 초과하는 경우
                 if current_chunk_length + sentence_length > chunk_size:
-                    yield Document(" ".join(current_chunk))
+                    # 현재 청크를 chunks에 추가
+                    chunk = " ".join(current_chunk)
+                    chunks.append(Document(chunk))
                     # 새로운 청크 시작
                     if sentence_overlap > 0:
                         current_chunk = current_chunk[-sentence_overlap:]
@@ -193,12 +228,17 @@ class TextSplitter():
         if current_chunk:
             chunk = " ".join(current_chunk)
             if len(chunk.strip()) > 3:
-                yield Document(chunk)
+                chunks.append(Document(chunk))
+        log('info', f'[preprocessor.py > TextSplitter] splitted_chunks: {len(chunks)}')
+        return chunks
     
     async def split_sentences_async(self, total_text):
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self.split_sentences, total_text)
-        
+    
+    async def split_docs_async(self, sentences, chunk_size, chunk_overlap):
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self.split_docs, sentences, chunk_size, chunk_overlap)
 
 
     # todo: get dynamic chunk size

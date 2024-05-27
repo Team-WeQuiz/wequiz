@@ -1,7 +1,15 @@
 package com.chatty.chatty.game.service.model;
 
-import static com.chatty.chatty.game.exception.ModelExceptionType.LACK_OF_TOKEN;
+import static com.chatty.chatty.game.exception.ModelExceptionType.FAILED_TO_CREATE;
+import static com.chatty.chatty.game.exception.ModelExceptionType.FILE_NOT_AVAILABLE;
+import static com.chatty.chatty.game.exception.ModelExceptionType.INSUFFICIENT_TOKENS;
+import static com.chatty.chatty.game.exception.ModelExceptionType.TOO_MANY_PAGES;
+import static com.chatty.chatty.game.exception.ModelExceptionType.TOO_MANY_TOKENS;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE;
+import static org.springframework.http.HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.chatty.chatty.config.minio.MinioRepository;
@@ -45,7 +53,31 @@ public class ModelService {
                 .onStatus(INTERNAL_SERVER_ERROR::equals,
                         (req, res) -> {
                             minioRepository.deleteFiles(fileNames);
-                            throw new ModelException(LACK_OF_TOKEN);
+                            throw new ModelException(FAILED_TO_CREATE);
+                        }
+                )
+                .onStatus(UNPROCESSABLE_ENTITY::equals,
+                        (req, res) -> {
+                            minioRepository.deleteFiles(fileNames);
+                            throw new ModelException(INSUFFICIENT_TOKENS);
+                        }
+                )
+                .onStatus(PAYLOAD_TOO_LARGE::equals,
+                        (req, res) -> {
+                            minioRepository.deleteFiles(fileNames);
+                            throw new ModelException(TOO_MANY_TOKENS);
+                        }
+                )
+                .onStatus(REQUESTED_RANGE_NOT_SATISFIABLE::equals,
+                        (req, res) -> {
+                            minioRepository.deleteFiles(fileNames);
+                            throw new ModelException(TOO_MANY_PAGES);
+                        }
+                )
+                .onStatus(BAD_REQUEST::equals,
+                        (req, res) -> {
+                            minioRepository.deleteFiles(fileNames);
+                            throw new ModelException(FILE_NOT_AVAILABLE);
                         }
                 )
                 .body(QuizDocIdMLResponse.class);

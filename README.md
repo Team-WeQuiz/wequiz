@@ -89,7 +89,7 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 </br>
 
 ## 🎮 Demo
-준비 중...
+[![Video Label](http://img.youtube.com/vi/_8EoD0a8urQ/0.jpg)](https://www.youtube.com/watch?v=L84IS3E5d7Y)
 
 </br>
 </br>
