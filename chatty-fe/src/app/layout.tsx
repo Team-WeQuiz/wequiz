@@ -4,6 +4,7 @@ import './globals.css';
 import './layout.css';
 import { Suspense } from 'react';
 import BgmComponent from './_components/BgmComponent/BgmComponent';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const pretendard = localFont({
   src: '../../public/fonts/PretendardVariable.ttf',
@@ -42,6 +43,9 @@ export default function RootLayout({
           </Suspense>
         </div>
       </body>
+      {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ? (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID} />
+      ) : null}
     </html>
   );
 }

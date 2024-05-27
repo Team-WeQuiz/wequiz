@@ -98,6 +98,46 @@ a {
 	height: 35%;
 }
 
+.site--link {
+	position: relative;
+}
+
+.site--link.disabled {
+	cursor: not-allowed;
+}
+
+.site--link::after {
+	content: '사이트로 이동하기';
+	position: absolute;
+	left: 50%;
+	top: 100%;
+	transform: translateX(-50%);
+	padding: 5px 60px;
+	background-color: #333;
+	color: #fff;
+	white-space: nowrap;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.2s, visibility 0.2s;
+	margin-top: 5px;
+	border-radius: 3px;
+	z-index: 1000;
+}
+
+.site--link.disabled::after {
+	content: '현재 서버 작업 중으로 접속이 어려워요 😭';
+}
+
+.site--link:hover::after {
+	opacity: 1;
+	visibility: visible;
+}
+
+.site--link.disabled:hover::after {
+	opacity: 1;
+	visibility: visible;
+}
+
 .main--image {
 	width: 100%;
 	height: 100%;
@@ -132,7 +172,8 @@ a {
 section {
 	width: 100vw;
 	height: 100vh;
-	padding: 160px 140px;
+	padding: 60px;
+	gap: 60px;
 }
 
 section.about--section {
@@ -144,9 +185,10 @@ section.about--section {
 @media screen and (max-width: 768px) {
 	section.about--section {
 		flex-direction: column;
-		gap: 10px;
-		padding: 50px 10px;
+		justify-content: center;
+		/* gap: 10px; */
 	}
+	
 }
 
 .about {
@@ -159,11 +201,23 @@ section.about--section {
 }
 
 .about--description {
-	margin: 0px 100px;
+	padding: 0 40px;
+}
+
+@media screen and (max-width: 768px) {
+	.about--description {
+		padding: 0;
+	}
 }
 
 .description-image {
 	width: 50%;
+}
+
+@media screen and (max-width: 768px) {
+	.description-image {
+		width: 100%;
+	}
 }
 
 h1 {
@@ -204,7 +258,7 @@ h2 {
 @media screen and (max-width: 768px) {
 	.tech-stack-container {
 		flex-direction: column;
-		gap: 10px;
+		/* gap: 10px; */
 	}
 }
 
@@ -217,7 +271,6 @@ h2 {
 	background: var(--sixth-color);
 	width: 25%;
 	max-width: 300px;
-
 	height: 100%;
 	max-height: 400px;
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
@@ -281,12 +334,20 @@ img {
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
+.team-section {
+	height: auto;
+}
+
 .team-container {
-	display: flex;
-	justify-content: space-between;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+	justify-content: center;
+	align-items: center;
 	width: 100%;
 	gap: 10px;
 	background-color: var(--sixth-color);
+	max-width: 990px;
+	margin: 0 auto;
 }
 
 .our-team {
@@ -297,7 +358,8 @@ img {
 	text-align: center;
 	overflow: hidden;
 	position: relative;
-	width: 20%;
+	width: 100%;
+	margin: 0 auto;
 }
 
 .our-team .picture {

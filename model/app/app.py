@@ -7,13 +7,12 @@ import asyncio
 import os
 
 from schema import *
-from data.preprocessor import Parser, TextSplitter
+from data.preprocessor import Parser
 from data.generator import QuizGenerator, Marker, Summarizer
 from data.keyword import *
 from utils.security import get_openai_api_key, get_aws_access_key
 from utils.logger import *
 from utils.exception import *
-from data.settings import *
 # 로깅 설정
 setup_logging()
 
@@ -149,11 +148,8 @@ async def create_id(generate_request):
 async def generate_quiz_async(generate_request, id, summary_split_docs, vector_split_docs, keywords):
     try:
         # Generate description
-        summary_docs = []
-        async for doc in summary_split_docs:
-            summary_docs.append(doc)
         summarizer = Summarizer()
-        summary = await summarizer.summarize(summary_docs)
+        summary = await summarizer.summarize(summary_split_docs)
         
         async with aioboto3.Session().client('dynamodb', region_name=REGION_NAME, config=config) as dynamodb:
             try:
@@ -163,12 +159,9 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                     UpdateExpression='SET description = :val, version = if_not_exists(version, :zero)',
                     ExpressionAttributeValues={':val': {'S': summary}, ':zero': {'N': '0'}}
                 )
-
-                vector_docs = []
-                async for doc in vector_split_docs:
-                    vector_docs.append(doc) 
+            
                 # Generate quiz
-                quiz_generator = QuizGenerator(vector_docs)
+                quiz_generator = QuizGenerator(vector_split_docs)
 
                 async def generate_question(idx, i):
                     max_attempts = generate_request.num_of_quiz
@@ -235,6 +228,9 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                             except Exception as e:
                                 log('error', f"[app.py > quiz] Unexpected error occurred: {str(e)}")
                                 raise Exception("Failed to push questions to dynamo due to an unexpected error.") from e
+            except aioboto3.exceptions.NoCredentialsError:
+                log('error', '[app.py > quiz] No valid credentials found.')
+                raise HTTPException(status_code=500, detail="No valid credentials found.")
             except Exception as e:
                 log('error', f'[app.py > quiz] Error occurred while validating credentials: {str(e)}')
 
@@ -248,25 +244,24 @@ async def generate(generate_request: GenerateRequest):
     try:
         # Parsing and split file
         parser = Parser()
-        total_text = await parser.parse(generate_request.user_id, generate_request.timestamp)
         
-        textsplitter = TextSplitter()
-        sentences = await textsplitter.split_sentences_async(total_text)
-        # 각각의 작업을 비동기로 처리
-        keyword_docs = textsplitter.split_docs_generator(sentences, KEYWORD_CHUNK_SIZE, KEYWORD_SENTENCE_OVERLAP)
-        summary_docs = textsplitter.split_docs_generator(sentences, SUMMARY_CHUNK_SIZE, SUMMARY_SENTENCE_OVERLAP)
-        vector_docs = textsplitter.split_docs_generator(sentences, VECTOR_CHUNK_SIZE, VECTOR_SENTENCE_OVERLAP)
-        log('warning', keyword_docs)
+        # 비동기 작업 생성
+        parse_task = asyncio.create_task(parser.parse(generate_request.user_id, generate_request.timestamp))
+        create_id_task = asyncio.create_task(create_id(generate_request))
 
-        # create_id 실행
-        res = await create_id(generate_request)
+        # parse와 create_id를 병렬로 실행하고 결과 기다리기
+        results = await asyncio.gather(parse_task, create_id_task)
+        keyword_split_docs, summary_split_docs, vector_split_docs, sentences = results[0]
+        res = results[1]
 
         # keyword 추출
-        keywords = await extract_keywords(keyword_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
+        keywords = await extract_keywords_async(keyword_split_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
         log('info', f'[app.py > quiz] Extracted Keywords: {keywords}')
+        # queries = extract_concept_relationships(sentences, keywords, min(generate_request.num_of_quiz * 2, len(sentences) - 1))
+        # log('info', f'[app.py > quiz] Extracted Seed Queries: {len(queries)}')
 
         # quiz 생성 (비동기)
-        asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_docs, vector_docs, keywords))
+        asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))
 
         return res
     
