@@ -32,14 +32,14 @@ export const MyImage = style({
   borderRadius: 100,
   overflow: 'hidden',
   background: '#fff',
-  border: `4px solid transparent`,
+  border: `5px solid transparent`,
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
 });
 
 export const SolvedMyImage = style([
   MyImage,
   {
-    border: `4px solid ${globals.color.blue_main}`,
+    border: `5px solid ${globals.color.blue_main}`,
   },
 ]);
 
@@ -52,14 +52,14 @@ export const UserImage = style({
   borderRadius: 100,
   overflow: 'hidden',
   background: '#fff',
-  border: `4px solid transparent`,
+  border: `5px solid transparent`,
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
 });
 
 export const SolvedUserImage = style([
   UserImage,
   {
-    border: `4px solid ${globals.color.blue_main}`,
+    border: `5px solid ${globals.color.blue_main}`,
   },
 ]);
 
