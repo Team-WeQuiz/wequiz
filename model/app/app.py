@@ -204,7 +204,9 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                     # 5문제가 생성되었거나 마지막 문제인 경우 DynamoDB에 업데이트
                     if idx % 5 == 0 or idx == generate_request.num_of_quiz:
                         log('info', f'[app.py > quiz] cur idx: {idx} - quiz batch is ready to push. {questions}')
-                        while True:
+
+                        retries = 0
+                        while retries < QUIZ_UPDATE_RETRY:
                             try:
                                 response = await dynamodb.get_item(
                                     TableName=QUIZ_TABLE,
@@ -230,13 +232,16 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
                                 log('info', f'[app.py > quiz] quiz push to dynamodb successed.')
                                 questions = []  # 새로운 5문제를 위해 questions 리스트 초기화
                                 break
-                            except dynamodb.exceptions.ConditionalCheckFailedException:
-                                log('warning', "[app.py > quiz] Failed to push questions to dynamo due to version conflict. Retrying...")
                             except Exception as e:
-                                log('error', f"[app.py > quiz] Unexpected error occurred: {str(e)}")
-                                raise Exception("Failed to push questions to dynamo due to an unexpected error.") from e
+                                log('warning', "[app.py > quiz] Failed to push questions to dynamo due to version conflict. Retrying...")
+                                retries += 1
+                                
+                        if retries == QUIZ_UPDATE_RETRY:
+                            log('error', "[app.py > quiz] Failed to push questions to dynamo after maximum retries.")
+                            raise Exception("Failed to push questions to dynamo after maximum retries.")
+
             except Exception as e:
-                log('error', f'[app.py > quiz] Error occurred while validating credentials: {str(e)}')
+                log('error', f'[app.py > quiz] Error occurred while updating quiz to dynamodb: {str(e)}')
 
     except Exception as e:
         log('error', f'[app.py > quiz] Failed to generate quiz: {str(e)}')
