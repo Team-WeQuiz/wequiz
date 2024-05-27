@@ -134,6 +134,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       (submitStatus) => {
         const statusData = JSON.parse(submitStatus.body);
         console.log('제출현황: ', statusData);
+        statusData.submitStatuses.sort(
+          (a: SubmitStatus, b: SubmitStatus) => a.userId - b.userId,
+        );
         setSubmitStatuses(statusData);
       },
       {

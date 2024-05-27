@@ -27,11 +27,17 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
   return (
     <div className={styles.UserContainer}>
       <div className={styles.MyContainer}>
-        <div className={styles.MyImage}>
+        <div
+          className={
+            submitStatus.find((status) => status.userId === userId)?.isSolved
+              ? styles.SolvedMyImage
+              : styles.MyImage
+          }
+        >
           <Image
             src={
               submitStatus.find((status) => status.userId === userId)
-                ?.profileImage || '/images/profile.svg'
+                ?.profileImage || '/images/Empty_profile.svg'
             }
             alt="profile"
             width={180}
@@ -42,11 +48,6 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
         <div className={styles.MyNickname}>
           <span>
             {submitStatus.find((status) => status.userId === userId)?.nickname}
-          </span>
-          <span>
-            {submitStatus.find((status) => status.userId === userId)?.isSolved
-              ? ' 🟢'
-              : ' 🔴'}
           </span>
         </div>
         <div className={styles.EmojiContainer}>
@@ -71,16 +72,19 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
         {submitStatus.map((status, index) =>
           status.userId !== userId ? (
             <div className={styles.UserBox} key={status.userId}>
-              <div className={styles.UserImage}>
+              <div
+                className={
+                  status.isSolved ? styles.SolvedUserImage : styles.UserImage
+                }
+              >
                 <Image
-                  src={status.profileImage || '/images/profile.svg'}
+                  src={status.profileImage || '/images/Empty_profile.svg'}
                   alt="profile"
                   width={120}
                   height={120}
                 />
               </div>
               <div>{status.nickname}</div>
-              <span>{status.isSolved ? '🟢' : '🔴'}</span>
             </div>
           ) : null,
         )}

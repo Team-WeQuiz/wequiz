@@ -6,7 +6,8 @@ export const Container = style({
   width: 434,
   height: 516,
   alignItems: 'flex-start',
-  gap: 8,
+  padding: '0 14.5px',
+  gap: 14.5,
   flexShrink: 0,
   flexWrap: 'wrap',
 });
@@ -23,20 +24,44 @@ export const UserContainer = style({
 });
 
 export const MyImage = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   width: 180,
   height: 180,
   borderRadius: 100,
   overflow: 'hidden',
   background: '#fff',
+  border: `4px solid transparent`,
+  boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
 });
 
+export const SolvedMyImage = style([
+  MyImage,
+  {
+    border: `4px solid ${globals.color.blue_main}`,
+  },
+]);
+
 export const UserImage = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   width: 120,
   height: 120,
   borderRadius: 100,
   overflow: 'hidden',
   background: '#fff',
+  border: `4px solid transparent`,
+  boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
 });
+
+export const SolvedUserImage = style([
+  UserImage,
+  {
+    border: `4px solid ${globals.color.blue_main}`,
+  },
+]);
 
 export const UserBox = style({
   display: 'flex',
