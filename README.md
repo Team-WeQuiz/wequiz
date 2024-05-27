@@ -89,7 +89,8 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 </br>
 
 ## 🎮 Demo
-[![Video Label](http://img.youtube.com/vi/_8EoD0a8urQ/0.jpg)](https://www.youtube.com/watch?v=L84IS3E5d7Y)
+[![Video Label](https://github.com/Team-WeQuiz/wequiz/assets/90228925/2a919cbe-2bc2-4495-9762-5b17b1e34ee9)](https://www.youtube.com/watch?v=L84IS3E5d7Y)
+
 
 </br>
 </br>

@@ -31,6 +31,7 @@ export const profileButton = style({
 export const profileImage = style({
   borderRadius: '50%',
   border: `1px solid ${globals.color.blue_7}`,
+  objectFit: 'cover',
 });
 
 export const dropdownMenu = style({

@@ -52,7 +52,7 @@ const QuizInfoCard = ({
           code: '',
         });
         alert(error.message);
-        // router.push('/main-lobby');
+        router.push('/main-lobby');
       }
     };
     if (accessToken && isSubscribed) {

@@ -60,6 +60,7 @@ const UserCard = ({
             style={{
               borderRadius: '50%',
               border: '2px solid #fff',
+              objectFit: 'cover',
             }}
           />
         </div>
