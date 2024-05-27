@@ -13,7 +13,7 @@ def extract_keywords(split_doc_list, top_n):
     try:
         text_data = []
         for doc in split_doc_list:
-            content = doc.page_content.split()
+            content = doc.page_content.strip()
             if len(content) > MIN_DETECT_LENGTH:
                 text_data.append(content)
 
