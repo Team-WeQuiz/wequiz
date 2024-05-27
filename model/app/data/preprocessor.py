@@ -171,7 +171,10 @@ class TextSplitter():
         self.nlp.add_pipe('sentencizer')
 
     def split_sentences(self, total_text):
-        lang = detect(total_text[:100])
+        if len(total_text) > MIN_DETECT_LENGTH:
+            lang = detect(total_text[:100])
+        else:
+            raise InsufficientException(f'[text splitter] there is too small total text.')
         if lang == "ko":
             # Okt로 total_text를 형태소 단위로 분석
             morphs = self.okt.morphs(total_text, stem=True)
