@@ -20,6 +20,42 @@ export const Default: Story = {
       },
       {
         userId: 8,
+        profileImage: null,
+        nickname: '2',
+        isSolved: false,
+      },
+      {
+        userId: 8,
+        profileImage: '/images/profile.svg',
+        nickname: '2',
+        isSolved: true,
+      },
+      {
+        userId: 8,
+        profileImage: '/images/profile.svg',
+        nickname: '2',
+        isSolved: false,
+      },
+      {
+        userId: 8,
+        profileImage: '/images/profile.svg',
+        nickname: '2',
+        isSolved: false,
+      },
+      {
+        userId: 8,
+        profileImage: '/images/profile.svg',
+        nickname: '2',
+        isSolved: false,
+      },
+      {
+        userId: 8,
+        profileImage: '/images/profile.svg',
+        nickname: '2',
+        isSolved: false,
+      },
+      {
+        userId: 8,
         profileImage: '/images/profile.svg',
         nickname: '2',
         isSolved: false,
