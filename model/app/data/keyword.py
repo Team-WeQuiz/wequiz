@@ -7,7 +7,7 @@ from nltk.corpus import stopwords as en_stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from data.korean_stopwords import *
 from utils.exception import *
-from settings import *
+from data.settings import *
 
 def extract_keywords(split_doc_list, top_n):
     try:
