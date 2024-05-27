@@ -11,16 +11,13 @@ from data.settings import *
 
 async def extract_keywords(split_doc_list, top_n):
     try:
-        text_data = []
-        for doc in split_doc_list:
-            content = doc.page_content.strip()
-            if len(content) > MIN_DETECT_LENGTH:
-                text_data.append(content)
-
         cleaned_text_data = []
         async for doc in split_doc_list:
-            text = doc.page_content
-            language = detect(text)
+            text = doc.page_content.strip()
+            if len(text) > MIN_DETECT_LENGTH:
+                language = detect(text)
+            else:
+                continue
             
             if language == 'ko':
                 # 한글 문서인 경우
@@ -58,8 +55,3 @@ async def extract_keywords(split_doc_list, top_n):
         raise e
     except Exception as e:
         raise Exception(f"An unexpected error occurred during keyword extraction: {str(e)}")
-
-
-# async def extract_keywords_async(split_doc_list, top_n):
-#     loop = asyncio.get_running_loop()
-#     return await loop.run_in_executor(None, extract_keywords, split_doc_list, top_n)
