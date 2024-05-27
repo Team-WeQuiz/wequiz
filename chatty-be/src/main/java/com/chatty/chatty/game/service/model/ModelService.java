@@ -50,31 +50,31 @@ public class ModelService {
                         .build()
                 )
                 .retrieve()
-                .onStatus(INTERNAL_SERVER_ERROR::equals,
+                .onStatus(status -> status.value() == INTERNAL_SERVER_ERROR.value(),
                         (req, res) -> {
                             minioRepository.deleteFiles(fileNames);
                             throw new ModelException(FAILED_TO_CREATE);
                         }
                 )
-                .onStatus(UNPROCESSABLE_ENTITY::equals,
+                .onStatus(status -> status.value() == UNPROCESSABLE_ENTITY.value(),
                         (req, res) -> {
                             minioRepository.deleteFiles(fileNames);
                             throw new ModelException(INSUFFICIENT_TOKENS);
                         }
                 )
-                .onStatus(PAYLOAD_TOO_LARGE::equals,
+                .onStatus(status -> status.value() == PAYLOAD_TOO_LARGE.value(),
                         (req, res) -> {
                             minioRepository.deleteFiles(fileNames);
                             throw new ModelException(TOO_MANY_TOKENS);
                         }
                 )
-                .onStatus(REQUESTED_RANGE_NOT_SATISFIABLE::equals,
+                .onStatus(status -> status.value() == REQUESTED_RANGE_NOT_SATISFIABLE.value(),
                         (req, res) -> {
                             minioRepository.deleteFiles(fileNames);
                             throw new ModelException(TOO_MANY_PAGES);
                         }
                 )
-                .onStatus(BAD_REQUEST::equals,
+                .onStatus(status -> status.value() == BAD_REQUEST.value(),
                         (req, res) -> {
                             minioRepository.deleteFiles(fileNames);
                             throw new ModelException(FILE_NOT_AVAILABLE);
