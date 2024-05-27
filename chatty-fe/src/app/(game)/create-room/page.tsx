@@ -55,9 +55,9 @@ export default function CreateRoom() {
   }, [qustionType]);
 
   const isFileSizeBigger = () => {
-    const MAX_FILE_SIZE = 100 * 1024 * 1024;
+    const MAX_FILE_SIZE = 25 * 1024 * 1024;
     if (files?.some((file) => file.size > MAX_FILE_SIZE)) {
-      alert('파일 크기는 100MB를 초과할 수 없습니다.');
+      alert('파일 크기는 25MB를 초과할 수 없습니다.');
       return true;
     }
     return false;
