@@ -97,6 +97,7 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
 - [포스터](https://github.com/Team-WeQuiz/wequiz/blob/main/docs/poster.png)
 - [수행결과 보고서](https://github.com/Team-WeQuiz/wequiz/blob/main/docs/%EC%88%98%ED%96%89%EA%B2%B0%EA%B3%BC%EB%B3%B4%EA%B3%A0%EC%84%9C.pdf)
 - [발표 자료](https://github.com/Team-WeQuiz/wequiz/blob/main/docs/presentation.pdf)
+- [시연 영상](https://youtu.be/L84IS3E5d7Y?feature=shared)
 
 </br>
 </br>
