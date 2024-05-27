@@ -83,7 +83,11 @@ class Parser():
                 page_num += 1
             total_token += self.num_tokens_from_string(total_text)
             if total_token < MIN_TOKEN_LIMIT:
-                raise InsufficientException(f"Insufficient token count. Found {total_token}, required at least {MIN_TOKEN_LIMIT}.")
+                raise InsufficientTokensException(f"Insufficient token count. Found {total_token}, required at least {MIN_TOKEN_LIMIT}.")
+            if total_token >= MAX_TOKEN_LIMIT:
+                raise TooManyTokensException(f"Too many token count. Found {total_token}, expected under {MAX_TOKEN_LIMIT}")
+            if page_num > MAX_PAGE_LIMIT:
+                raise TooManyPagesException(f"Too many page count, Found {page_num}, expected under {MAX_PAGE_LIMIT}")
         # 결과 반환
         return total_text, page_num, total_token
 
@@ -95,6 +99,12 @@ class Parser():
                 total_text, page_num, total_token = await loop.run_in_executor(
                     pool, self.load_and_parse_files, parser, loader, files
                 )
+            except InsufficientTokensException as e:
+                raise e
+            except TooManyTokensException as e:
+                raise e
+            except TooManyPagesException as e:
+                raise e
             except Exception as e:
                 raise ParsingException(f"Unexpected error occurred during parsing") from e
 

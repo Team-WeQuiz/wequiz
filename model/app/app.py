@@ -18,6 +18,12 @@ setup_logging()
 
 app = FastAPI()
 
+app.add_exception_handler(QuizGenerationException, quiz_generation_exception_handler)
+app.add_exception_handler(NotAvailableFileException, not_available_file_exception_handler)
+app.add_exception_handler(InsufficientTokensException, insufficient_tokens_exception_handler)
+app.add_exception_handler(TooManyTokensException, too_many_tokens_exception_handler)
+app.add_exception_handler(TooManyPagesException, too_many_pages_exception_handler)
+
 os.environ["OPENAI_API_KEY"] = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
 aws_credentials = json.loads(get_aws_access_key())
 os.environ["AWS_ACCESS_KEY_ID"] = aws_credentials["AWS_ACCESS_KEY_ID"]
@@ -258,11 +264,19 @@ async def generate(generate_request: GenerateRequest):
         asyncio.create_task(generate_quiz_async(generate_request, res["id"], summary_split_docs, vector_split_docs, keywords))
 
         return res
-
+    
+    except InsufficientTokensException as e:
+        log('error', str(e))
+        raise e
+    except TooManyTokensException as e:
+        log('error', str(e))
+        raise e
+    except TooManyPagesException as e:
+        log('error', str(e))
+        raise e
     except InsufficientException as e:
         log('error', str(e))
-        raise QuizGenerationException(f"Quiz generation failed due to insufficient data: {str(e)}") from e
-
+        raise NotAvailableFileException(f"Cannot create some quiz due to insufficient data: {str(e)}") from e
     except Exception as e:
         log('error', f'[app.py > quiz] Unexpected error occurred: {str(e)}')
         raise QuizGenerationException(f"Quiz generation failed due to an unexpected error: {str(e)}") from e
