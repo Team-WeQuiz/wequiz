@@ -16,9 +16,10 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
     userId: -1,
     isReady: isQuizReady,
     nickname: '퀴즈 생성 AI',
-    profileImage: isQuizReady === true
-      ? '/images/bot_ready.svg'
-      : '/images/bot_not_ready.svg',
+    profileImage:
+      isQuizReady === true
+        ? '/images/bot_ready.svg'
+        : '/images/bot_not_ready.svg',
   });
 
   const calculateCardSize = (
@@ -98,7 +99,10 @@ const UserList = ({ isQuizReady }: { isQuizReady: boolean }) => {
         isReady: isQuizReady,
         message: '나도 준비 완료!',
         nickname: '퀴즈 생성 AI',
-        profileImage: null,
+        profileImage:
+          isQuizReady === true
+            ? '/images/bot_ready.svg'
+            : '/images/bot_not_ready.svg',
       });
     }
   }, [isQuizReady]);
