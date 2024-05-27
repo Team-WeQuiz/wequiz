@@ -9,7 +9,7 @@ from data.korean_stopwords import *
 from utils.exception import *
 from data.settings import *
 
-def extract_keywords(split_doc_list, top_n):
+async def extract_keywords(split_doc_list, top_n):
     try:
         text_data = []
         for doc in split_doc_list:
@@ -18,7 +18,8 @@ def extract_keywords(split_doc_list, top_n):
                 text_data.append(content)
 
         cleaned_text_data = []
-        for text in text_data:
+        async for doc in split_doc_list:
+            text = doc.page_content
             language = detect(text)
             
             if language == 'ko':
@@ -59,6 +60,6 @@ def extract_keywords(split_doc_list, top_n):
         raise Exception(f"An unexpected error occurred during keyword extraction: {str(e)}")
 
 
-async def extract_keywords_async(split_doc_list, top_n):
-    loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(None, extract_keywords, split_doc_list, top_n)
+# async def extract_keywords_async(split_doc_list, top_n):
+#     loop = asyncio.get_running_loop()
+#     return await loop.run_in_executor(None, extract_keywords, split_doc_list, top_n)
