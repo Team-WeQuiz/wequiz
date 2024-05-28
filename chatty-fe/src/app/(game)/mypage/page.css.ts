@@ -19,11 +19,11 @@ export const mobileTab = style({
   '@media': {
     '(max-width: 768px)': {
       position: 'sticky',
-      top: -8,
+      top: -20,
       display: 'flex',
       width: '100%',
       gap: 10,
-      paddingBottom: 10,
+      padding: 10,
       backgroundColor: '#fff',
       zIndex: 10,
     },
