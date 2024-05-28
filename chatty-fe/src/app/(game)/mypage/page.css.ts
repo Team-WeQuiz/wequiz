@@ -81,3 +81,4 @@ export const contentBox = style({
   borderRadius: 20,
   border: `1px solid ${globals.color.blue_5}`,
 });
+
