@@ -28,6 +28,11 @@ const CodeInput = () => {
     }
   };
 
+  const handleCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (/^\d*$/.test(e.target.value) && e.target.value.length < 7)
+      setCode(e.target.value);
+  };
+
   return (
     <>
       <form onSubmit={enterRoomWithCode}>
@@ -35,9 +40,7 @@ const CodeInput = () => {
           value={code}
           placeholder="코드로 입장하기"
           borderRadius={12}
-          onChange={(e) => {
-            setCode(e.target.value);
-          }}
+          onChange={handleCodeInput}
           inputmode="numeric"
           endAdornment={
             <SolidButton shadowExist={false} type="submit">
