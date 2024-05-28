@@ -4,6 +4,7 @@ import { useState } from 'react';
 import * as styles from './page.css';
 import UserInfoForm from './_component/UserInfoForm/UserInfoForm';
 import UserQuizList from './_component/UserQuizList/UserQuizList';
+import Footer from './_component/Footer/Footer';
 
 const MyPage = () => {
   const [tabIndex, setTabIndex] = useState<number>(0);
@@ -23,12 +24,6 @@ const MyPage = () => {
         >
           나의 퀴즈
         </h1>
-        <h1
-          className={`${styles.tabText} ${tabIndex === 2 && styles.tabTextActive}`}
-          onClick={() => setTabIndex(2)}
-        >
-          문의
-        </h1>
       </div>
       <div
         className={`${styles.contentContainer} ${tabIndex !== 0 && styles.mobileHidden}`}
@@ -46,12 +41,7 @@ const MyPage = () => {
           <UserQuizList />
         </div>
       </div>
-      <div
-        className={`${styles.contentContainer} ${tabIndex !== 2 && styles.mobileHidden}`}
-      >
-        <h1 className={styles.headerText}>문의</h1>
-        <div className={styles.contentBox}></div>
-      </div>
+      <Footer />
     </div>
   );
 };
