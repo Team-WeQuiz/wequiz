@@ -14,6 +14,7 @@ export const container = style({
     color: globals.color.black_3,
   },
   ':focus': {
+    border: 'none',
     outline: `1px solid ${globals.color.black_3}`,
   },
 });
