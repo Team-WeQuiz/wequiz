@@ -14,4 +14,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Send Trigger
         run: |
-          curl -X POST ${{ secrets.ML_PORTAINER_WEBHOOK_URL }}
+          curl -X POST ${{ secrets.ML1_PORTAINER_WEBHOOK_URL }}
+          curl -X POST ${{ secrets.ML2_PORTAINER_WEBHOOK_URL }}
+          curl -X POST ${{ secrets.ML3_PORTAINER_WEBHOOK_URL }}
