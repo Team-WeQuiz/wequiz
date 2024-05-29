@@ -41,7 +41,7 @@ const EnteringModals = ({
         }));
         openModal();
       } catch (error: any) {
-        alert(error.message);
+        alert('퀴즈 방 정보를 불러오는데 실패했습니다.');
         router.push('/main-lobby');
       } finally {
         setRequestState((prev) => ({
