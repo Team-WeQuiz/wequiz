@@ -22,7 +22,7 @@ const Footer = () => {
             <span className={styles.linkText}>About Us</span>
           </Link>
           <Link
-            href="https://설문 링크"
+            href="https://docs.google.com/forms/d/1GZ3mHS6XMvTsEqeMhKeAG75Ck24y7SUZdQ6sDTqrw2M"
             target="_blank"
             className={styles.link}
           >
