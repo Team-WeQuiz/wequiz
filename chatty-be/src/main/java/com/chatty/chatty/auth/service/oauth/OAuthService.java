@@ -1,5 +1,6 @@
 package com.chatty.chatty.auth.service.oauth;
 
+import static com.chatty.chatty.auth.exception.AuthExceptionType.ALREADY_JOINED_NORMAL_USER;
 import static com.chatty.chatty.auth.exception.AuthExceptionType.INVALID_TOKEN;
 import static com.chatty.chatty.auth.exception.AuthExceptionType.UNSUPPORTED_LOGIN_PROVIDER;
 
@@ -50,6 +51,9 @@ public class OAuthService {
             user = join(newUser, loginService);
         } else {
             user = optionalUser.get();
+            if (!user.getLoginType().equals(loginService.getServiceName())) {
+                throw new AuthException(ALREADY_JOINED_NORMAL_USER);
+            }
         }
 
         String accessToken = jwtUtil.createAccessToken(user);
