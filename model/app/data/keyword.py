@@ -1,7 +1,7 @@
 import string
 import asyncio
 from langdetect import detect
-from konlpy.tag import Mecab
+# from konlpy.tag import Mecab
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords as en_stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -9,7 +9,7 @@ from data.korean_stopwords import *
 from utils.exception import *
 from data.settings import *
 
-async def extract_keywords(split_doc_list, top_n):
+async def extract_keywords(tokenizer, split_doc_list, top_n):
     try:
         cleaned_text_data = []
         async for doc in split_doc_list:
@@ -21,7 +21,7 @@ async def extract_keywords(split_doc_list, top_n):
             
             if language == 'ko':
                 # 한글 문서인 경우
-                mecab = Mecab()
+                mecab = tokenizer
                 tokens = mecab.morphs(text)
                 ko_stop_words = set([word.strip() for word in ko_stopwords.split('\n')])
                 cleaned_tokens = [token for token in tokens if token not in ko_stop_words]

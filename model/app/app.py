@@ -14,6 +14,7 @@ from utils.security import get_openai_api_key, get_aws_access_key
 from utils.logger import *
 from utils.exception import *
 from data.settings import *
+from data.tokenizer import *
 # 로깅 설정
 setup_logging()
 
@@ -35,6 +36,9 @@ REGION_NAME = 'ap-northeast-2'
 QUIZ_TABLE = 'wequiz-quiz'
 MARK_TABLE = 'wequiz-mark'
 config = Config(parameter_validation=True)
+# 객체 풀 생성
+mecab_pool = MecabPool(size=3)
+okt_pool = OktPool(size=3)
 
 
 @app.get("/ping")
@@ -255,19 +259,23 @@ async def generate(generate_request: GenerateRequest):
         parser = Parser()
         total_text = await parser.parse(generate_request.user_id, generate_request.timestamp)
         
-        textsplitter = TextSplitter()
+        okt = okt_pool.get_okt()
+        textsplitter = TextSplitter(tokenizer=okt)
         sentences = await textsplitter.split_sentences_async(total_text)
         # 각각의 작업을 비동기로 처리
         keyword_docs = textsplitter.split_docs_generator(sentences, KEYWORD_CHUNK_SIZE, KEYWORD_SENTENCE_OVERLAP)
         summary_docs = textsplitter.split_docs_generator(sentences, SUMMARY_CHUNK_SIZE, SUMMARY_SENTENCE_OVERLAP)
         vector_docs = textsplitter.split_docs_generator(sentences, VECTOR_CHUNK_SIZE, VECTOR_SENTENCE_OVERLAP)
+        okt_pool.return_okt(okt)
         log('warning', keyword_docs)
 
         # create_id 실행
         res = await create_id(generate_request)
 
         # keyword 추출
-        keywords = await extract_keywords(keyword_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
+        mecab = mecab_pool.get_mecab()
+        keywords = await extract_keywords(mecab, keyword_docs, top_n=min(generate_request.num_of_quiz * 2, len(sentences) - 1))  # 키워드는 개수를 여유롭게 생성합니다.
+        mecab_pool.return_mecab(mecab)
         log('info', f'[app.py > quiz] Extracted Keywords for creating {generate_request.num_of_quiz} quizs.: {keywords}')
 
         # quiz 생성 (비동기)

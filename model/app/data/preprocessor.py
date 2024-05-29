@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import tiktoken
 import asyncio
 import spacy
-from konlpy.tag import Okt
+# from konlpy.tag import Okt
 from langdetect import detect
 from langchain_core.documents import Document
 from langchain_community.document_loaders.parsers.pdf import (
@@ -133,8 +133,8 @@ class Parser():
 
 
 class TextSplitter():
-    def __init__(self):
-        self.okt = Okt()
+    def __init__(self, tokenizer):
+        self.okt = tokenizer
         self.nlp = spacy.blank("en")
         self.nlp.add_pipe('sentencizer')
 
