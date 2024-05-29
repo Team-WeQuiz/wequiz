@@ -51,8 +51,10 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       timer = setInterval(() => {
         setCountdown((prevCount) => {
           const nextCount = prevCount - 1;
-          if (nextCount === 0) {
+          if (nextCount === 1) {
             setToggleBlock(true);
+          }
+          if (nextCount === 0) {
             // userStatuses에서 내 userId가 min값이면 퀴즈 시작
             const minUserId = userStatuses.reduce((prev, curr) =>
               prev.userId < curr.userId ? prev : curr,
