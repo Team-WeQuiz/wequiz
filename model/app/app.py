@@ -1,3 +1,4 @@
+from msilib.schema import Error
 from fastapi import FastAPI, HTTPException
 import json
 import aioboto3
@@ -26,7 +27,11 @@ app.add_exception_handler(InsufficientTokensException, insufficient_tokens_excep
 app.add_exception_handler(TooManyTokensException, too_many_tokens_exception_handler)
 app.add_exception_handler(TooManyPagesException, too_many_pages_exception_handler)
 
-os.environ["OPENAI_API_KEY"] = json.loads(get_openai_api_key())["OPENAI_API_KEY"]
+server_num = os.environ["ML_SERVER_NUM"]
+if server_num:
+    os.environ["OPENAI_API_KEY"] = json.loads(get_openai_api_key(int(server_num)))["OPENAI_API_KEY"]
+else:
+    raise Error("What Server number is?")
 aws_credentials = json.loads(get_aws_access_key())
 os.environ["AWS_ACCESS_KEY_ID"] = aws_credentials["AWS_ACCESS_KEY_ID"]
 os.environ["AWS_SECRET_ACCESS_KEY"] = aws_credentials["AWS_SECRET_ACCESS_KEY"]
