@@ -124,7 +124,11 @@ export const detailBlock = style({
   fontWeight: 400,
   backgroundColor: globals.color.blue_7,
   borderRadius: 16,
-  overflow: 'scroll',
+  overflowX: 'scroll',
+  '::-webkit-scrollbar': {
+    display: 'none',
+  },
+  scrollbarWidth: 'none',
   '@media': {
     '(max-width: 768px)': {
       fontSize: 10,
