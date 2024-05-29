@@ -252,6 +252,16 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
   };
 
   useEffect(() => {
+    if (
+      submitStatuses?.submitStatuses.find((status) => status.userId === userId)
+        ?.isSolved
+    ) {
+      setIsAnswered(true);
+      setUnableSubmit(true);
+    }
+  }, [submitStatuses, userId]);
+
+  useEffect(() => {
     if (accessToken && userId) {
       stompClient.beforeConnect = () => {
         console.log('Connecting to WebSocket with token: ', accessToken);
