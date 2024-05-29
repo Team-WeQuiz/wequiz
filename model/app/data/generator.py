@@ -12,13 +12,8 @@ from utils.exception import *
 setup_logging()
 
 class QuizGenerator():
-    def __init__(self, split_docs):
-        self.embedding = OpenAIEmbeddings(model="text-embedding-3-large")
-        try:
-            self.indices = FAISS.from_documents(split_docs, self.embedding)
-        except Exception as e:
-            raise e
-        self.chain = QuizPipeline(self.indices)
+    def __init__(self, split_docs, summary):
+        self.chain = QuizPipeline(split_docs, summary)
     
     def get_type(self, text):
         # self.types = ['1. Multiple choice', '2. Short answer type that can be easily answered in one word', '3. yes/no quiz']
@@ -30,7 +25,6 @@ class QuizGenerator():
             return "OX퀴즈"
     
     def adjust_result(self, type, option_list, correct):
-        log("warning", f"[generator.py > quiz] set type({type}), options({option_list}), correct({correct}) ")
         if type == "단답형" or type == None:
             if (correct.strip().lower() in NO_LIST) or (correct.strip().lower() in YES_LIST):
                 type = "OX퀴즈"

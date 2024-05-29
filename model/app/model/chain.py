@@ -7,6 +7,9 @@ from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.schema import BaseRetriever
 from typing import List, Dict, Any
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from sklearn.metrics.pairwise import cosine_similarity
 
 from model.prompt import CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE, GENERATE_QUIZ_TEMPLATE, JSON_FORMAT_TEMPLATE
 from data.settings import *
@@ -18,6 +21,8 @@ setup_logging()
 # Retrieval 체인
 class RetrievalChain(Chain):
     retriever: BaseRetriever
+    embeddings: OpenAIEmbeddings
+    summary: str
 
     @property
     def input_keys(self) -> List[str]:
@@ -30,7 +35,23 @@ class RetrievalChain(Chain):
     def _call(self, inputs: Dict[str, Any]) -> Dict[str, str]:
         message = inputs["message"]
         relevant_docs = self.retriever.invoke(message)
-        context = " ".join([doc.page_content for doc in relevant_docs])
+        log('info', f'[chain.py > RetrievalChain] Retrieved {len(relevant_docs)} Docs for {message}')
+
+        # 검색된 문서들과 summary 임베딩
+        doc_embeddings = self.embeddings.embed_documents([doc.page_content for doc in relevant_docs])
+        summary_embedding = self.embeddings.embed_query(self.summary)
+        summary_embedding = [summary_embedding]  # 1D 배열을 2D 배열로 변환
+
+        # 유사도 계산
+        similarities = cosine_similarity(summary_embedding, doc_embeddings)
+
+        # 유사도가 높은 문서 K개 선택
+        top_k_indices = similarities.argsort()[0][-K:][::-1]
+        top_k_docs = [relevant_docs[i] for i in top_k_indices]
+        log('info', f'[chain.py > RetrievalChain] Selected {len(top_k_docs)} Docs for {message} with summary.')
+
+        context = "\n".join([doc.page_content for doc in top_k_docs])
+
         if len(context) < VECTOR_CHUNK_SIZE * 0.3:
             log('error', f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
             raise ValueError(f'[chain.py > RetrievalChain] Retrieved Context is not sufficient. - "{message}", len: {len(context)}')
@@ -90,9 +111,14 @@ class JSONFormatterChain(Chain):
     
 # 문제 생성 클래스
 class QuizPipeline:
-    def __init__(self, indices: object):
-        self.indices = indices
-        self.retriever = self.indices.as_retriever(search_kwargs=dict(k=K))  # 인덱스 객체로부터 retriever 초기화
+    def __init__(self, split_docs, summary):
+        self.embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+        try:
+            self.indices = FAISS.from_documents(split_docs, self.embeddings)
+            self.retriever = self.indices.as_retriever(search_kwargs=dict(k=K+1))  # 인덱스 객체로부터 retriever 초기화
+        except Exception as e:
+            raise e
+        self.summary = summary
         self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
         self.question_templates = [CHOICE_PROB_TEMPLATE, SHORT_PROB_TEMPLATE]
         # self.output_schemas = [ChoiceOutput, ShortOutput]
@@ -114,7 +140,7 @@ class QuizPipeline:
             partial_variables={"format_instructions": json_output_parser.get_format_instructions()}
         )
 
-        retrieval_chain = RetrievalChain(retriever=self.retriever)
+        retrieval_chain = RetrievalChain(retriever=self.retriever, embeddings=self.embeddings, summary=self.summary)
         quiz_generation_chain = QuizGenerationChain(prompt= quiz_prompt, llm=self.llm)
         json_formatter_chain = JSONFormatterChain(prompt=json_prompt, llm=self.llm, output_parser=json_output_parser)
 
