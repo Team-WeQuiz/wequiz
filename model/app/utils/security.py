@@ -3,7 +3,7 @@ from botocore.exceptions import ClientError
 
 def get_openai_api_key():
 
-    secret_name = "wequiz/api/openai_1"
+    secret_name = "wequiz/api/openai_api_1"
     region_name = "ap-northeast-2"
 
     # Create a Secrets Manager client
