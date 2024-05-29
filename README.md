@@ -2,6 +2,10 @@
 <div align='center'>
 <a href='https://github.com/Team-WeQuiz/wequiz'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/6e9d764d-6be1-4c71-aa00-51aaee0dfa3e"></a>
 
+<h2 href="https://wequiz.kr/">Shell we quiz? [Click here!]</h2>
+
+<a href="https://forms.gle/18tuJnwU67CensYy7">Send to Feedback</a>
+
 </div>
 </br>
 </br>
