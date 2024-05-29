@@ -4,8 +4,8 @@ import { globals } from '../globals.css';
 
 export const gradButton = recipe({
   base: {
-    minHeight: 60,
     position: 'relative',
+    minHeight: 60,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -59,12 +59,8 @@ export const gradButton = recipe({
     },
     disabled: {
       true: {
-        background: `linear-gradient(180deg, rgba(230, 230, 230, 0.10) 0%, #DEDEDE 77.5%), white`,
+        // background: `linear-gradient(180deg, rgba(230, 230, 230, 0.10) 0%, #aaaaaa 77.5%), white`,
         cursor: 'default',
-        boxShadow: 'none',
-        ':hover': {
-          boxShadow: 'none',
-        },
         ':active': {
           transform: 'none',
         },
@@ -72,6 +68,15 @@ export const gradButton = recipe({
         -1px -1px 1px ${globals.color.black_4}, 
         1px -1px 1px ${globals.color.black_4}, 
         -1px 1px 1px ${globals.color.black_4}`,
+        ':after': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(200, 200, 200, 0.5)',
+        },
       },
     },
     isLoading: {
@@ -81,16 +86,41 @@ export const gradButton = recipe({
       },
     },
   },
+  compoundVariants: [
+    {
+      variants: {
+        disabled: true,
+        rounded: true,
+      },
+      style: {
+        ':after': {
+          borderRadius: 50,
+        },
+      },
+    },
+    {
+      variants: {
+        disabled: true,
+        rounded: false,
+      },
+      style: {
+        ':after': {
+          borderRadius: 12,
+        },
+      },
+    },
+  ],
 });
 
 export const loadingContainer = style({
   position: 'absolute',
-  top: 'calc(50% - 8px)',
+  top: '10%',
   left: 0,
   width: '100%',
-  height: 16,
+  height: '80%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
+  zIndex: 1,
 });
