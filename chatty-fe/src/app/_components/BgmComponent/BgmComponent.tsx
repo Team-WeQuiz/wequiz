@@ -20,5 +20,5 @@ export default function BgmComponent() {
     checkUrlAndChangeBgm();
   }, [url]);
 
-  return <audio src={bgm} autoPlay loop ref={audioElement} />;
+  return <audio src={bgm} autoPlay={isPlaying} loop ref={audioElement} />;
 }
