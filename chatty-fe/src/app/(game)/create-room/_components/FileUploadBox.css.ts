@@ -39,6 +39,8 @@ export const container = recipe({
 });
 
 export const wrapper = style({
+  width: '100%',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -47,6 +49,8 @@ export const wrapper = style({
 });
 
 export const ddWrapper = style({
+  width: '100%',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -62,6 +66,14 @@ export const title = style({
   color: globals.color.black_3,
   fontSize: 16,
   fontWeight: 400,
+  textAlign: 'center',
+});
+
+export const comment = style({
+  color: globals.color.black_4,
+  fontSize: 14,
+  fontWeight: 400,
+  textAlign: 'center',
 });
 
 export const FileListContainer = style({
