@@ -75,3 +75,16 @@ export const findByCode = async (code: string, token: string) => {
     }
   }
 };
+
+export const endQuiz = async (token: string, roomId: number) => {
+  try {
+    const response = await client.delete(`rooms/${roomId}/end`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};

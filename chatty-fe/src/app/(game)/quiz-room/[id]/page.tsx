@@ -14,6 +14,7 @@ import useModal from '@/app/_hooks/useModal';
 import ResultModal from './_components/ResultModal/ResultModal';
 import { useRouter } from 'next/navigation';
 import useBgmStore from '@/app/_store/useBgmStore';
+import { endQuiz } from '@/app/_api/quiz';
 
 type QuizSet = {
   totalRound: number;
@@ -193,6 +194,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         if (countData.second === -1) {
           if (lastQuizSetRef.current) {
             console.log('끝났어');
+            endQuiz(accessToken, params.id);
             router.push(`/result/${roomId}`);
           } else {
             closeModal();
@@ -271,7 +273,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
       };
       stompClient.activate();
     }
-  }, [accessToken, params.id]);
+  }, [accessToken, params.id, userId]);
 
   return (
     <div className={styles.Main}>
