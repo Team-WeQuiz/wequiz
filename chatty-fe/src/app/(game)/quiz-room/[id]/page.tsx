@@ -84,10 +84,9 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
         submitQuiz(params.id);
       }
     };
-
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keypress', handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keypress', handleKeyDown);
     };
   }, [unableSubmit, params.id, userAnswer, selectedOption]);
 
