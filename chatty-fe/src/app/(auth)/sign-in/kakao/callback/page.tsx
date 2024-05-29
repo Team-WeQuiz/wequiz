@@ -18,12 +18,17 @@ function KakaoLoginComponent() {
   const router = useRouter();
 
   const handleLogin = async (authCode: string) => {
-    const response = await postKakaoLogin(authCode);
-    const { accessToken, refreshToken } = response;
-    setAuth(accessToken);
-    setAuthTokenCookie(refreshToken);
+    try {
+      const response = await postKakaoLogin(authCode);
+      const { accessToken, refreshToken } = response;
+      setAuth(accessToken);
+      setAuthTokenCookie(refreshToken);
 
-    router.push('/main-lobby');
+      router.push('/main-lobby');
+    } catch (error: any) {
+      alert(error.message);
+      router.push('/sign-in');
+    }
   };
 
   useEffect(() => {

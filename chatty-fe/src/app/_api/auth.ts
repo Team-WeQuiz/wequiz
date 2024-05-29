@@ -9,9 +9,11 @@ export const postKakaoLogin = async (code: string) => {
     });
     console.log(response);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('error: ', error);
-    throw new Error('Login failed');
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('로그인 중 오류가 발생했습니다.');
   }
 };
 
@@ -23,9 +25,11 @@ export const postGoogleLogin = async (code: string) => {
     });
     console.log(response);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('error: ', error);
-    throw new Error('Login failed');
+    if (error.response.data.exceptionCode > 1000)
+      throw new Error(error.response.data.message);
+    else throw new Error('로그인 중 오류가 발생했습니다.');
   }
 };
 
