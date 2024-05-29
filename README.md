@@ -3,7 +3,7 @@
 <a href='https://github.com/Team-WeQuiz/wequiz'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/6e9d764d-6be1-4c71-aa00-51aaee0dfa3e"></a>
 
 <h3>
- 🎲 Shell we quiz?... <a href="https://wequiz.kr/">Click here!</a>
+ 🎲 Shall we quiz?... <a href="https://wequiz.kr/">Click here!</a>
 </h3>
 
 <a href="https://forms.gle/18tuJnwU67CensYy7">📝 Send Feedback</a>
