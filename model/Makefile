@@ -5,7 +5,7 @@ run:
 	sudo docker run -d \
 	-e AWS_ACCESS_KEY_ID= \
 	-e AWS_SECRET_ACCESS_KEY= \
-	-p  \
+	-p 8000:7999\
 	-v ~/workspace/wequiz/model/app:/app \
 	--restart always \
 	--name wequiz-model wequiz-model
