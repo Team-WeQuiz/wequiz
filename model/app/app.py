@@ -203,7 +203,7 @@ async def generate_quiz_async(generate_request, id, summary_split_docs, vector_s
 
                     # 5문제가 생성되었거나 마지막 문제인 경우 DynamoDB에 업데이트
                     if idx % 5 == 0 or idx == generate_request.num_of_quiz:
-                        log('info', f'[app.py > quiz] cur idx: {idx} - quiz batch is ready to push. {questions}')
+                        log('info', f'[app.py > quiz] cur idx: {idx} - quiz batch is ready to push. idx: {idx}')
 
                         retries = 0
                         while retries < QUIZ_UPDATE_RETRY:

@@ -25,7 +25,6 @@ class QuizGenerator():
             return "OX퀴즈"
     
     def adjust_result(self, type, option_list, correct):
-        log("warning", f"[generator.py > quiz] set type({type}), options({option_list}), correct({correct}) ")
         if type == "단답형" or type == None:
             if (correct.strip().lower() in NO_LIST) or (correct.strip().lower() in YES_LIST):
                 type = "OX퀴즈"
