@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 
 const QuizSummaryCard = ({ summary }: { summary: string }) => {
   const [text, setText] = useState<string>('');
-  const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
     if (!summary) return;
