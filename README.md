@@ -6,6 +6,8 @@
  🎲 Shall we quiz?... <a href="https://wequiz.kr/">Click here!</a>
 </h3>
 
+<a href="https://team-wequiz.github.io/wequiz"> 🌈 Introduction Page</a>
+
 <a href="https://forms.gle/18tuJnwU67CensYy7">📝 Send Feedback</a>
 
 </div>
