@@ -142,7 +142,7 @@ export default function ResultPageModal({
                 <div className={styles.ProfileWrapper}>
                   <div className={styles.ImageWrapper}>
                     <Image
-                      src={answer.profileImage || '/images/logo.svg'}
+                      src={answer.profileImage || '/images/person.svg'}
                       alt="profile"
                       width={40}
                       height={40}

@@ -159,9 +159,8 @@ export const ImageWrapper = style({
   alignItems: 'center',
   width: 40,
   height: 40,
-  borderRadius: 100,
-  background: '#fff',
-  overflow: 'hidden',
+  borderRadius: '50%',
+  border: `1px solid ${globals.color.blue_2}`,
 });
 
 export const nickname = style({
@@ -172,5 +171,4 @@ export const answer = style({
   width: '100%',
   wordWrap: 'break-word',
   overflowWrap: 'break-word',
-
 });

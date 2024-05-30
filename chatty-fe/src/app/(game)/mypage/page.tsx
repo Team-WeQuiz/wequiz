@@ -4,7 +4,7 @@ import { useState } from 'react';
 import * as styles from './page.css';
 import UserInfoForm from './_component/UserInfoForm/UserInfoForm';
 import UserQuizList from './_component/UserQuizList/UserQuizList';
-import Footer from '../../_components/Footer/Footer';
+import Footer from '@/app/_components/Footer/Footer';
 
 const MyPage = () => {
   const [tabIndex, setTabIndex] = useState<number>(0);

@@ -33,10 +33,19 @@ export default function ResultPage({ params }: { params: { id: number } }) {
   const [currentQuizNumber, setCurrentQuizNumber] = useState<number | null>(
     null,
   );
-  const [containerHeight, setContainerHeight] = useState('100vh');
   const contentsWrapperRef = useRef<HTMLDivElement>(null);
   const { accessToken } = useAuthStore();
   const { id } = useUserInfoStore();
+
+  const selectColor = (percentage: number) => {
+    if (percentage <= 30) {
+      return '#FF0C0C';
+    } else if (percentage <= 60) {
+      return '#77F359';
+    } else {
+      return '#51A8FF';
+    }
+  };
 
   const fetchResultData = async () => {
     try {
@@ -54,7 +63,7 @@ export default function ResultPage({ params }: { params: { id: number } }) {
   };
 
   useEffect(() => {
-    fetchResultData();
+    if (accessToken) fetchResultData();
   }, [accessToken]);
 
   const handleOpenModal = (quizNumber: number) => {
@@ -66,52 +75,81 @@ export default function ResultPage({ params }: { params: { id: number } }) {
     <div className={styles.Container}>
       <div className={styles.Wrapper}>
         <div className={styles.ContentsBox}>
-          <div className={styles.ContentsWrapper} ref={contentsWrapperRef}>
+          <div className={styles.ContentsWrapper}>
             {results.map((result, index) => (
               <div className={styles.ContentsCard} key={index}>
-                <span className={styles.Number}>{result.quizNumber}</span>
-                <div className={styles.QuestionCard}>
-                  <span className={styles.QuestionMark}>Q</span>
-                  <span style={{ marginTop: 5 }}>{result.quiz}</span>
-                </div>
-                {result.playerAnswers
-                  .filter((answer) => answer.playerId === id)
-                  .map((answer) => (
-                    <div
-                      key={id}
-                      className={
-                        answer.marking
-                          ? styles.CorrectAnswerCard
-                          : styles.WrongAnswerCard
-                      }
+                <div className={styles.CardHeader}>
+                  <span className={styles.Number}>{result.quizNumber}</span>
+                  <div className={styles.MobileStatsArea}>
+                    <span
+                      className={styles.MobileRateText}
+                      style={{ color: `${selectColor(result.correctRate)}` }}
                     >
-                      <span
+                      정답률 {result.correctRate}%
+                    </span>
+                    <button
+                      onClick={() => handleOpenModal(result.quizNumber)}
+                      className={styles.MobileModalButton}
+                    >
+                      <span>상세보기</span>
+                      <Image
+                        src="/images/arrow_right.svg"
+                        height={20}
+                        width={20}
+                        alt="arrow"
+                      />
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.CardsWrapper}>
+                  <div className={styles.QuestionCard}>
+                    <span className={styles.QuestionMark}>Q</span>
+                    <span className={styles.SpanText}>{result.quiz}</span>
+                  </div>
+                  {result.playerAnswers
+                    .filter((answer) => answer.playerId === id)
+                    .map((answer) => (
+                      <div
+                        key={id}
                         className={
                           answer.marking
-                            ? styles.CorrectAnswerMark
-                            : styles.WrongAnswerMark
+                            ? styles.CorrectAnswerCard
+                            : styles.WrongAnswerCard
                         }
                       >
-                        A
-                      </span>
-                      <span style={{ marginTop: 5 }}>
-                        {answer.playerAnswer}
-                      </span>
-                    </div>
-                  ))}
-                <PercentageCircle percentage={result.correctRate} />
-                <button
-                  className={styles.ModalButton}
-                  onClick={() => handleOpenModal(result.quizNumber)}
-                >
-                  <span style={{ whiteSpace: 'nowrap' }}>상세보기</span>
-                  <Image
-                    src="/images/arrow_right.svg"
-                    height={48}
-                    width={48}
-                    alt="arrow"
+                        <span
+                          className={
+                            answer.marking
+                              ? styles.CorrectAnswerMark
+                              : styles.WrongAnswerMark
+                          }
+                        >
+                          A
+                        </span>
+                        <span className={styles.SpanText}>
+                          {answer.playerAnswer}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+                <div className={styles.StatsArea}>
+                  <PercentageCircle
+                    color={selectColor(result.correctRate)}
+                    percentage={result.correctRate}
                   />
-                </button>
+                  <button
+                    className={styles.ModalButton}
+                    onClick={() => handleOpenModal(result.quizNumber)}
+                  >
+                    <span style={{ whiteSpace: 'nowrap' }}>상세보기</span>
+                    <Image
+                      src="/images/arrow_right.svg"
+                      height={48}
+                      width={48}
+                      alt="arrow"
+                    />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
