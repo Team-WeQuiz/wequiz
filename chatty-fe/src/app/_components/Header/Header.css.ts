@@ -1,6 +1,5 @@
 import { style } from '@vanilla-extract/css';
 import { globals } from '../../globals.css';
-import { recipe } from '@vanilla-extract/recipes';
 
 export const container = style({
   display: 'flex',
@@ -77,80 +76,4 @@ export const musicPlayButton = style({
   padding: 0,
   cursor: 'pointer',
   backgroundColor: globals.color.blue_7,
-});
-
-export const ModalContainer = style({
-  width: '60vw',
-  maxWidth: 890,
-  height: '80vh',
-});
-
-export const LogoWrapper = style({
-  marginBottom: 20,
-});
-
-export const BoxWrapper = style({
-  backgroundColor: globals.color.blue_6,
-  borderRadius: 12,
-  display: 'flex',
-  height: '100%',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: 12,
-  padding: 30,
-});
-
-export const ContentsBox = style({
-  width: '70%',
-  height: 52,
-  minHeight: 52,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: globals.color.blue_2,
-  cursor: 'pointer',
-  borderRadius: 12,
-  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-  color: '#fff',
-  transition: 'background-color 0.3s',
-});
-
-export const ContentsWrapper = recipe({
-  base: {
-    display: 'flex',
-    width: '70%',
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    gap: 24,
-  },
-  variants: {
-    visible: {
-      true: {
-        display: 'flex',
-      },
-      false: {
-        display: 'none',
-      },
-    },
-  },
-});
-
-export const ImageWrapper = style({
-  display: 'flex',
-  position: 'relative',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  height: 300,
-});
-
-export const ContentsTextWrapper = style({
-  display: 'flex',
-  flexDirection: 'column',
-  backgroundColor: globals.color.blue_5,
-  borderRadius: 12,
-  padding: 30,
-  gap: 12,
 });
