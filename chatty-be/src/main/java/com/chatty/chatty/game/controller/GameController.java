@@ -45,8 +45,8 @@ public class GameController {
                 .build();
     }
 
-    @MessageMapping("/rooms/{roomId}/chat")
-    @SendTo("/sub/rooms/{roomId}/chat")
+    @MessageMapping("/rooms/{roomId}/emoji")
+    @SendTo("/sub/rooms/{roomId}/emoji")
     public EmojiResponse emoji(
             @DestinationVariable Long roomId,
             SimpMessageHeaderAccessor headerAccessor,
