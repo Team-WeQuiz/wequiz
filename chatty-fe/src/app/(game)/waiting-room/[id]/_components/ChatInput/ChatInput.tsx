@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import TextInputField from '@/app/_components/TextInputField';
 import stompClient from '../../../../_utils/stomp';
-import { ChatType, ChatMessage } from '@/app/_types/ChatType';
+import { ChatMessage } from '@/app/_types/ChatType';
 import { submitButton } from './ChatInput.css';
 
 const ChatInput = ({
@@ -17,13 +17,11 @@ const ChatInput = ({
 
   // 채팅 메시지 보내기
   const sendChatMessage = ({
-    chatType,
     roomId,
     userId,
     message,
   }: ChatMessage) => {
     const chatMessage = {
-      chatType,
       roomId,
       userId,
       message,
@@ -42,7 +40,6 @@ const ChatInput = ({
     if (!message) return;
 
     sendChatMessage({
-      chatType: ChatType.TEXT,
       roomId,
       userId,
       message,
