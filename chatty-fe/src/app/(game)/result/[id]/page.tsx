@@ -8,6 +8,7 @@ import PercentageCircle from './_components/PercentageCircle/PercentageCircle';
 import Image from 'next/image';
 import useModal from '@/app/_hooks/useModal';
 import ResultPageModal from './_components/ResultPageModal/ResultPageModal';
+import Footer from '@/app/_components/Footer/Footer';
 
 type PlayerAnswers = {
   playerId: number;
@@ -56,21 +57,13 @@ export default function ResultPage({ params }: { params: { id: number } }) {
     fetchResultData();
   }, [accessToken]);
 
-  useEffect(() => {
-    if (contentsWrapperRef.current) {
-      const height = contentsWrapperRef.current.offsetHeight;
-      setContainerHeight(`calc(100px + ${height}px)`);
-      console.log(height);
-    }
-  }, [results]);
-
   const handleOpenModal = (quizNumber: number) => {
     setCurrentQuizNumber(quizNumber);
     openModal();
   };
 
   return (
-    <div className={styles.Container} style={{ height: containerHeight }}>
+    <div className={styles.Container}>
       <div className={styles.Wrapper}>
         <div className={styles.ContentsBox}>
           <div className={styles.ContentsWrapper} ref={contentsWrapperRef}>
@@ -124,13 +117,15 @@ export default function ResultPage({ params }: { params: { id: number } }) {
           </div>
         </div>
       </div>
-      {isOpen && currentQuizNumber != null ? (
+      {currentQuizNumber != null ? (
         <ResultPageModal
+          isOpen={isOpen}
           results={results}
           currentQuizNumber={currentQuizNumber}
           closeModal={closeModal}
         />
       ) : null}
+      <Footer />
     </div>
   );
 }

@@ -4,14 +4,13 @@ import { style } from '@vanilla-extract/css';
 export const Container = style({
   display: 'flex',
   width: '100%',
-  justifyContent: 'center',
-  alignItems: 'stretch',
+  flexDirection: 'column',
+  alignItems: 'center',
 });
 
 export const Wrapper = style({
-  width: '80%',
-  minHeight: '100vh',
-  maxWidth: 1480,
+  width: '100%',
+  maxWidth: 1124,
 });
 
 export const ContentsBox = style({
