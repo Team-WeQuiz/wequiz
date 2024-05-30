@@ -5,6 +5,11 @@ export const Wrapper = style({
   display: 'flex',
   gap: 36,
   alignItems: 'center',
+  "@media" : {
+    "(max-width: 768px)": {
+      gap: 12,
+    }
+  }
 });
 
 export const WrapperColumn = style({
@@ -19,6 +24,15 @@ export const Container = style({
   display: 'inline-block',
 });
 
+export const MobileRound = style({
+  '@media': {
+    '(max-width: 768px)': {
+      width: 25,
+      height: 25,
+    },
+  },
+});
+
 export const TextGrey = style({
   position: 'absolute',
   top: '45%',
@@ -29,6 +43,11 @@ export const TextGrey = style({
   fontFamily: 'var(--bagel-font)',
   WebkitTextStrokeWidth: 1,
   WebkitTextStrokeColor: '#fff',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 16,
+    },
+  },
 });
 
 export const TextBlue = style({
@@ -41,4 +60,9 @@ export const TextBlue = style({
   fontFamily: 'var(--bagel-font)',
   WebkitTextStrokeWidth: 1,
   WebkitTextStrokeColor: '#fff',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 16,
+    },
+  },
 });

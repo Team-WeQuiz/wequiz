@@ -27,7 +27,6 @@ const ReadyButton = ({
   const [isReady, setIsReady] = useState<boolean>(false);
   const { Modal, isOpen, openModal, closeModal } = useModal();
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   useEffect(() => {
     setIsReady(

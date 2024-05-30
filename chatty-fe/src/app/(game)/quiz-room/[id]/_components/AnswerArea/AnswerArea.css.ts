@@ -9,6 +9,11 @@ export const Container = style({
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
   width: '100%',
+  '@media': {
+    '(max-width: 768px)': {
+      gap: 8,
+    },
+  },
 });
 
 export const Wrapper = style({
@@ -18,6 +23,11 @@ export const Wrapper = style({
 export const Answer = style({
   fontSize: 40,
   fontFamily: 'var(--bagel-font)',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 20,
+    },
+  },
 });
 
 export const RadioButtonWrapper = style({
@@ -27,7 +37,13 @@ export const RadioButtonWrapper = style({
   borderRadius: 12,
   background: '#fff',
   padding: 20,
+  "@media": {
+    "(max-width: 768px)": {
+      padding: 12,
+    },
+  },
 });
+
 export const LabelWrapper = style({
   display: 'flex',
   padding: 4,
