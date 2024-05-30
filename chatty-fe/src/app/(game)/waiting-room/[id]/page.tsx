@@ -103,8 +103,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       stompClient.subscribe(`/sub/rooms/${roomId}/chat`, (message) => {
         const chatMessage = JSON.parse(message.body);
         console.log('Received chatting message:', chatMessage);
-        if (chatMessage.chatType === 'TEXT')
-          setMessage(chatMessage.userId, chatMessage.message);
+        setMessage(chatMessage.userId, chatMessage.message);
       });
     };
 

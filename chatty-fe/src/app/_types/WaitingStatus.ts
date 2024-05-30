@@ -6,13 +6,7 @@ export type UserStatus = {
   profileImage: string | null;
 };
 
-enum ChatType {
-  TEXT = 'TEXT',
-  Emoji = 'Emoji',
-}
-
 export type ChatMessage = {
-  chatType: ChatType;
   roomId: number;
   userId: number;
   message: string;
