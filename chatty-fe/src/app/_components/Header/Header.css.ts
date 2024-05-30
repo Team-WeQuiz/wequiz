@@ -82,7 +82,13 @@ export const musicPlayButton = style({
 export const ModalContainer = style({
   width: '60vw',
   maxWidth: 890,
-  height: '80vh',
+  height: '100%',
+  '@media': {
+    '(max-width: 768px)': {
+      width: '100%',
+      height: '100%',
+    },
+  },
 });
 
 export const LogoWrapper = style({});
@@ -112,6 +118,13 @@ export const ContentsBox = style({
   boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   color: '#fff',
   transition: 'background-color 0.3s',
+  '@media': {
+    '(max-width: 768px)': {
+      width: '100%',
+      height: 32,
+      minHeight: 32,
+    },
+  },
 });
 
 export const ContentsWrapper = recipe({
@@ -123,6 +136,11 @@ export const ContentsWrapper = recipe({
     justifyContent: 'center',
     gap: 24,
     margin: '12px 0',
+    '@media': {
+      '(max-width: 768px)': {
+        width: '100%',
+      },
+    },
   },
   variants: {
     visible: {
@@ -143,6 +161,11 @@ export const ImageWrapper = style({
   alignItems: 'center',
   width: '100%',
   height: 300,
+  '@media': {
+    '(max-width: 768px)': {
+      height: 150,
+    },
+  },
 });
 
 export const ContentsTextWrapper = style({
@@ -153,4 +176,25 @@ export const ContentsTextWrapper = style({
   padding: 30,
   gap: 12,
   wordBreak: 'keep-all',
+});
+
+export const BoldText = style({
+  fontSize: '1rem',
+  fontWeight: '700',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: '0.8rem',
+    },
+  },
+});
+
+export const ContentsText = style({
+  fontSize: '1rem',
+  fontWeight: '400',
+  color: globals.color.black_2,
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: '0.8rem',
+    },
+  },
 });
