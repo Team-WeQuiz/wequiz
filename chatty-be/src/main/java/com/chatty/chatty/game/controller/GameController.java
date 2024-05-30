@@ -53,7 +53,6 @@ public class GameController {
             EmojiRequest request
     ) {
         return EmojiResponse.builder()
-                .roomId(request.roomId())
                 .userId(getUserIdFromHeader(headerAccessor))
                 .emojiIndex(request.emojiIndex())
                 .build();
