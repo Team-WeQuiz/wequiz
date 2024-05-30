@@ -2,6 +2,8 @@ package com.chatty.chatty.quizroom.repository;
 
 import com.chatty.chatty.quizroom.entity.QuizRoom;
 import com.chatty.chatty.quizroom.entity.Status;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +24,6 @@ public interface QuizRoomRepository extends JpaRepository<QuizRoom, Long> {
     @Modifying
     @Query("UPDATE QuizRoom q SET q.status = :status WHERE q.id = :id")
     void updateStatusById(Long id, Status status);
+
+    List<QuizRoom> findByStatusAndCreatedAtBefore(Status status, LocalDateTime createdAt);
 }

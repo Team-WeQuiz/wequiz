@@ -94,7 +94,7 @@ export const buttonWrapper = style({
       position: 'absolute',
       right: 0,
       width: 80,
-      height: "100%",
+      height: '100%',
     },
   },
 });

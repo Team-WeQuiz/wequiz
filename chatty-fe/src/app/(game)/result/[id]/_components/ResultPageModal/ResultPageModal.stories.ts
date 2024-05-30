@@ -11,6 +11,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    isOpen: true,
     results: [
       {
         quizNumber: 1,
@@ -23,19 +24,20 @@ export const Default: Story = {
             nickname: 'test',
             playerAnswer: 'test',
             marking: true,
-            profileImage: null
+            profileImage: null,
           },
           {
             playerId: 2,
             nickname: 'test',
             playerAnswer: 'test',
             marking: false,
-            profileImage: null
+            profileImage: null,
           },
         ],
         correctRate: 45,
       },
     ],
     currentQuizNumber: 1,
+    closeModal: () => {},
   },
 };

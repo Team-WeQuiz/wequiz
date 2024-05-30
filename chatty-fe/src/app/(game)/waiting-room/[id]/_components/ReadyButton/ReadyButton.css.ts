@@ -13,7 +13,7 @@ export const readyContainer = style({
     '(max-width: 768px)': {
       padding: 4,
       flexDirection: 'column',
-      overflow: 'clip',
+      overflow: 'visible',
       height: '100%',
       gap: 5,
     },
@@ -22,6 +22,22 @@ export const readyContainer = style({
 
 export const readyButtonWrapper = style({
   width: '100%',
+});
+
+export const shareButtonWrapper = style({
+  position: 'relative',
+});
+
+const float = keyframes({
+  '0%': {
+    transform: 'translateY(0)',
+  },
+  '50%': {
+    transform: 'translateY(-10px)',
+  },
+  '100%': {
+    transform: 'translateY(0)',
+  },
 });
 
 export const readyStatus = style({
@@ -78,6 +94,46 @@ export const shareButton = style({
       height: 20,
     },
   },
+});
+
+export const toolTip = style({
+  position: 'absolute',
+  width: 120,
+  top: -50,
+  left: 'calc(50% - 60px)',
+  padding: 8,
+  borderRadius: 8,
+  backgroundColor: '#fff',
+  animation: `${float} 1s infinite`,
+  visibility: 'hidden',
+  opacity: 0,
+  transition: 'opacity 0.3s',
+  boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)',
+  zIndex: 3,
+  selectors: {
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: '100%',
+      left: '50%',
+      marginLeft: '-5px',
+      borderWidth: '5px',
+      borderStyle: 'solid',
+      borderColor: '#fff transparent transparent transparent',
+    },
+    [`${shareButtonWrapper}:hover &`]: {
+      visibility: 'visible',
+      opacity: 0.9,
+    },
+  },
+});
+
+export const toolTipText = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignContent: 'center',
+  textAlign: 'center',
+  fontSize: 12,
 });
 
 export const modalContent = style({

@@ -5,7 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record ChatResponse(
-        ChatType chatType,
 
         Long roomId,
 

@@ -23,9 +23,11 @@ const ReadyButton = ({
   toggleBlock: boolean;
   code: string;
 }) => {
-  const { userStatuses, allUsersReady } = useWaitingStore();
+  const { userStatuses } = useWaitingStore();
   const [isReady, setIsReady] = useState<boolean>(false);
   const { Modal, isOpen, openModal, closeModal } = useModal();
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   useEffect(() => {
     setIsReady(
@@ -40,6 +42,10 @@ const ReadyButton = ({
       destination: `/pub/rooms/${roomId}/ready`,
     });
   };
+
+  useEffect(() => {
+    if (!isOpen) setIsCopied(false);
+  }, [isOpen]);
 
   return (
     <>
@@ -59,15 +65,20 @@ const ReadyButton = ({
             </span>
           </GradButton>
         </div>
-        <GradButton rounded onClick={openModal}>
-          <Image
-            src="/images/share.svg"
-            alt="share"
-            width={28}
-            height={28}
-            className={styles.shareButton}
-          />
-        </GradButton>
+        <div className={styles.shareButtonWrapper}>
+          <GradButton rounded onClick={openModal}>
+            <Image
+              src="/images/share.svg"
+              alt="share"
+              width={28}
+              height={28}
+              className={styles.shareButton}
+            />
+          </GradButton>
+          <div className={`${styles.toolTip}`}>
+            <span className={styles.toolTipText}>코드를 공유해<br/>친구를 초대해보세요!</span>
+          </div>
+        </div>
       </div>
       <Modal isOpen={isOpen} onClose={closeModal}>
         <div className={styles.modalContent}>
@@ -89,10 +100,14 @@ const ReadyButton = ({
                 borderRadius={12}
                 endAdornment={
                   <button
-                    onClick={() => navigator.clipboard.writeText(code)}
+                    onClick={() => {
+                      setIsCopied(false);
+                      navigator.clipboard.writeText(code);
+                      setIsCopied(true);
+                    }}
                     className={styles.copyButton}
                   >
-                    복사하기
+                    복사하기 {isCopied ? '✅' : '\u00A0\u00A0\u00A0'}
                   </button>
                 }
               />

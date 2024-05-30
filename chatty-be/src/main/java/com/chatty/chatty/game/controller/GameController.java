@@ -3,6 +3,8 @@ package com.chatty.chatty.game.controller;
 import com.chatty.chatty.config.GlobalMessagingTemplate;
 import com.chatty.chatty.game.controller.dto.ChatRequest;
 import com.chatty.chatty.game.controller.dto.ChatResponse;
+import com.chatty.chatty.game.controller.dto.EmojiRequest;
+import com.chatty.chatty.game.controller.dto.EmojiResponse;
 import com.chatty.chatty.game.controller.dto.QuizResponse;
 import com.chatty.chatty.game.controller.dto.SubmitAnswerRequest;
 import com.chatty.chatty.game.service.GameService;
@@ -36,7 +38,6 @@ public class GameController {
             ChatRequest request
     ) {
         return ChatResponse.builder()
-                .chatType(request.chatType())
                 .roomId(request.roomId())
                 .userId(getUserIdFromHeader(headerAccessor))
                 .message(request.message())
@@ -44,10 +45,23 @@ public class GameController {
                 .build();
     }
 
+    @MessageMapping("/rooms/{roomId}/emoji")
+    @SendTo("/sub/rooms/{roomId}/emoji")
+    public EmojiResponse emoji(
+            @DestinationVariable Long roomId,
+            SimpMessageHeaderAccessor headerAccessor,
+            EmojiRequest request
+    ) {
+        return EmojiResponse.builder()
+                .userId(getUserIdFromHeader(headerAccessor))
+                .emojiIndex(request.emojiIndex())
+                .build();
+    }
+
     @MessageMapping("/rooms/{roomId}/join")
     @SendTo("/sub/rooms/{roomId}/status")
     public PlayersStatusDTO joinRoom(@DestinationVariable Long roomId, SimpMessageHeaderAccessor headerAccessor,
-                                     NicknameRequest request) {
+            NicknameRequest request) {
         headerAccessor.getSessionAttributes().put("roomId", roomId);
         PlayersStatusDTO response = gameService.joinRoom(roomId, getUserIdFromHeader(headerAccessor), request);
         quizRoomService.broadcastUpdatedRoomList();
@@ -75,7 +89,7 @@ public class GameController {
 
     @MessageMapping("/rooms/{roomId}/submit")
     public void submitAnswer(@DestinationVariable Long roomId, SubmitAnswerRequest request,
-                             SimpMessageHeaderAccessor headerAccessor) {
+            SimpMessageHeaderAccessor headerAccessor) {
         log.info("Submit request: {}", request);
         log.info("Submit userId: {}", getUserIdFromHeader(headerAccessor));
         gameService.addPlayerAnswer(roomId, request, getUserIdFromHeader(headerAccessor));

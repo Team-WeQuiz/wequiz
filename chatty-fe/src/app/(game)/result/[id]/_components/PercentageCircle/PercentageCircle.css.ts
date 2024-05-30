@@ -21,7 +21,7 @@ export const CircleFill = style({
 });
 
 export const Percentage = style({
-  zIndex: 1000,
+  zIndex: 10,
   fontSize: 20,
   textAlign: 'center',
 });
