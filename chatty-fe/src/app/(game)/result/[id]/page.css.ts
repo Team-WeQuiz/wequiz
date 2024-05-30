@@ -4,13 +4,13 @@ import { style } from '@vanilla-extract/css';
 export const Container = style({
   display: 'flex',
   width: '100%',
+  maxWidth: 1124,
   flexDirection: 'column',
-  alignItems: 'center',
+  gap: 36,
 });
 
 export const Wrapper = style({
   width: '100%',
-  maxWidth: 1124,
 });
 
 export const ContentsBox = style({
@@ -20,9 +20,7 @@ export const ContentsBox = style({
   gap: 60,
   borderRadius: 20,
   backgroundColor: globals.color.blue_7,
-  minHeight: '100vh',
-  padding: '40px 0',
-  overflow: 'visible',
+  padding: 24,
 });
 
 export const ContentsWrapper = style({
@@ -36,30 +34,103 @@ export const ContentsWrapper = style({
 export const ContentsCard = style({
   display: 'flex',
   padding: 24,
-  justifyContent: 'space-around',
   gap: 24,
   borderRadius: 20,
-  width: '80%',
+  width: '100%',
   backgroundColor: globals.color.blue_6,
+  '@media': {
+    '(max-width: 768px)': {
+      flexDirection: 'column',
+      gap: 16,
+    },
+  },
+});
+
+export const CardHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+export const MobileStatsArea = style({
+  display: 'none',
+  '@media': {
+    '(max-width: 768px)': {
+      display: 'flex',
+      width: 'calc(100% - 45px)',
+      alignItems: 'center',
+      marginTop: 5,
+      justifyContent: 'space-between',
+    },
+  },
+});
+
+export const MobileRateText = style({
+  fontSize: 18,
+});
+
+export const MobileModalButton = style({
+  display: 'flex',
+  marginTop: 3,
+  cursor: 'pointer',
+  fontSize: 12,
+  color: globals.color.blue_main,
+  ':active': {
+    transform: 'scale(0.99)',
+  },
+});
+
+export const StatsArea = style({
+  display: 'flex',
+  gap: 24,
+  '@media': {
+    '(max-width: 768px)': {
+      display: 'none',
+    },
+  },
 });
 
 export const Number = style({
-  width: 80,
+  width: 58,
   height: 58,
   fontFamily: 'var(--bagel-font)',
   fontSize: 40,
+  '@media': {
+    '(max-width: 768px)': {
+      width: 45,
+      height: 40,
+      fontSize: 28,
+    },
+  },
+});
+
+export const CardsWrapper = style({
+  width: 'calc(100% - 410px)',
+  display: 'flex',
+  gap: 24,
+  '@media': {
+    '(max-width: 992px)': {
+      flexDirection: 'column',
+    },
+    '(max-width: 768px)': {
+      width: '100%',
+    },
+  },
 });
 
 export const QuestionCard = style({
   display: 'flex',
-  width: '35%',
+  width: 'calc(50% - 12px)',
   height: '100%',
   padding: 16,
   gap: 10,
   backgroundColor: '#fff',
   borderRadius: 20,
   fontSize: 20,
-  wordBreak: 'keep-all',
+  '@media': {
+    '(max-width: 992px)': {
+      width: '100%',
+    },
+  },
 });
 
 export const QuestionMark = style({
@@ -98,7 +169,7 @@ export const ModalButton = style({
   display: 'flex',
   flexDirection: 'column',
   width: 80,
-  height: '100%',
+  height: 200,
   padding: '57px 10px',
   justifyContent: 'center',
   alignItems: 'center',
@@ -111,4 +182,11 @@ export const ModalButton = style({
   ':active': {
     transform: 'scale(0.99)',
   },
+});
+
+export const SpanText = style({
+  width: 'calc(100% - 25px)',
+  wordWrap: 'break-word',
+  overflowWrap: 'break-word',
+  marginTop: 5,
 });
