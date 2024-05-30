@@ -165,13 +165,15 @@ export default function Header() {
                 />
               </div>
               <div className={styles.ContentsTextWrapper}>
-                <p>
-                  <span style={{ fontWeight: 700 }}>방 제목</span>,{' '}
-                  <span style={{ fontWeight: 700 }}>설명</span>,{' '}
-                  <span style={{ fontWeight: 700 }}>인원 수</span>,{' '}
-                  <span style={{ fontWeight: 700 }}>문제 수</span>를 설정하세요.
+                <p className={styles.ContentsText}>
+                  <span className={styles.BoldText}>방 제목</span>,{' '}
+                  <span className={styles.BoldText}>설명</span>,{' '}
+                  <span className={styles.BoldText}>인원 수</span>,{' '}
+                  <span className={styles.BoldText}>문제 수</span>를 설정하세요.
                 </p>
-                <p>닉네임을 입력하면, 퀴즈 방이 생성됩니다!</p>
+                <p className={styles.ContentsText}>
+                  닉네임을 입력하면, 퀴즈 방이 생성됩니다!
+                </p>
               </div>
             </div>
             <div className={styles.ContentsBox} onClick={handlePlayVisibility}>
@@ -192,14 +194,14 @@ export default function Header() {
                 />
               </div>
               <div className={styles.ContentsTextWrapper}>
-                <p>
-                  <span style={{ fontWeight: 700 }}>엔터 키</span> 로도 답을
+                <p className={styles.ContentsText}>
+                  <span className={styles.BoldText}>엔터 키</span> 로도 답을
                   제출할 수 있습니다.
                 </p>
 
-                <p>
-                  <span style={{ fontWeight: 700 }}>과반수</span> 이상이 답을
-                  입력하면 <span style={{ fontWeight: 700 }}>3초</span> 뒤에
+                <p className={styles.ContentsText}>
+                  <span className={styles.BoldText}>과반수</span> 이상이 답을
+                  입력하면 <span className={styles.BoldText}>3초</span> 뒤에
                   자동으로 다음 문제로 넘어갑니다!
                 </p>
               </div>
@@ -225,8 +227,8 @@ export default function Header() {
                 />
               </div>
               <div className={styles.ContentsTextWrapper}>
-                <p>
-                  <span style={{ fontWeight: 700 }}>마이페이지</span> 에서 내가
+                <p className={styles.ContentsText}>
+                  <span className={styles.BoldText}>마이페이지</span> 에서 내가
                   풀었던 퀴즈의 결과를 언제든지 확인할 수 있습니다.
                 </p>
               </div>
