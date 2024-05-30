@@ -25,8 +25,9 @@ export default function QuestionProgess({
                 key={index}
                 src="/images/progress_round_blue.svg"
                 alt="progress_round_grey"
-                width={52}
-                height={52}
+                width={50}
+                height={50}
+                className={styles.MobileRound}
               />
               <span className={styles.TextBlue}>{index + 1}</span>
             </>
@@ -36,8 +37,9 @@ export default function QuestionProgess({
                 key={index}
                 src="/images/progress_round_grey.svg"
                 alt="progress_round_grey"
-                width={52}
-                height={52}
+                width={50}
+                height={50}
+                className={styles.MobileRound}
               />
               <span className={styles.TextGrey}>{index + 1}</span>
             </>

@@ -327,7 +327,7 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
             ) : (
               ''
             )}
-            <div>
+            <div className={styles.StatusText}>
               {count !== null
                 ? '과반수 이상이 제출하였습니다.'
                 : isAnswered
@@ -348,7 +348,13 @@ const QuizRoom = ({ params }: { params: { id: number } }) => {
           </div>
         </div>
       </div>
-      <UserGrid submitStatus={submitStatuses?.submitStatuses || []} />
+      <div className={styles.StatusContainer}>
+        <UserGrid
+          submitStatus={
+            submitStatuses?.submitStatuses || []
+          }
+        />
+      </div>
       {isOpen ? (
         <ResultModal
           currentRound={quizSet?.currentRound || 0}

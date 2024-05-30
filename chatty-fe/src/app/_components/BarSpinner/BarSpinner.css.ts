@@ -14,10 +14,14 @@ export const Container = style({
   border: `1.5px solid #ffb526`,
   height: 40,
   width: 40,
-
   position: 'relative',
-  // 분침
+  '@media': {
+    '(max-width: 768px)': {
+      transform: 'scale(0.6)',
+    },
+  },
 
+  // 분침
   '::after': {
     content: '""',
     position: 'absolute',

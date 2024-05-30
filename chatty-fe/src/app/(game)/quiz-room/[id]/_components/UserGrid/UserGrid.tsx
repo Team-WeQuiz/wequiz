@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as styles from './UserGrid.css';
 import Image from 'next/image';
 import useUserInfoStore from '@/app/_store/useUserInfoStore';
@@ -16,6 +16,21 @@ type UserGridProps = {
 
 export default function UserGrid({ submitStatus }: UserGridProps) {
   const { id: userId } = useUserInfoStore();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number>(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        setContainerWidth(containerWidth);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     console.log('submitStatus:', submitStatus);
@@ -25,7 +40,7 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
   }, [submitStatus, userId]);
 
   return (
-    <div className={styles.UserContainer}>
+    <div className={styles.UserContainer} ref={containerRef}>
       <div className={styles.MyContainer}>
         <div
           className={
@@ -33,6 +48,7 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
               ? styles.SolvedMyImage
               : styles.MyImage
           }
+          style={{ width: containerWidth - 80, height: containerWidth - 80 }}
         >
           <Image
             src={
@@ -40,13 +56,14 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
                 ?.profileImage || '/images/Empty_profile.svg'
             }
             alt="profile"
-            width={180}
-            height={180}
+            width={80}
+            height={80}
+            style={{ width: '100%', height: '100%' }}
           />
         </div>
 
-        <div className={styles.MyNickname}>
-          <span>
+        <div>
+          <span className={styles.MyNickname}>
             {submitStatus.find((status) => status.userId === userId)?.nickname}
           </span>
         </div>
@@ -76,15 +93,20 @@ export default function UserGrid({ submitStatus }: UserGridProps) {
                 className={
                   status.isSolved ? styles.SolvedUserImage : styles.UserImage
                 }
+                style={{
+                  width: (containerWidth - 75) / 3,
+                  height: (containerWidth - 75) / 3,
+                }}
               >
                 <Image
                   src={status.profileImage || '/images/Empty_profile.svg'}
                   alt="profile"
-                  width={120}
-                  height={120}
+                  width={10}
+                  height={10}
+                  style={{ width: '100%', height: '100%' }}
                 />
               </div>
-              <div>{status.nickname}</div>
+              <div className={styles.UserNickname}>{status.nickname}</div>
             </div>
           ) : null,
         )}

@@ -9,6 +9,11 @@ export const Container = style({
   borderRadius: 20,
   backgroundColor: globals.color.blue_6,
   width: '100%',
+  '@media': {
+    '(max-width: 768px)': {
+      gap: 8,
+    },
+  },
 });
 
 export const TextBox = style({
@@ -20,9 +25,19 @@ export const TextBox = style({
   borderRadius: 8,
   background: '#fff',
   lineHeight: 1.5,
+  '@media': {
+    '(max-width: 768px)': {
+      padding: 12,
+    },
+  },
 });
 
 export const Question = style({
   fontSize: 40,
   fontFamily: 'var(--bagel-font)',
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 20,
+    },
+  },
 });
