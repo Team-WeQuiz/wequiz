@@ -29,7 +29,8 @@ const NicknameModal = ({
       alert('닉네임을 입력해주세요.');
       return;
     }
-    router.push(`/waiting-room/${roomId}?nickname=${nickname}`);
+    const encodedNickname = encodeURIComponent(nickname);
+    router.push(`/waiting-room/${roomId}?nickname=${encodedNickname}`);
     closeModal();
   };
 

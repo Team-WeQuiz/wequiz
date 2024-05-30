@@ -11,7 +11,7 @@ import useAuthStore from '@/app/_store/useAuthStore';
 import useWaitingStore from '@/app/_store/useWaitingStore';
 import ReadyButton from './_components/ReadyButton/ReadyButton';
 import QuizSummaryCard from './_components/QuizSummaryCard/QuizSummaryCard';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { UserStatus } from '@/app/_types/WaitingStatus';
 import { startQuiz } from '@/app/_api/quiz';
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,20 @@ import { useRouter } from 'next/navigation';
 const WaitingRoom = ({ params }: { params: { id: number } }) => {
   const { id: userId } = useUserInfoStore();
   const searchParams = useSearchParams();
-  const nickname = searchParams.get('nickname');
+  //닉네임
+  const [nickname, setNickname] = useState<string>('');
+
+  useEffect(() => {
+    const nicknameFromUrl = decodeURIComponent(
+      searchParams.get('nickname') || '',
+    );
+    if (nicknameFromUrl === '' || nicknameFromUrl.length > 10) {
+      alert('올바르지 않은 닉네임 형식입니다');
+      router.push('/main-lobby');
+      return;
+    }
+    setNickname(decodeURIComponent(searchParams.get('nickname') || ''));
+  }, [searchParams]);
 
   const [isConnected, setIsConnected] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -47,7 +60,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
   useEffect(() => {
     setCountdown(3);
     let timer: NodeJS.Timeout | null = null;
-    if (isQuizReady && allUsersReady) {
+    if (quizSummary && isQuizReady && allUsersReady) {
       timer = setInterval(() => {
         setCountdown((prevCount) => {
           const nextCount = prevCount - 1;
@@ -74,7 +87,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [isQuizReady, allUsersReady]);
+  }, [isQuizReady, allUsersReady, quizSummary]);
 
   useEffect(() => {
     const subscribeToStatus = (roomId: number) => {
@@ -105,7 +118,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         (message) => {
           const data = JSON.parse(message.body);
           console.log('Received description message:', data);
-          setQuizSummary(data.description);
+          if (quizSummary === '') setQuizSummary(data.description);
         },
       );
     };
@@ -140,6 +153,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
 
     stompClient.onDisconnect = () => {
       console.log('Disconnected from WebSocket');
+      setIsConnected(false);
     };
 
     stompClient.onConnect = () => {
@@ -154,7 +168,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       joinRoom(params.id);
     };
 
-    if (accessToken && userId) stompClient.activate();
+    if (accessToken && userId && nickname !== '') stompClient.activate();
 
     return () => {
       stompClient.deactivate();
@@ -166,7 +180,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
       <div className={styles.roomContainer}>
         <div className={styles.wideArea}>
           <div className={styles.userList}>
-            <UserList isQuizReady={isQuizReady} />
+            <UserList isQuizReady={quizSummary !== '' && isQuizReady} />
           </div>
           <div className={styles.chattingArea}>
             <ChatInput
@@ -182,6 +196,8 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
               roomId={params.id}
               isSubscribed={isSubscribed}
               setRoomCode={setRoomCode}
+              isSolo={userStatuses.length < 2}
+              isConnected={isConnected}
             />
             <QuizSummaryCard summary={quizSummary} />
           </div>
@@ -197,7 +213,7 @@ const WaitingRoom = ({ params }: { params: { id: number } }) => {
         </div>
         {isReady && (
           <div className={styles.readyStatus}>
-            {isQuizReady && allUsersReady ? (
+            {quizSummary && isQuizReady && allUsersReady ? (
               <span className={styles.readyStatusText}>
                 {countdown > 0 ? countdown : '퀴즈 시작 !'}
               </span>

@@ -36,6 +36,7 @@ const ChatInput = ({
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    
     e.preventDefault();
 
     if (!message) return;

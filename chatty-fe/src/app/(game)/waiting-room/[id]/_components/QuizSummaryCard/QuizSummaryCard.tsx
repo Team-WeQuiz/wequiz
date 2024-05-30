@@ -10,7 +10,7 @@ const QuizSummaryCard = ({ summary }: { summary: string }) => {
     const interval = setInterval(() => {
       setText((prevText) => {
         let newText = '';
-        newText = prevText + summary[i];
+        newText = prevText + summary.charAt(i);
         i++;
         return newText;
       });
