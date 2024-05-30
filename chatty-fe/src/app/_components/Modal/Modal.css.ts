@@ -15,6 +15,7 @@ export const modalContainer = style({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  maxHeight: '90%',
   minWidth: 300,
   backgroundColor: '#fff',
   borderRadius: 16,
@@ -55,4 +56,16 @@ export const closeButton = style({
 
 export const closeIconButton = style({
   cursor: 'pointer',
+});
+
+export const modalContent = style({
+  height: 'calc(100% - 24px)',
+  marginTop: 24,
+  display: 'flex',
+  flexDirection: 'column',
+  overflowY: 'scroll',
+  '::-webkit-scrollbar': {
+    display: 'none',
+  },
+  scrollbarWidth: 'none',
 });

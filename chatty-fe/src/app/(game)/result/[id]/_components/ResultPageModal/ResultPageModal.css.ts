@@ -1,50 +1,40 @@
 import { globals } from '@/app/globals.css';
 import { style } from '@vanilla-extract/css';
 
-export const ModalBackground = style({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'rgba(0, 0, 0, 0.1)',
-  zIndex: 1000,
-});
-
-export const Modal = style({
-  display: 'flex',
-  width: '80%',
-  maxWidth: 1480,
-  height: '80%',
-  borderRadius: 16,
-  background: '#FFF',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
 export const Container = style({
   display: 'flex',
   flexDirection: 'column',
-  width: '95%',
-  height: '90%',
+  width: '100%',
+  minWidth: 600,
+  maxWidth: 1000,
   background: globals.color.blue_6,
   borderRadius: 16,
-  padding: 30,
-  overflowY: 'scroll',
+  '@media': {
+    '(max-width: 768px)': {
+      minWidth: 300,
+    },
+  },
 });
 
 export const Title = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 16,
+  display: 'flex',
   width: '100%',
+  alignItems: 'baseline',
+  gap: 16,
+  padding: 16,
+});
+
+export const TitleText = style({
+  fontSize: 24,
+  fontWeight: 600,
+  '@media': {
+    '(max-width: 768px)': {
+      fontSize: 18,
+    },
+  },
 });
 
 export const Number = style({
-  fontSize: 36,
   fontFamily: 'var(--bagel-font)',
 });
 
@@ -56,6 +46,10 @@ export const Wrapper = style({
   padding: 16,
   width: '100%',
   height: '100%',
+});
+
+export const comparingCard = style({
+  border: `1px solid ${globals.color.blue_main}`,
 });
 
 export const Card = style({
@@ -72,10 +66,9 @@ export const AnswerContainer = style({
   display: 'flex',
   padding: 16,
   flexDirection: 'column',
-  justifyContent: 'space-between',
-  flex: '1 0 0',
   background: '#fff',
   borderRadius: 16,
+  gap: 8,
 });
 
 export const AnswerWrapper = style({
@@ -91,9 +84,23 @@ export const MyAnswerWrapper = style({
   gap: 8,
 });
 
+export const divider = style({
+  width: '100%',
+  borderTop: `1px dashed ${globals.color.blue_main}`,
+});
+
 export const Description = style({
   color: globals.color.black_3,
   fontSize: 14,
+  paddingLeft: 8,
+});
+
+export const myAnswerCardCorrect = style({
+  border: '1px solid #D4E7D1',
+});
+
+export const myAnswerCardWrong = style({
+  border: '1px solid #E1CDCD',
 });
 
 export const UserWrapper = style({
@@ -114,6 +121,7 @@ export const WrongAnswerCard = style([
   Card,
   {
     backgroundColor: '#fff8fb',
+    flexWrap: 'wrap',
   },
 ]);
 
@@ -127,6 +135,7 @@ export const CorrectAnswerCard = style([
   Card,
   {
     backgroundColor: '#fafff9',
+    flexWrap: 'wrap',
   },
 ]);
 
@@ -153,4 +162,15 @@ export const ImageWrapper = style({
   borderRadius: 100,
   background: '#fff',
   overflow: 'hidden',
+});
+
+export const nickname = style({
+  color: globals.color.black_3,
+});
+
+export const answer = style({
+  width: '100%',
+  wordWrap: 'break-word',
+  overflowWrap: 'break-word',
+
 });
