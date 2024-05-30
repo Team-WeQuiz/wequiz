@@ -85,9 +85,7 @@ export const ModalContainer = style({
   height: '80vh',
 });
 
-export const LogoWrapper = style({
-  marginBottom: 20,
-});
+export const LogoWrapper = style({});
 
 export const BoxWrapper = style({
   backgroundColor: globals.color.blue_6,
@@ -95,10 +93,10 @@ export const BoxWrapper = style({
   display: 'flex',
   height: '100%',
   flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
   gap: 12,
   padding: 30,
+  overflow: 'auto',
 });
 
 export const ContentsBox = style({
@@ -124,6 +122,7 @@ export const ContentsWrapper = recipe({
     flexDirection: 'column',
     justifyContent: 'center',
     gap: 24,
+    margin: '12px 0',
   },
   variants: {
     visible: {
@@ -153,4 +152,5 @@ export const ContentsTextWrapper = style({
   borderRadius: 12,
   padding: 30,
   gap: 12,
+  wordBreak: 'keep-all',
 });
