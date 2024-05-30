@@ -21,10 +21,14 @@ const QuizInfoCard = ({
   roomId,
   isSubscribed,
   setRoomCode,
+  isSolo,
+  isConnected,
 }: {
   roomId: number;
   isSubscribed: boolean;
   setRoomCode: (code: string) => void;
+  isSolo: boolean;
+  isConnected: boolean;
 }) => {
   const [data, setData] = useState<QuizInfo>(initialData);
   const { accessToken } = useAuthStore();
@@ -33,6 +37,7 @@ const QuizInfoCard = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("소켓 연결~~~~");
       try {
         const response: QuizInfo = await getQuizInfo(roomId, accessToken);
         setData(response);
@@ -51,14 +56,15 @@ const QuizInfoCard = ({
           isFull: false,
           code: '',
         });
-        alert(error.message);
+        if (isSolo) alert('오랫동안 접속하지 않아 방이 삭제되었습니다.');
+        else alert('존재하지 않는 방입니다. 로비로 이동합니다.');
         router.push('/main-lobby');
       }
     };
-    if (accessToken && isSubscribed) {
+    if (isConnected && accessToken && isSubscribed) {
       fetchData();
     }
-  }, [isSubscribed, accessToken]);
+  }, [isConnected, isSubscribed, accessToken]);
 
   return (
     <div className={styles.infoCard}>

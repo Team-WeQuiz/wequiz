@@ -46,8 +46,10 @@ const Modal = ({
   useEffect(() => {
     if (modalRoot) {
       if (isOpen) {
+        console.log('open!!');
         modalRoot.classList.add('visible');
       } else {
+        console.log('close!!');
         modalRoot.classList.remove('visible');
       }
     }
@@ -87,7 +89,7 @@ const Modal = ({
               )}
             </div>
           )}
-          {children}
+          <div className={styles.modalContent}>{children}</div>
         </div>
       </div>
     ) : null,

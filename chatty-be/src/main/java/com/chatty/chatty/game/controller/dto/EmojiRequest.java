@@ -1,9 +1,8 @@
 package com.chatty.chatty.game.controller.dto;
 
-public record ChatRequest(
+public record EmojiRequest(
         Long roomId,
-
-        String message
+        Integer emojiIndex
 ) {
 
 }

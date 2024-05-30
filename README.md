@@ -3,10 +3,12 @@
 <a href='https://github.com/Team-WeQuiz/wequiz'><img src="https://github.com/Team-WeQuiz/wequiz/assets/66217855/6e9d764d-6be1-4c71-aa00-51aaee0dfa3e"></a>
 
 <h3>
- 🎲 Shall we quiz?... <a href="https://wequiz.kr/">Click here!</a>
+ 🎲 Shall we quiz?... <a href="https://wequiz.kr/" target='_blank'>Click here!</a>
 </h3>
 
-<a href="https://forms.gle/18tuJnwU67CensYy7">📝 Send Feedback</a>
+<a href="https://team-wequiz.github.io/wequiz" target='_blank'> 🌈 Introduction Page</a>
+
+<a href="https://forms.gle/18tuJnwU67CensYy7" target='_blank'>📝 Send Feedback</a>
 
 </div>
 </br>
@@ -122,11 +124,11 @@ AI가 생성한 퀴즈를 친구들과 함께 푸는 서비스
     </thead>
     <tbody>
          <tr>
-           <td align='center'><a href="https://github.com/noooey"><img src="https://avatars.githubusercontent.com/u/66217855?v=4" width="100" height="100"></td>
-           <td align='center'><a href="https://github.com/cherry031"><img src="https://avatars.githubusercontent.com/u/66215132?v=4" width="100" height="100"></td>
-           <td align='center'><a href="https://github.com/koomchang"><img src="https://avatars.githubusercontent.com/u/90228925?v=4" width="100" height="100"></td>
-           <td align='center'><a href="https://github.com/KRimwoo"><img src="https://avatars.githubusercontent.com/u/66295173?v=4" width="100" height="100"></td>
-           <td align='center'><a href="https://github.com/ryanbae94"><img src="https://avatars.githubusercontent.com/u/122738447?v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/noooey" target='_blank'><img src="https://avatars.githubusercontent.com/u/66217855?v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/cherry031" target='_blank'><img src="https://avatars.githubusercontent.com/u/66215132?v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/koomchang" target='_blank'><img src="https://avatars.githubusercontent.com/u/90228925?v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/KRimwoo" target='_blank'><img src="https://avatars.githubusercontent.com/u/66295173?v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/ryanbae94" target='_blank'><img src="https://avatars.githubusercontent.com/u/122738447?v=4" width="100" height="100"></td>
          </tr>
          <tr>
            <td align='center'>박규연(팀장)</td>
