@@ -14,7 +14,7 @@
             <td align='center'>퀴즈, 문서 요약 생성 과정</td>
           </tr>
           <tr>
-            <td align='center'><img src="assets/ml_architecture.svg"></td>
+            <td align='center'><img src="assets/ml_architecture.png"></td>
           </tr>
     </tbody>
 </table>
